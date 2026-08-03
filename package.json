@@ -1,0 +1,26 @@
+{
+  "name": "orientation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anubhavkr8000-source/orientation.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/anubhavkr8000-source/orientation/issues"
+  },
+  "homepage": "https://github.com/anubhavkr8000-source/orientation#readme",
+  "dependencies": {
+    "anime": "^0.1.2",
+    "gsap": "^3.15.0",
+    "three": "^0.185.1"
+  }
+}

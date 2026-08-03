@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UPSIFS 2026 — B.TECH - M.TECH CYBER SECURITY PORTAL</title>
+  <meta name="description" content="UPSIFS Retro 8-Bit Arcade Portal — B.Tech-M.Tech Integrated Cyber Security Freshers Class of 2026.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- GSAP & Three.js Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <!-- Mario Platformer Game Engine -->
+  <script src="game.js" defer></script>
+</head>
+<body>
+
+  <!-- ═══════════════ 8-BIT HEADER BAR ═══════════════ -->
+  <header class="arcade-header">
+    <div class="header-left">
+      <input type="checkbox" id="sidebar-toggle" class="sidebar-toggle-input">
+      <label for="sidebar-toggle" class="sidebar-backdrop" aria-label="Close Menu"></label>
+      <label for="sidebar-toggle" class="sidebar-handle" aria-label="Toggle Menu">≡ MENU</label>
+      <div class="logo-text">UPSIFS 2026</div>
+    </div>
+    <nav class="header-nav">
+      <button class="nav-btn active" data-tab="home" onclick="switchTab('home')">HOME</button>
+      <button class="nav-btn" data-tab="about" onclick="switchTab('about')">ABOUT</button>
+      <button class="nav-btn" data-tab="resources" onclick="switchTab('resources')">RESOURCES</button>
+      <button class="nav-btn" data-tab="seniors" onclick="switchTab('seniors')">SENIORS</button>
+      <button class="nav-btn" data-tab="gallery" onclick="switchTab('gallery')">GALLERY</button>
+    </nav>
+    <a href="https://www.reddit.com/r/upsifs/" target="_blank" rel="noopener noreferrer" class="btn-buy-pass">
+      JOIN R/UPSIFS
+    </a>
+  </header>
+
+  <!-- ═══════════════ SIDEBAR MENU ═══════════════ -->
+  <aside class="sidebar" id="main-sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-brand">PAUSE MENU</span>
+      <span class="sidebar-version">B.TECH-M.TECH CYBER SEC 2026</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">
+        <span class="sidebar-section-title">// NAVIGATION</span>
+        <ul>
+          <li><a href="#" class="active" onclick="switchTab('home'); closeSidebar();">▶ HOME</a></li>
+          <li><a href="#about" onclick="switchTab('about'); closeSidebar();">▶ ABOUT UPSIFS</a></li>
+          <li><a href="#resources" onclick="switchTab('resources'); closeSidebar();">▶ ACADEMIC RESOURCES</a></li>
+          <li><a href="#gallery" onclick="switchTab('gallery'); switchGalleryView('college'); closeSidebar();">▶ 🏛️ CAMPUS GALLERY</a></li>
+          <li><a href="#seniors" onclick="switchTab('seniors'); closeSidebar();">▶ 🧑‍💻 CONNECT SENIORS</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+      <!-- ═══ Connect with Batchmates ═══ -->
+      <div class="sidebar-section">
+        <span class="sidebar-section-title">// BATCHMATE COMMUNITY</span>
+        <ul>
+          <li>
+            <a href="https://www.reddit.com/r/upsifs/" target="_blank" rel="noopener noreferrer" class="social-link">
+              <span class="social-icon">👾</span>
+              r/upsifs — REDDIT ↗
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+      <!-- ═══ Seniors Connect Tab ═══ -->
+      <div class="sidebar-section">
+        <span class="sidebar-section-title">// SENIOR NETWORK</span>
+        <ul>
+          <li>
+            <a href="#seniors" onclick="closeSidebar(); switchTab('seniors');">
+              <span class="social-icon">🧑‍💻</span>
+              CONNECT WITH SENIORS
+            </a>
+          </li>
+          <li>
+            <a href="https://forms.gle/WurEYQVuinQKqtBP9" target="_blank" rel="noopener noreferrer">
+              <span class="social-icon">📝</span>
+              JUNIOR DETAILS FORM
+            </a>
+          </li>
+          <li>
+            <button class="add-photo-btn" onclick="closeSidebar(); openUploadModal();">
+              <span class="social-icon">➕</span>
+              ADD STUDENT PHOTO
+            </button>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="blink">●</span> B.TECH-M.TECH CYBER SEC // UPSIFS 2026
+    </div>
+  </aside>
+
+  <!-- ═══════════════ MAIN ARCADE STAGE ═══════════════ -->
+  <main class="arcade-stage">
+    
+    <!-- ═══ TAB 1: HOME (FRESHERS WELCOME) ═══ -->
+    <div class="tab-content active" id="tab-home">
+      <h1 class="stage-title">WELCOME FRESHERS</h1>
+      <p class="stage-subtitle">CLASS OF 2026 · PLAYER 1 READY?</p>
+
+      <div class="pixel-starburst">✳ ✳ ✳</div>
+
+      <div class="lineup-grid">
+        <div class="lineup-tier tier-2">
+          <p class="welcome-sub">
+            Grab notes, slides, labs, campus photos, and batchmate links from one tiny arcade hub.
+          </p>
+        </div>
+
+        <div class="pixel-starburst">✳ ✳ ✳</div>
+
+        <div class="lineup-tier tier-3">
+          <div class="quick-action-row">
+            <button class="arcade-card-btn" onclick="switchTab('resources')">
+              📚 ACADEMIC RESOURCES
+            </button>
+            <button class="arcade-card-btn" onclick="switchTab('gallery'); switchGalleryView('college');">
+              🏛️ COLLEGE GALLERY
+            </button>
+            <a href="https://www.reddit.com/r/upsifs/" target="_blank" rel="noopener noreferrer" class="arcade-card-btn highlight">
+              👾 JOIN r/upsifs REDDIT
+            </a>
+            <button class="arcade-card-btn" onclick="switchTab('seniors')">
+              🧑‍💻 CONNECT WITH SENIORS
+            </button>
+            <a href="https://forms.gle/WurEYQVuinQKqtBP9" target="_blank" rel="noopener noreferrer" class="arcade-card-btn feedback-link">
+              📝 JUNIOR DETAILS FORM
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB 2: ABOUT ═══ -->
+    <div class="tab-content" id="tab-about">
+      <div class="tab-top-bar">
+        <button class="btn-back-home" onclick="switchTab('home')">
+          ◄ BACK TO HOME
+        </button>
+      </div>
+
+      <h1 class="stage-title">ABOUT UPSIFS</h1>
+      <p class="stage-subtitle">UTTAR PRADESH STATE INSTITUTE OF FORENSIC SCIENCES</p>
+
+      <div class="pixel-starburst">✳ ✳ ✳</div>
+
+      <div class="about-card-box">
+        <p class="about-text">
+          UPSIFS (Uttar Pradesh State Institute of Forensic Sciences) is a premier state institute dedicated to advanced Cyber Security, Digital Evidence Investigation, and Forensic Science Engineering.
+        </p>
+        <div class="about-stats-list">
+          <div class="stat-row"><span class="s-key">LOCATION:</span> <span class="s-val">Lucknow, Uttar Pradesh</span></div>
+          <div class="stat-row"><span class="s-key">PROGRAM:</span> <span class="s-val green-text">Integrated B.Tech - M.Tech Cyber Security</span></div>
+          <div class="stat-row"><span class="s-key">COMMUNITY:</span> <span class="s-val"><a href="https://www.reddit.com/r/upsifs/" target="_blank" class="pixel-link">r/upsifs Subreddit ↗</a></span></div>
+          <div class="stat-row"><span class="s-key">STATUS:</span> <span class="s-val green-text">Semesters 1–10 Active & Ready</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB 3: ACADEMIC RESOURCES (MULTI-SEMESTER SEM 1 TO SEM 10) ═══ -->
+    <div class="tab-content" id="tab-resources">
+      <div class="tab-top-bar">
+        <button class="btn-back-home" onclick="switchTab('home')">
+          ◄ BACK TO HOME
+        </button>
+      </div>
+
+      <h1 class="stage-title" id="resources-title">ACADEMIC RESOURCES</h1>
+      <p class="stage-subtitle" id="resources-subtitle">B.Tech - M.Tech Integrated Cyber Security</p>
+
+      <div class="pixel-starburst">✳ ✳ ✳</div>
+
+      <!-- TIER 1: SYLLABUS -->
+      <div class="resource-block">
+        <h2 class="res-block-title">[STAGE 1] SYLLABUS & CURRICULUM</h2>
+        <div class="res-grid">
+          <a href="#" class="res-pixel-card" onclick="alert('Downloading B.Sc/M.Sc Cyber Security Sem 1 Official Syllabus PDF...'); return false;">
+            <span class="card-icon">📄</span>
+            <div class="card-text">
+              <span class="c-title">Sem 1 Official Syllabus</span>
+              <span class="c-sub">Credit distribution, course structure & exam scheme</span>
+            </div>
+            <span class="c-btn">[DOWNLOAD]</span>
+          </a>
+          <a href="#" class="res-pixel-card" onclick="alert('Downloading Academic Calendar PDF...'); return false;">
+            <span class="card-icon">📅</span>
+            <div class="card-text">
+              <span class="c-title">Academic Calendar 2026-2027</span>
+              <span class="c-sub">Important dates, midterm & final exam schedule</span>
+            </div>
+            <span class="c-btn">[DOWNLOAD]</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="pixel-starburst">✳ ✳ ✳</div>
+
+      <!-- TIER 2: SUBJECT NOTES -->
+      <div class="resource-block">
+        <h2 class="res-block-title">[STAGE 2] SUBJECT NOTES & LAB MANUALS</h2>
+        <div class="res-grid">
+          <a href="#" class="res-pixel-card" onclick="alert('Opening Cyber Security & Computer Fundamentals Drive...'); return false;">
+            <span class="card-icon">💻</span>
+            <div class="card-text">
+              <span class="c-title">Cyber Security Fundamentals</span>
+              <span class="c-sub">Lecture slides, unit notes & practice question sets</span>
+            </div>
+            <span class="c-btn">[ACCESS]</span>
+          </a>
+          <a href="#" class="res-pixel-card" onclick="alert('Opening C / Python Lab Manual...'); return false;">
+            <span class="card-icon">🔬</span>
+            <div class="card-text">
+              <span class="c-title">C & Python Programming Lab Manual</span>
+              <span class="c-sub">Practical code programs, lab viva questions & solutions</span>
+            </div>
+            <span class="c-btn">[ACCESS]</span>
+          </a>
+          <a href="#" class="res-pixel-card" onclick="alert('Opening Forensic Science Intro Notes...'); return false;">
+            <span class="card-icon">🔍</span>
+            <div class="card-text">
+              <span class="c-title">Intro to Forensic Science</span>
+              <span class="c-sub">Evidence preservation, crime scene investigation notes</span>
+            </div>
+            <span class="c-btn">[ACCESS]</span>
+          </a>
+          <a href="#" class="res-pixel-card" onclick="alert('Opening Applied Mathematics Drive...'); return false;">
+            <span class="card-icon">📐</span>
+            <div class="card-text">
+              <span class="c-title">Applied Mathematics I</span>
+              <span class="c-sub">Formula sheets, practice problems & solved PYQs</span>
+            </div>
+            <span class="c-btn">[ACCESS]</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="pixel-starburst">✳ ✳ ✳</div>
+
+      <!-- TIER 3: REDDIT LINK -->
+      <div class="resource-block">
+        <h2 class="res-block-title">[STAGE 3] BATCHMATE COMMUNITY</h2>
+        <div class="res-grid">
+          <a href="https://www.reddit.com/r/upsifs/" target="_blank" rel="noopener noreferrer" class="res-pixel-card reddit-card">
+            <span class="card-icon">👾</span>
+            <div class="card-text">
+              <span class="c-title">r/upsifs Subreddit</span>
+              <span class="c-sub">Ask seniors, find roommates & connect with batchmates</span>
+            </div>
+            <span class="c-btn">[JOIN REDDIT ↗]</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB 4: CONNECT WITH SENIORS ═══ -->
+    <div class="tab-content" id="tab-seniors">
+      <div class="tab-top-bar">
+        <button class="btn-back-home" onclick="switchTab('home')">
+          ◄ BACK TO HOME
+        </button>
+      </div>
+
+      <h1 class="stage-title">CONNECT SENIORS</h1>
+      <p class="stage-subtitle">ASK · LEARN · LEVEL UP</p>
+
+      <div class="pixel-starburst">✳ ✳ ✳</div>
+
+      <section class="senior-board-hero" aria-label="Senior connect mission board">
+        <div class="board-copy">
+          <span class="board-kicker">MISSION BOARD</span>
+          <h2>Find the right senior before you ping.</h2>
+          <p>Search by name, city, skill, internship, sports, coding, cybersecurity, or academics. Keep it friendly, specific, and respectful.</p>
+        </div>
+        <a href="https://forms.gle/WurEYQVuinQKqtBP9" target="_blank" rel="noopener noreferrer" class="feedback-card">
+          <span class="feedback-card-title">JUNIOR DETAILS FORM</span>
+          <span class="feedback-card-copy">Submit junior details and game inputs here.</span>
+          <span class="feedback-card-btn">OPEN FORM ↗</span>
+        </a>
+      </section>
+
+      <div class="senior-filter-bar" aria-label="Senior year filter">
+        <span class="senior-program-chip">B.TECH SENIORS ONLY (AS OF NOW)</span>
+        <div class="senior-year-switch">
+          <button class="senior-year-btn active" type="button" data-year="2" onclick="switchSeniorYear('2')">YEAR 2</button>
+          <button class="senior-year-btn" type="button" data-year="3" onclick="switchSeniorYear('3')">YEAR 3</button>
+        </div>
+      </div>
+
+      <div class="senior-toolbar">
+        <input class="senior-search" id="senior-search" type="search" placeholder="SEARCH SENIORS, SKILLS, PLACE..." autocomplete="off">
+        <span class="senior-count" id="senior-count">0 SENIORS</span>
+      </div>
+
+      <div class="senior-quick-filters" aria-label="Senior skill quick filters">
+        <button class="senior-quick-btn active" type="button" data-filter="" onclick="setSeniorQuickFilter('')">ALL</button>
+        <button class="senior-quick-btn" type="button" data-filter="coding" onclick="setSeniorQuickFilter('coding')">CODING</button>
+        <button class="senior-quick-btn" type="button" data-filter="cyber" onclick="setSeniorQuickFilter('cyber')">CYBER</button>
+        <button class="senior-quick-btn" type="button" data-filter="research" onclick="setSeniorQuickFilter('research')">RESEARCH</button>
+        <button class="senior-quick-btn" type="button" data-filter="sports" onclick="setSeniorQuickFilter('sports')">SPORTS</button>
+        <button class="senior-quick-btn" type="button" data-filter="hackathon" onclick="setSeniorQuickFilter('hackathon')">HACKATHON</button>
+      </div>
+
+      <div class="seniors-grid">
+        <article class="senior-card" data-senior-year="2">
+          <div class="senior-top">
+            <span class="senior-chip">LUCKNOW</span>
+          </div>
+          <img class="senior-photo senior-photo-kartikey" src="assets/seniors/kartikey-porwal.png" alt="Kartikey Porwal">
+          <div class="senior-info">
+            <h2>Kartikey Porwal</h2>
+            <p>Research Intern @ IIIT-N</p>
+            <span>Research projects · AI/ML basics · Hyperspectral imaging · Hackathons · Internships</span>
+          </div>
+          <div class="senior-actions">
+            <a href="https://wa.me/919412856627" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
+            <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
+          </div>
+        </article>
+
+        <article class="senior-card" data-senior-year="2">
+          <div class="senior-top">
+            <span class="senior-chip">KANPUR</span>
+          </div>
+          <img class="senior-photo" src="assets/seniors/arijit-singh.png" alt="Arijit Singh">
+          <div class="senior-info">
+            <h2>Arijit Singh</h2>
+            <p>Volleyball Sports Captain</p>
+            <span>Table tennis · Volleyball · Chess · Coding · Sports events</span>
+          </div>
+          <div class="senior-actions">
+            <a href="https://wa.me/919453644814" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
+            <a href="https://www.instagram.com/arijit49271/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
+          </div>
+        </article>
+
+        <article class="senior-card" data-senior-year="2">
+          <div class="senior-top">
+            <span class="senior-chip">KURUKSHETRA</span>
+          </div>
+          <img class="senior-photo" src="assets/seniors/ansh.png" alt="Ansh">
+          <div class="senior-info">
+            <h2>Ansh</h2>
+            <p>You can be winner at any point.</p>
+            <span>Table tennis · Spiritual balance with studies · Reading books · Journaling</span>
+          </div>
+          <div class="senior-actions">
+            <a href="https://wa.me/917056582882" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
+          </div>
+        </article>
+
+        <article class="senior-card" data-senior-year="2">
+          <div class="senior-top">
+            <span class="senior-chip">KANPUR</span>
+          </div>
+          <img class="senior-photo" src="assets/seniors/shivang-shukla.png" alt="Shivang Shukla">
+          <div class="senior-info">
+            <h2>Shivang Shukla</h2>
+            <p>Vibe Coder</p>
+            <span>Web dev · Software dev · Kali Linux · OSINT · Ethical hacking · Java/C++/Python</span>
+          </div>
+          <div class="senior-actions">
+            <a href="https://wa.me/919236809518" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
+            <a href="https://www.instagram.com/swiftlysurreal/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
+            <a href="https://www.linkedin.com/in/amshivang" target="_blank" rel="noopener noreferrer" class="senior-connect senior-linkedin">LINKEDIN ↗</a>
+            <a href="https://github.com/amshivang" target="_blank" rel="noopener noreferrer" class="senior-connect senior-github">GITHUB ↗</a>
+          </div>
+        </article>
+
+        <article class="senior-card" data-senior-year="2">
+          <div class="senior-top">
+            <span class="senior-chip">HAPUR</span>
+          </div>
+          <div class="senior-photo" aria-label="Akshat Siddhu photo">AS</div>
+          <div class="senior-info">
+            <h2>Akshat Siddhu</h2>
+            <p>Curious by nature, consistent by choice</p>
+            <span>Competitive programming · Web/App dev · Cybersecurity · Hackathons</span>
+          </div>
+          <div class="senior-actions">
+            <a href="https://wa.me/919084924880" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
+          </div>
+        </article>
+
+        <article class="senior-card" data-senior-year="2">
+          <div class="senior-top">
+            <span class="senior-chip">PATNA</span>
+          </div>
+          <img class="senior-photo" src="assets/seniors/aryan-anand.png" alt="Aryan Anand">
+          <div class="senior-info">
+            <h2>Aryan Anand</h2>
+            <p>Consistency is the Key</p>
+            <span>Academic life · Personal life · Cyberspace</span>
+          </div>
+          <div class="senior-actions">
+            <a href="https://wa.me/917292835500" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
+            <a href="https://www.instagram.com/aaryan_7452/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
+          </div>
+        </article>
+
+        <article class="senior-card" data-senior-year="2">
+          <div class="senior-top">
+            <span class="senior-chip">VARANASI</span>
+          </div>
+          <div class="senior-photo" aria-label="Sarthak Sharma photo">SS</div>
+          <div class="senior-info">
+            <h2>Sarthak Sharma</h2>
+            <p>Do not stop until victory is achieved</p>
+            <span>Studies · Gym · Book reading</span>
+          </div>
+          <div class="senior-actions">
+            <a href="https://wa.me/918887954259" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
+            <a href="https://www.instagram.com/sarthakshrm3333/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
+          </div>
+        </article>
+
+        <article class="senior-card" data-senior-year="2">
+          <div class="senior-top">
+            <span class="senior-chip">PRAYAGRAJ</span>
+          </div>
+          <img class="senior-photo" src="assets/seniors/saksham-singh.png" alt="Saksham Singh">
+          <div class="senior-info">
+            <h2>Saksham Singh</h2>
+            <p>Project AstraMED</p>
+            <span>Web Development· Python · DSA </span>
+          </div>
+          <div class="senior-actions">
+            <a href="https://wa.me/917060780882" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
+          </div>
+        </article>
+
+        <article class="senior-card" data-senior-year="2">
+          <div class="senior-top">
+            <span class="senior-chip">KOLKATA</span>
+          </div>
+          <img class="senior-photo" src="assets/seniors/aritra-santra.png" alt="Aritra Santra">
+          <div class="senior-info">
+            <h2>Aritra Santra</h2>
+            <p>IIC Council Member</p>
+            <span>Management · Communication Skills & Connections · Cyber security · Digital forensics · Web Development</span>
+          </div>
+          <div class="senior-actions">
+            <a href="https://wa.me/919903502192" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
+            <a href="https://www.instagram.com/a.r.i.t.r.a_14/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
+          </div>
+        </article>
+
+        <article class="senior-card" data-senior-year="2">
+          <div class="senior-top">
+            <span class="senior-chip">KANPUR</span>
+          </div>
+          <img class="senior-photo" src="assets/seniors/shreya-trivedi.png" alt="Shreya Trivedi">
+          <div class="senior-info">
+            <h2>Shreya Trivedi</h2>
+            <p>Research Intern @ IITK</p>
+            <span>C/C++/Python · Academics · Filesystem forensics · Cybersecurity basics</span>
+          </div>
+          <div class="senior-actions">
+            <a href="https://wa.me/917007676337" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
+            <a href="https://www.instagram.com/Shre_17_rsh/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
+          </div>
+        </article>
+
+        <article class="senior-card" data-senior-year="2">
+          <div class="senior-top">
+            <span class="senior-chip">MATHURA</span>
+          </div>
+          <img class="senior-photo" src="assets/seniors/himanshu-chaube.png" alt="Himanshu Chaube">
+          <div class="senior-info">
+            <h2>Himanshu Chaube</h2>
+            <p></p>
+            <span>AI & Cybersecurity · Python · C/C++ · Git/GitHub · Web Development · Resume Guidance · Hackathons</span>
+          </div>
+          <div class="senior-actions">
+            <a href="https://wa.me/917878626349" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
+            <a href="https://www.instagram.com/himanshuchaube.387/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
+          </div>
+        </article>
+
+        <article class="senior-card" data-senior-year="2">
+          <div class="senior-top">
+            <span class="senior-chip">MORADABAD</span>
+          </div>
+          <img class="senior-photo" src="assets/seniors/abhinay-kumar.png" alt="Abhinay Kumar">
+          <div class="senior-info">
+            <h2>Abhinay Kumar</h2>
+            <p>Systems Thinker & Builder</p>
+            <span>AI system design · B2B startups · Prompt engineering · AI prototyping · Photography</span>
+          </div>
+          <div class="senior-actions">
+            <a href="https://wa.me/919897713420" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
+          </div>
+        </article>
+
+        <article class="senior-card" data-senior-year="2">
+          <div class="senior-top">
+            <span class="senior-chip">GHAZIPUR</span>
+          </div>
+          <div class="senior-photo" aria-label="Ravishankar Kushwaha photo">RK</div>
+          <div class="senior-info">
+            <h2>Ravishankar Kushwaha</h2>
+            <p>GPCSSI Intern · I4C Delhi selected</p>
+            <span>Cybersecurity · Internship guidance · Police cyber exposure · General mentoring</span>
+          </div>
+          <div class="senior-actions">
+            <a href="https://wa.me/917905751041" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
+          </div>
+        </article>
+
+        <article class="senior-card" data-senior-year="2">
+          <div class="senior-top">
+            <span class="senior-chip">LUCKNOW</span>
+          </div>
+          <img class="senior-photo" src="assets/seniors/rishabh-tripathi.png" alt="Rishabh Tripathi">
+          <div class="senior-info">
+            <h2>Rishabh Tripathi</h2>
+            <p>Let's just say I know a guy...</p>
+            <span>C/C++ · Python · DSA fundamentals · Cybersecurity · eSports · Poetry</span>
+          </div>
+          <div class="senior-actions">
+            <a href="https://wa.me/917302046539" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
+            <a href="https://www.instagram.com/Rishabh_tri22/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
+          </div>
+        </article>
+
+        <article class="senior-card" data-senior-year="2">
+          <div class="senior-top">
+            <span class="senior-chip">PATNA</span>
+          </div>
+          <img class="senior-photo" src="assets/seniors/piyush-jiloka.png" alt="Piyush Jiloka">
+          <div class="senior-info">
+            <h2>Piyush Jiloka</h2>
+            <p>Compiling life, code, everything...</p>
+            <span>C/C++ · Java · OOPs · Web basics · Cricket · Dance · Judo · UI/UX</span>
+          </div>
+          <div class="senior-actions">
+            <a href="https://wa.me/919431283598" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
+            <a href="https://www.instagram.com/piyush_jiloka/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
+          </div>
+        </article>
+
+        <article class="senior-card hidden" data-senior-year="3">
+          <div class="senior-top">
+            <span class="senior-chip">YEAR 3</span>
+          </div>
+          <div class="senior-photo" aria-label="Kabir Khan photo">KK</div>
+          <div class="senior-info">
+            <h2>Year 3 Senior</h2>
+            <p>“Add profile details when seniors confirm.”</p>
+            <span>Advanced courses · Internships · Projects · Clubs</span>
+          </div>
+          <a href="https://www.reddit.com/r/upsifs/" target="_blank" rel="noopener noreferrer" class="senior-connect">CONNECT ↗</a>
+        </article>
+
+        <article class="senior-card hidden" data-senior-year="3">
+          <div class="senior-top">
+            <span class="senior-chip">YEAR 3</span>
+          </div>
+          <div class="senior-photo" aria-label="Priya Sharma photo">PS</div>
+          <div class="senior-info">
+            <h2>Year 3 Senior</h2>
+            <p>“Add profile details when seniors confirm.”</p>
+            <span>Semester planning · Hackathons · Placements prep · PYQs</span>
+          </div>
+          <a href="https://www.reddit.com/r/upsifs/" target="_blank" rel="noopener noreferrer" class="senior-connect">CONNECT ↗</a>
+        </article>
+      </div>
+    </div>
+
+    <!-- ═══ TAB 5: GALLERY — LAUNCHER ═══ -->
+    <div class="tab-content" id="tab-gallery">
+      <div class="tab-top-bar">
+        <button class="btn-back-home" onclick="switchTab('home')">
+          ◄ BACK TO HOME
+        </button>
+      </div>
+
+      <h1 class="stage-title">STUDENT GALLERY</h1>
+      <p class="stage-subtitle">HOLOGRAPHIC ARCHIVE · IRON MAN PROTOCOL</p>
+
+      <div class="pixel-starburst">✳ ✳ ✳</div>
+
+      <div class="holo-launcher-box">
+        <button class="holo-launch-btn" onclick="openHologramFullscreen()">
+          ⚡ LAUNCH STUDENT GALLERY
+        </button>
+        <button class="holo-upload-launch-btn" onclick="openUploadModal()">
+          [+] ADD STUDENT PHOTO
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ═══════════════ THREE.JS + GSAP 90s NES SUPER MARIO GAME CONTAINER ═══════════════ -->
+  <button class="game-toggle-btn" id="game-toggle-btn" type="button" onclick="toggleGameDock()" aria-expanded="true" aria-controls="mario-game-dock">
+    GAME ▼
+  </button>
+
+  <div class="mario-bottom-bar-container" id="mario-game-dock">
+    
+    <!-- NES HUD SCORE BOARD -->
+    <div class="nes-hud-bar">
+      <span>MARIO <span id="hud-score">004200</span></span>
+      <span>🪙x<span id="hud-coins">14</span></span>
+      <span>WORLD 1-1</span>
+      <span>TIME <span id="hud-time">285</span></span>
+    </div>
+
+    <!-- PROMINENT STUDENT NAME REVEAL OVERLAY BANNER -->
+    <div class="student-reveal-banner" id="student-reveal-banner">
+      <span class="banner-icon">🍄</span>
+      <span class="banner-text" id="revealed-student-text">COLLECT COINS TO REVEAL BATCHMATES!</span>
+    </div>
+
+    <!-- GAME CANVAS CONTAINER -->
+    <div class="three-mario-viewport" id="mario-viewport">
+      <canvas id="mario-canvas"></canvas>
+
+      <!-- Game State & Instructions Overlay -->
+      <div class="game-overlay" id="game-overlay">
+        <div class="game-overlay-title" id="game-overlay-title">WORLD 1-1</div>
+        <div class="game-overlay-text" id="game-overlay-text">♦ UPSIFS SUPER BROS ♦</div>
+        <div class="game-overlay-sub" id="game-overlay-sub">PRESS ENTER / TAP TO START</div>
+      </div>
+
+      <!-- Mobile Touch Controls -->
+      <div class="touch-controls" id="touch-controls">
+        <div class="touch-dpad">
+          <button class="touch-btn" id="touch-left" aria-label="Move Left">◄</button>
+          <button class="touch-btn" id="touch-down" aria-label="Down / Pipe">▼</button>
+          <button class="touch-btn" id="touch-right" aria-label="Move Right">►</button>
+        </div>
+        <button class="touch-btn touch-action" id="touch-jump" aria-label="Jump">JUMP</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════ 8-BIT FOOTER BAR ═══════════════ -->
+  <footer class="arcade-footer">
+    <div class="footer-left">
+      <a href="https://www.reddit.com/r/upsifs/" target="_blank" class="footer-link">R/UPSIFS</a>
+      <a href="#gallery" onclick="switchTab('gallery')" class="footer-link">GALLERY</a>
+      <a href="https://forms.gle/WurEYQVuinQKqtBP9" target="_blank" rel="noopener noreferrer" class="footer-link">DETAILS</a>
+    </div>
+    <div class="footer-right">
+      <a href="https://www.reddit.com/r/upsifs/" target="_blank" class="social-pixel-btn" title="Reddit">👾 REDDIT</a>
+    </div>
+  </footer>
+
+  <!-- ═══════════════ UPLOAD MODAL ═══════════════ -->
+  <div class="modal-overlay" id="upload-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <span>[+] UPLOAD STUDENT PHOTO</span>
+        <button class="modal-close" onclick="closeUploadModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="upload-zone" id="upload-zone">
+          <input type="file" id="photo-input" accept="image/*" hidden>
+          <div class="upload-placeholder" id="upload-placeholder">
+            <span class="upload-icon">📁</span>
+            <p>CLICK OR DRAG IMAGE HERE</p>
+            <p class="upload-hint">JPG, PNG, WEBP — MAX 5MB</p>
+          </div>
+          <img id="upload-preview" class="upload-preview" alt="Preview">
+        </div>
+        <div class="upload-fields">
+          <label for="student-name">STUDENT NAME *</label>
+          <input type="text" id="student-name" placeholder="e.g. Rahul Sharma" autocomplete="off">
+          <label for="photo-caption">CAPTION / BRANCH</label>
+          <input type="text" id="photo-caption" placeholder="e.g. Cyber Security Sem 1" autocomplete="off">
+        </div>
+        <button class="submit-btn" id="submit-photo" onclick="submitPhoto()">
+          [SUBMIT PHOTO]
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ FULL-SCREEN HOLOGRAM OVERLAY ═══════════════ -->
+  <div id="holo-fullscreen">
+    <!-- THREE.JS CANVAS RENDERS HERE -->
+    <div id="holo-hud">
+      UPSIFS ARCHIVES · INITIALIZING
+      <div class="holo-hud-sub">Drag to rotate & scroll · Click a photo to view</div>
+    </div>
+    <div id="holo-hint">SCROLL / DRAG VERTICALLY TO NAVIGATE · CLICK CARD TO VIEW DETAILED PROFILE</div>
+    <div id="holo-controls">
+      <button class="holo-ctrl-btn" id="holo-close-btn" onclick="closeHologramFullscreen()">✕ EXIT</button>
+      <button class="holo-ctrl-btn" id="holo-upload-btn" onclick="openUploadModal()">+ ADD PHOTO</button>
+    </div>
+    <!-- INTEGRATED PHOTO LIGHTBOX -->
+    <div id="holo-photo-view">
+      <div class="holo-photo-close" id="holo-photo-close" onclick="closeHoloLightbox()">✕</div>
+      <img id="holo-photo-img" src="" alt="">
+      <div class="holo-photo-cap" id="holo-photo-cap"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ LIGHTBOX ═══════════════ -->
+  <div class="lightbox-overlay" id="lightbox">
+    <button class="lightbox-close" onclick="closeLightbox()">[CLOSE ✕]</button>
+    <img id="lightbox-img" src="" alt="Full size photo">
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
