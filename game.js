@@ -1172,7 +1172,14 @@
         </div>
       `;
 
-      showOverlay('WORLD 1-1', instructionsHTML, 'PRESS ENTER / TOUCH TO PLAY');
+      const theme = typeof window.getActiveArcadeThemeConfig === 'function'
+        ? window.getActiveArcadeThemeConfig()
+        : null;
+      showOverlay(
+        theme?.overlayTitle || 'WORLD 1-1',
+        instructionsHTML,
+        theme?.overlaySub || 'PRESS ENTER / TOUCH TO PLAY'
+      );
 
       window.addEventListener('resize', () => {
         setupCanvas();

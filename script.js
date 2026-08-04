@@ -164,6 +164,60 @@ let activeSeniorYear = '2';
 let activeSeniorQuickFilter = '';
 const SENIOR_ACCESS_KEY = 'upsifs_senior_access_code';
 const SENIOR_FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzd55ExHTpaKooyEFivmZEQ38sAMfAahtCviZgUK4HYV-01-Nn8CS08P1omWKx3CdaPoQ/exec';
+const RESOURCE_FEED_ENDPOINT = '';
+const ARCADE_THEME_KEY = 'upsifs_arcade_theme';
+
+const arcadeThemes = {
+  classic: {
+    bodyClass: '',
+    logo: 'UPSIFS 2026',
+    sidebarBrand: 'PAUSE MENU',
+    gameButton: 'GAME ▼',
+    hudPlayer: 'MARIO',
+    hudWorld: 'WORLD 1-1',
+    collectibleIcon: '🪙',
+    bannerIcon: '🍄',
+    bannerText: 'COLLECT COINS TO REVEAL BATCHMATES!',
+    overlayTitle: 'WORLD 1-1',
+    overlayText: '♦ UPSIFS SUPER BROS ♦',
+    overlaySub: 'PRESS ENTER / TAP TO START'
+  },
+  f1: {
+    bodyClass: 'theme-f1',
+    logo: 'UPSIFS RACING',
+    sidebarBrand: 'VERSTAPPEN PIT WALL',
+    gameButton: 'MAX GP ▼',
+    hudPlayer: 'MAX VERSTAPPEN',
+    hudWorld: 'MAX GP CIRCUIT',
+    collectibleIcon: '🏁',
+    bannerIcon: '🏎️',
+    bannerText: 'DRS OPEN: HIT APEX MARKERS TO REVEAL BATCHMATES!',
+    overlayTitle: 'MAX GP CIRCUIT',
+    overlayText: '♦ UPSIFS VERSTAPPEN RACING ♦',
+    overlaySub: 'PRESS ENTER / TAP FOR LIGHTS OUT'
+  },
+  pokemon: {
+    bodyClass: 'theme-pokemon',
+    logo: 'UPSIFS DEX',
+    sidebarBrand: 'POKE MENU',
+    gameButton: 'POKEMON GAME ▼',
+    hudPlayer: 'ASH KETCHUM',
+    hudWorld: 'KANTO ROUTE 26',
+    collectibleIcon: '⚡',
+    bannerIcon: '🔴',
+    bannerText: 'ASH KETCHUM: CATCH AND BATTLE TO DISCOVER BATCHMATES!',
+    overlayTitle: 'KANTO ROUTE 26',
+    overlayText: '♦ UPSIFS POKEMON GAME ♦',
+    overlaySub: 'PRESS ENTER / TAP TO TRAIN'
+  }
+};
+
+let activeArcadeTheme = 'classic';
+const savedPokemonTrainerName = localStorage.getItem('upsifs_pokemon_trainer_name');
+let arcadePlayerNames = {
+  f1: localStorage.getItem('upsifs_f1_driver_name') || 'Max Verstappen',
+  pokemon: savedPokemonTrainerName && savedPokemonTrainerName !== 'Trainer' ? savedPokemonTrainerName : 'Ash Ketchum'
+};
 
 // ═══════════════ TAB SWITCHING ═══════════════
 function switchTab(tabName) {
@@ -197,6 +251,105 @@ function switchTab(tabName) {
 
 window.switchTab = switchTab;
 
+function setTextById(id, value) {
+  const element = document.getElementById(id);
+  if (element) element.textContent = value;
+}
+
+function applyArcadeTheme(themeName) {
+  const theme = arcadeThemes[themeName] || arcadeThemes.classic;
+  activeArcadeTheme = arcadeThemes[themeName] ? themeName : 'classic';
+  const playerName = activeArcadeTheme === 'f1'
+    ? arcadePlayerNames.f1
+    : activeArcadeTheme === 'pokemon'
+      ? arcadePlayerNames.pokemon
+      : theme.hudPlayer;
+
+  document.body.classList.remove('theme-f1', 'theme-pokemon');
+  if (theme.bodyClass) {
+    document.body.classList.add(theme.bodyClass);
+  }
+
+  setTextById('game-toggle-btn', theme.gameButton);
+  setTextById('hud-world-label', theme.hudWorld);
+  setTextById('hud-collectible-icon', theme.collectibleIcon);
+  setTextById('game-banner-icon', theme.bannerIcon);
+  setTextById('revealed-student-text', theme.bannerText);
+
+  const logo = document.querySelector('.logo-text');
+  if (logo) logo.textContent = theme.logo;
+
+  const sidebarBrand = document.querySelector('.sidebar-brand');
+  if (sidebarBrand) sidebarBrand.textContent = theme.sidebarBrand;
+
+  const hudScore = document.getElementById('hud-score')?.textContent || '000000';
+  const playerLabel = document.getElementById('hud-player-label');
+  if (playerLabel) playerLabel.innerHTML = `${playerName.toUpperCase()} <span id="hud-score">${hudScore}</span>`;
+
+  document.querySelectorAll('.theme-option').forEach(button => {
+    button.classList.toggle('active', button.dataset.themeOption === activeArcadeTheme);
+  });
+
+  const overlay = document.getElementById('game-overlay');
+  if (overlay && !overlay.classList.contains('hidden')) {
+    setTextById('game-overlay-title', theme.overlayTitle);
+    const overlayText = document.getElementById('game-overlay-text');
+    const hasControlBox = overlayText?.querySelector('.ctrl-box');
+    if (overlayText && !hasControlBox) {
+      overlayText.textContent = theme.overlayText;
+    }
+    setTextById('game-overlay-sub', theme.overlaySub);
+  }
+
+  if (typeof window.activateModeGame === 'function') {
+    window.activateModeGame(activeArcadeTheme, playerName);
+  }
+}
+
+function selectArcadeTheme(themeName) {
+  applyArcadeTheme(themeName);
+  localStorage.setItem(ARCADE_THEME_KEY, activeArcadeTheme);
+}
+
+window.selectArcadeTheme = selectArcadeTheme;
+window.getActiveArcadeThemeConfig = function () {
+  return arcadeThemes[activeArcadeTheme] || arcadeThemes.classic;
+};
+window.getCurrentArcadeMode = function () {
+  return {
+    theme: activeArcadeTheme,
+    playerName: activeArcadeTheme === 'f1'
+      ? arcadePlayerNames.f1
+      : activeArcadeTheme === 'pokemon'
+        ? arcadePlayerNames.pokemon
+        : 'Mario'
+  };
+};
+
+function changeArcadePlayerName() {
+  if (activeArcadeTheme === 'classic') {
+    alert('Switch to Formula 1 or Pokemon first, then set the character name.');
+    return;
+  }
+
+  const label = activeArcadeTheme === 'f1' ? 'driver' : 'trainer';
+  const currentName = activeArcadeTheme === 'f1' ? arcadePlayerNames.f1 : arcadePlayerNames.pokemon;
+  const nextName = prompt(`Enter ${label} name`, currentName);
+  if (!nextName || !nextName.trim()) return;
+
+  const cleanName = nextName.trim().slice(0, 24);
+  if (activeArcadeTheme === 'f1') {
+    arcadePlayerNames.f1 = cleanName;
+    localStorage.setItem('upsifs_f1_driver_name', cleanName);
+  } else {
+    arcadePlayerNames.pokemon = cleanName;
+    localStorage.setItem('upsifs_pokemon_trainer_name', cleanName);
+  }
+  applyArcadeTheme(activeArcadeTheme);
+}
+
+window.changeArcadePlayerName = changeArcadePlayerName;
+
 function switchSeniorYear(year) {
   activeSeniorYear = year;
   document.querySelectorAll('.senior-year-btn').forEach(btn => {
@@ -207,6 +360,239 @@ function switchSeniorYear(year) {
 }
 
 window.switchSeniorYear = switchSeniorYear;
+
+// ═══════════════ ACADEMIC RESOURCE BROWSER ═══════════════
+const resourceState = {
+  program: 'All',
+  academicYear: 'All',
+  semester: 'All',
+  teacher: 'All',
+  tag: 'All',
+  query: '',
+  items: []
+};
+
+function getResourceItems() {
+  return resourceState.items;
+}
+
+function resourceIcon(type) {
+  const cleanType = String(type || '').toLowerCase();
+  if (cleanType === 'pdf') return '📄';
+  if (['ppt', 'pptx'].includes(cleanType)) return '📊';
+  if (['doc', 'docx'].includes(cleanType)) return '📝';
+  if (['jpg', 'jpeg', 'png', 'webp'].includes(cleanType)) return '🖼️';
+  return '📁';
+}
+
+function escapeResourceText(value) {
+  return String(value || '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[char]));
+}
+
+function makeResourceButton(label, active, onClick) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'resource-chip' + (active ? ' active' : '');
+  button.textContent = label;
+  button.addEventListener('click', onClick);
+  return button;
+}
+
+function renderResourceFilters(resources) {
+  const programWrap = document.getElementById('resource-program-filters');
+  const yearWrap = document.getElementById('resource-year-filters');
+  const semesterWrap = document.getElementById('resource-semester-filters');
+  const teacherWrap = document.getElementById('resource-teacher-filters');
+  const tagWrap = document.getElementById('resource-tag-filters');
+  if (!programWrap || !yearWrap || !semesterWrap || !teacherWrap || !tagWrap) return;
+
+  const programs = ['All', ...new Set(resources.map(item => item.program || 'B.Tech - M.Tech').filter(Boolean))];
+  const academicYears = ['All', ...new Set(resources.map(item => item.academicYear).filter(Boolean))];
+  const semesters = ['All', ...new Set(resources.map(item => item.semester).filter(Boolean))];
+  const teachers = ['All', ...new Set(resources.map(item => item.teacher).filter(Boolean))];
+  const priorityTags = ['All', '2025-2026', 'Notes', 'Slides', 'PYQ', 'Practical', 'Syllabus', 'Schedule', 'PDF'];
+
+  programWrap.replaceChildren(...programs.map(program =>
+    makeResourceButton(program, resourceState.program === program, () => {
+      resourceState.program = program;
+      renderResources();
+    })
+  ));
+
+  yearWrap.replaceChildren(...academicYears.map(academicYear =>
+    makeResourceButton(academicYear, resourceState.academicYear === academicYear, () => {
+      resourceState.academicYear = academicYear;
+      renderResources();
+    })
+  ));
+
+  semesterWrap.replaceChildren(...semesters.map(semester =>
+    makeResourceButton(semester, resourceState.semester === semester, () => {
+      resourceState.semester = semester;
+      renderResources();
+    })
+  ));
+
+  teacherWrap.replaceChildren(...teachers.map(teacher =>
+    makeResourceButton(teacher, resourceState.teacher === teacher, () => {
+      resourceState.teacher = teacher;
+      renderResources();
+    })
+  ));
+
+  tagWrap.replaceChildren(...priorityTags.map(tag =>
+    makeResourceButton(tag, resourceState.tag === tag, () => {
+      resourceState.tag = tag;
+      renderResources();
+    })
+  ));
+}
+
+function filteredResources(resources) {
+  const query = resourceState.query.trim().toLowerCase();
+  return resources.filter(item => {
+    const program = item.program || 'B.Tech - M.Tech';
+    const matchesProgram = resourceState.program === 'All' || program === resourceState.program;
+    const matchesAcademicYear = resourceState.academicYear === 'All' || item.academicYear === resourceState.academicYear;
+    const matchesSemester = resourceState.semester === 'All' || item.semester === resourceState.semester;
+    const matchesTeacher = resourceState.teacher === 'All' || item.teacher === resourceState.teacher;
+    const matchesTag = resourceState.tag === 'All' || (item.tags || []).some(tag => tag.toLowerCase() === resourceState.tag.toLowerCase());
+    const haystack = [program, item.academicYear, item.semester, item.subject, item.teacher, item.title, item.type, ...(item.tags || [])].join(' ').toLowerCase();
+    return matchesProgram && matchesAcademicYear && matchesSemester && matchesTeacher && matchesTag && (!query || haystack.includes(query));
+  });
+}
+
+function groupResources(resources) {
+  return resources.reduce((groups, item) => {
+    const program = item.program || 'B.Tech - M.Tech';
+    const academicYear = item.academicYear || 'Academic archive';
+    const semester = item.semester || 'General';
+    const subject = item.subject || 'General';
+    const teacher = item.teacher ? ` · ${item.teacher}` : '';
+    const subjectKey = `${subject}${teacher}`;
+    groups[program] ||= {};
+    groups[program][academicYear] ||= {};
+    groups[program][academicYear][semester] ||= {};
+    groups[program][academicYear][semester][subjectKey] ||= [];
+    groups[program][academicYear][semester][subjectKey].push(item);
+    return groups;
+  }, {});
+}
+
+function renderResourceCard(item) {
+  const card = document.createElement('article');
+  card.className = 'resource-file-card';
+
+  const tags = (item.tags || []).slice(0, 5).map(tag => `<span>${escapeResourceText(tag)}</span>`).join('');
+  card.innerHTML = `
+    <div class="resource-file-icon" aria-hidden="true">${resourceIcon(item.type)}</div>
+    <div class="resource-file-main">
+      <h4>${escapeResourceText(item.title)}</h4>
+      <p>${escapeResourceText(item.program || 'B.Tech - M.Tech')} · ${escapeResourceText(item.academicYear || 'Academic archive')} · ${escapeResourceText(item.type || 'FILE')}</p>
+      <div class="resource-tags">${tags}</div>
+    </div>
+    <div class="resource-actions">
+      <a class="resource-action view" href="${item.viewUrl}" target="_blank" rel="noopener noreferrer">VIEW</a>
+      <a class="resource-action download" href="${item.downloadUrl}" download>DOWNLOAD</a>
+    </div>
+  `;
+  return card;
+}
+
+function renderResources() {
+  const resources = getResourceItems();
+  const groupWrap = document.getElementById('resource-groups');
+  const count = document.getElementById('resource-count');
+  if (!groupWrap) return;
+
+  renderResourceFilters(resources);
+  const visible = filteredResources(resources);
+  if (count) {
+    const sourceLabel = RESOURCE_FEED_ENDPOINT ? 'Drive sync' : 'Drive sync pending';
+    const yearLabel = resourceState.academicYear === 'All' ? 'all academic years' : resourceState.academicYear;
+    count.textContent = `${visible.length} files · ${yearLabel} · ${sourceLabel}`;
+  }
+
+  const groups = groupResources(visible);
+  const fragments = [];
+  Object.entries(groups).forEach(([program, academicYears]) => {
+    const programSection = document.createElement('section');
+    programSection.className = 'resource-program-group';
+    programSection.innerHTML = `<h2 class="res-block-title">[${escapeResourceText(program)}]</h2>`;
+
+    Object.entries(academicYears).forEach(([academicYear, semesters]) => {
+      const yearSection = document.createElement('div');
+      yearSection.className = 'resource-year-group';
+      yearSection.innerHTML = `<h3 class="resource-semester-title">${escapeResourceText(academicYear)}</h3>`;
+
+      Object.entries(semesters).forEach(([semester, subjects]) => {
+      const semesterSection = document.createElement('div');
+      semesterSection.className = 'resource-semester-group';
+      semesterSection.innerHTML = `<h4 class="resource-semester-title">${escapeResourceText(semester)}</h4>`;
+
+      Object.entries(subjects).forEach(([subject, items]) => {
+        const subjectSection = document.createElement('div');
+        subjectSection.className = 'resource-subject-group';
+        subjectSection.innerHTML = `<h3>${escapeResourceText(subject)}</h3>`;
+        const grid = document.createElement('div');
+        grid.className = 'resource-file-grid';
+        items.forEach(item => grid.appendChild(renderResourceCard(item)));
+        subjectSection.appendChild(grid);
+        semesterSection.appendChild(subjectSection);
+      });
+
+        yearSection.appendChild(semesterSection);
+      });
+
+      programSection.appendChild(yearSection);
+    });
+
+    fragments.push(programSection);
+  });
+
+  if (!fragments.length) {
+    groupWrap.innerHTML = '<p class="resource-empty">No matching files found.</p>';
+    return;
+  }
+  groupWrap.replaceChildren(...fragments);
+}
+
+window.renderResources = renderResources;
+
+async function loadResourceFeed() {
+  const count = document.getElementById('resource-count');
+  if (!RESOURCE_FEED_ENDPOINT) {
+    resourceState.items = [];
+    renderResources();
+    const groupWrap = document.getElementById('resource-groups');
+    if (groupWrap) groupWrap.innerHTML = '<p class="resource-empty">Drive resource sync is not configured yet.</p>';
+    return;
+  }
+
+  resourceState.items = [];
+  renderResources();
+  if (count) count.textContent = 'Fetching latest files from Google Drive...';
+
+  try {
+    const response = await fetch(RESOURCE_FEED_ENDPOINT, { cache: 'no-store' });
+    const data = await response.json();
+    if (!Array.isArray(data)) throw new Error('Resource feed did not return an array.');
+    resourceState.items = data;
+    renderResources();
+  } catch (error) {
+    console.warn('Live Drive resource sync failed.', error);
+    resourceState.items = [];
+    renderResources();
+    const groupWrap = document.getElementById('resource-groups');
+    if (groupWrap) groupWrap.innerHTML = '<p class="resource-empty">Drive resources are temporarily unavailable.</p>';
+  }
+}
 
 function setSeniorQuickFilter(filter) {
   activeSeniorQuickFilter = filter || '';
@@ -418,7 +804,7 @@ async function loadApprovedSeniorProfiles() {
     updateSeniorFilters();
   } catch (error) {
     saveSeniorAccessCode('');
-    setSeniorAreaLocked(true, 'Wrong code or senior board endpoint is not ready.');
+    setSeniorAreaLocked(true, 'Enrollment number not found or senior board endpoint is not ready.');
     console.warn('Senior sheet sync skipped:', error);
   }
 }
@@ -508,7 +894,9 @@ function toggleGameDock() {
   const collapsed = document.body.classList.toggle('game-collapsed');
   const btn = document.getElementById('game-toggle-btn');
   if (btn) {
-    btn.textContent = collapsed ? 'GAME ▲' : 'GAME ▼';
+    const theme = arcadeThemes[activeArcadeTheme] || arcadeThemes.classic;
+    const openLabel = theme.gameButton || 'GAME ▼';
+    btn.textContent = collapsed ? openLabel.replace('▼', '▲') : openLabel;
     btn.setAttribute('aria-expanded', String(!collapsed));
   }
 }
@@ -518,11 +906,22 @@ window.toggleGameDock = toggleGameDock;
 function closeSidebar() {
   const toggle = document.getElementById('sidebar-toggle');
   if (toggle) toggle.checked = false;
+  document.body.classList.remove('sidebar-open');
 }
 window.closeSidebar = closeSidebar;
 
+function setupSidebarToggle() {
+  const toggle = document.getElementById('sidebar-toggle');
+  if (!toggle) return;
+  document.body.classList.toggle('sidebar-open', toggle.checked);
+  toggle.addEventListener('change', () => {
+    document.body.classList.toggle('sidebar-open', toggle.checked);
+  });
+}
+
 function openGalleryTab() {
   switchTab('gallery');
+  renderCampusGallery();
 }
 window.openGalleryTab = openGalleryTab;
 
@@ -546,6 +945,115 @@ function escapeHtml(str) {
   div.textContent = str;
   return div.innerHTML;
 }
+
+// ═══════════════ CAMPUS GALLERY BOARD ═══════════════
+const CAMPUS_GALLERY_ITEMS = [
+  { title: 'Library Reading Hall', category: 'library', label: 'LIBRARY', tags: 'library reading hall study tables quiet academic', src: 'assets/gallery/campus/library-reading-hall.jpg' },
+  { title: 'Admin To Auditorium Road', category: 'auditorium', label: 'AUDITORIUM', tags: 'auditorium admin road campus pathway', src: 'assets/gallery/campus/admin-auditorium-road.jpg' },
+  { title: 'Auditorium Event Wide', category: 'auditorium', label: 'AUDITORIUM', tags: 'auditorium event ceremony stage seats nav tarang', src: 'assets/gallery/campus/auditorium-event-wide.jpg' },
+  { title: 'Auditorium Stage', category: 'auditorium', label: 'AUDITORIUM', tags: 'auditorium stage nav tarang performance seating', src: 'assets/gallery/campus/auditorium-stage.jpg' },
+  { title: 'Forensic AI Drone Lab', category: 'labs', label: 'LABS', tags: 'lab forensic ai drone robotics classroom workstations', src: 'assets/gallery/campus/forensic-ai-drone-lab-front.jpg' },
+  { title: 'Robotics Lab Workstations', category: 'labs', label: 'LABS', tags: 'lab robotics drone workstations forensic ai', src: 'assets/gallery/campus/drone-robotics-lab-workstations.jpg' },
+  { title: 'Drone Lab Wall', category: 'labs', label: 'LABS', tags: 'lab drone robotics forensic ai wall', src: 'assets/gallery/campus/forensic-ai-lab-displays.jpg' },
+  { title: 'Robotics Lab Wide', category: 'labs', label: 'LABS', tags: 'lab robotics drone workstation wide', src: 'assets/gallery/campus/robotics-lab-wide.jpg' },
+  { title: 'Drone Display Section', category: 'labs', label: 'LABS', tags: 'lab section drone display robot', src: 'assets/gallery/campus/drone-display-section-six.jpg' },
+  { title: 'Lab Section Wall', category: 'labs', label: 'LABS', tags: 'lab section wall future prospects forensic', src: 'assets/gallery/campus/lab-section-wall.jpg' },
+  { title: 'Future Prospects Wall', category: 'labs', label: 'LABS', tags: 'lab future prospects cyber ai display wall', src: 'assets/gallery/campus/future-prospects-lab-wall.jpg' },
+  { title: 'Academic Block Entrance', category: 'campus', label: 'ACADEMIC', tags: 'academic block entrance building campus', src: 'assets/gallery/campus/academic-block-entrance.jpg' },
+  { title: 'Hostel Block Day', category: 'hostels', label: 'HOSTELS', tags: 'hostel building residence block day', src: 'assets/gallery/campus/hostel-block-day.jpg' },
+  { title: 'Hostel Tower In Sun', category: 'hostels', label: 'HOSTELS', tags: 'hostel building residence tower sun campus', src: 'assets/gallery/campus/hostel-tower-sun.jpg' },
+  { title: 'Campus Road Hostels', category: 'hostels', label: 'HOSTELS', tags: 'hostel road campus residence', src: 'assets/gallery/campus/campus-road-hostels.jpg' },
+  { title: 'Hostel Field View', category: 'hostels', label: 'HOSTELS', tags: 'hostel field residence campus', src: 'assets/gallery/campus/hostel-field-view.jpg' },
+  { title: 'Hostel Balcony Detail', category: 'hostels', label: 'HOSTELS', tags: 'hostel balcony building detail', src: 'assets/gallery/campus/hostel-balcony-detail.jpg' },
+  { title: 'Hostel Birds Day', category: 'hostels', label: 'HOSTELS', tags: 'hostel birds building day', src: 'assets/gallery/campus/hostel-birds-day.jpg' },
+  { title: 'Hostel Birds Close', category: 'hostels', label: 'HOSTELS', tags: 'hostel birds building close', src: 'assets/gallery/campus/hostel-birds-close.jpg' },
+  { title: 'Moon Between Hostels', category: 'hostels', label: 'HOSTELS', tags: 'hostel moon courtyard sky', src: 'assets/gallery/campus/moon-between-hostels.jpg' },
+  { title: 'Window Campus View', category: 'hostels', label: 'HOSTELS', tags: 'window hostel campus view', src: 'assets/gallery/campus/window-campus-view.jpg' },
+  { title: 'Rainy Window Hostel', category: 'hostels', label: 'HOSTELS', tags: 'rain window hostel campus', src: 'assets/gallery/campus/rainy-window-hostel.jpg' },
+  { title: 'Dusk Hostel Block', category: 'hostels', label: 'HOSTELS', tags: 'dusk hostel block night', src: 'assets/gallery/campus/dusk-hostel-block.jpg' },
+  { title: 'Night Campus Skyline', category: 'campus', label: 'CAMPUS', tags: 'night campus skyline hostel lights', src: 'assets/gallery/campus/night-campus-skyline.jpg' },
+  { title: 'Night Admin Road', category: 'campus', label: 'CAMPUS', tags: 'night admin road campus lights', src: 'assets/gallery/campus/night-admin-road.jpg' },
+  { title: 'Moon Campus Night', category: 'campus', label: 'CAMPUS', tags: 'moon night campus sky palm', src: 'assets/gallery/campus/moon-campus-night.jpg' },
+  { title: 'Sunset Campus Hostels', category: 'campus', label: 'CAMPUS', tags: 'sunset campus hostels sky', src: 'assets/gallery/campus/sunset-campus-hostels.jpg' },
+  { title: 'Golden Sunset Admin', category: 'campus', label: 'CAMPUS', tags: 'sunset admin campus golden', src: 'assets/gallery/campus/golden-sunset-admin.jpg' },
+  { title: 'Sunset Courtyard', category: 'campus', label: 'CAMPUS', tags: 'sunset courtyard campus', src: 'assets/gallery/campus/sunset-courtyard.jpg' },
+  { title: 'Sunset Hostel Sky', category: 'campus', label: 'CAMPUS', tags: 'sunset hostel sky evening', src: 'assets/gallery/campus/sunset-hostel-sky.jpg' },
+  { title: 'Red Evening Sky', category: 'campus', label: 'CAMPUS', tags: 'red evening sky sunset campus', src: 'assets/gallery/campus/red-evening-sky.jpg' },
+  { title: 'Solar Rooftop Sky', category: 'campus', label: 'CAMPUS', tags: 'solar rooftop sky panels campus', src: 'assets/gallery/campus/solar-rooftop-sky.jpg' },
+  { title: 'Stormy Evening Sky', category: 'campus', label: 'CAMPUS', tags: 'storm evening sky campus', src: 'assets/gallery/campus/stormy-evening-sky.jpg' },
+  { title: 'Storm Sky Hostel', category: 'campus', label: 'CAMPUS', tags: 'storm sky hostel monsoon clouds', src: 'assets/gallery/campus/storm-sky-hostel.jpg' },
+  { title: 'Monsoon Hostel Clouds', category: 'campus', label: 'CAMPUS', tags: 'monsoon clouds hostel campus', src: 'assets/gallery/campus/monsoon-hostel-clouds.jpg' },
+  { title: 'Streetlight Clouds', category: 'campus', label: 'CAMPUS', tags: 'streetlight clouds sky campus', src: 'assets/gallery/campus/streetlight-clouds.jpg' },
+  { title: 'Quiet Campus Corner', category: 'campus', label: 'CAMPUS', tags: 'quiet campus corner parking building', src: 'assets/gallery/campus/quiet-campus-corner.jpg' },
+  { title: 'Synergy Gym Plaque', category: 'campus', label: 'GYM', tags: 'gym synergy fitness campus plaque', src: 'assets/gallery/campus/synergy-gym-plaque.jpg' },
+  { title: 'Campus Red Flowers', category: 'nature', label: 'NATURE', tags: 'flowers campus garden red plants', src: 'assets/gallery/campus/campus-red-flowers.jpg' },
+  { title: 'Red Campus Flowers', category: 'nature', label: 'NATURE', tags: 'flowers campus red plant', src: 'assets/gallery/campus/red-campus-flowers.jpg' },
+  { title: 'Campus Daisy Curb', category: 'nature', label: 'NATURE', tags: 'flowers daisy curb garden campus', src: 'assets/gallery/campus/campus-daisy-curb.jpg' },
+  { title: 'Marigold Sunset Campus', category: 'nature', label: 'NATURE', tags: 'marigold flowers sunset campus', src: 'assets/gallery/campus/marigold-sunset-campus.jpg' },
+  { title: 'Campus Grass Building', category: 'nature', label: 'NATURE', tags: 'grass building campus garden', src: 'assets/gallery/campus/campus-grass-building.jpg' }
+];
+
+let activeCampusFilter = 'all';
+
+function getCampusGalleryMatches() {
+  const search = document.getElementById('campus-gallery-search')?.value.trim().toLowerCase() || '';
+  return CAMPUS_GALLERY_ITEMS.filter((item) => {
+    const categoryMatch = activeCampusFilter === 'all' || item.category === activeCampusFilter;
+    const haystack = `${item.title} ${item.label} ${item.category} ${item.tags}`.toLowerCase();
+    return categoryMatch && (!search || haystack.includes(search));
+  });
+}
+
+function renderCampusGallery() {
+  const grid = document.getElementById('campus-gallery-grid');
+  if (!grid) return;
+
+  const count = document.getElementById('campus-gallery-count');
+  const empty = document.getElementById('campus-gallery-empty');
+  const matches = getCampusGalleryMatches();
+  grid.innerHTML = '';
+
+  matches.forEach((item) => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'campus-gallery-card';
+    card.innerHTML = `
+      <span class="campus-gallery-image-wrap">
+        <img src="${escapeHtml(item.src)}" alt="${escapeHtml(item.title)}" loading="lazy" />
+      </span>
+      <span class="campus-gallery-copy">
+        <span class="campus-gallery-chip">${escapeHtml(item.label)}</span>
+        <strong>${escapeHtml(item.title)}</strong>
+      </span>
+    `;
+    card.addEventListener('click', () => openLightbox(item.src, `${item.title} · ${item.label}`));
+    grid.appendChild(card);
+  });
+
+  if (count) count.textContent = `${matches.length} PHOTO${matches.length === 1 ? '' : 'S'}`;
+  if (empty) empty.hidden = matches.length > 0;
+
+  document.querySelectorAll('.campus-filter-btn').forEach((btn) => {
+    btn.classList.toggle('active', (btn.dataset.campusFilter || 'all') === activeCampusFilter);
+  });
+}
+
+function setCampusGalleryFilter(filter) {
+  activeCampusFilter = filter || 'all';
+  renderCampusGallery();
+}
+
+function switchGalleryView(view = 'college') {
+  if (view === 'students') {
+    openHologramFullscreen();
+    return;
+  }
+  renderCampusGallery();
+}
+
+window.setCampusGalleryFilter = setCampusGalleryFilter;
+window.switchGalleryView = switchGalleryView;
+window.renderCampusGallery = renderCampusGallery;
 
 // ═══════════════ THREE.JS SOLID WHITE 3D SPIRAL GALLERY ═══════════════
 let holoInitialized = false;
@@ -1256,6 +1764,9 @@ document.addEventListener('keydown', (e) => {
 
 // ═══════════════ INITIALIZATION ═══════════════
 window.addEventListener('DOMContentLoaded', () => {
+  setupSidebarToggle();
+  applyArcadeTheme(localStorage.getItem(ARCADE_THEME_KEY) || 'classic');
+
   if (typeof window.initMarioGame === 'function') {
     window.initMarioGame();
   }
@@ -1269,6 +1780,16 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('senior-profile-form')?.addEventListener('submit', submitSeniorProfile);
   document.getElementById('senior-lock-form')?.addEventListener('submit', unlockSeniorBoard);
   document.getElementById('senior-search')?.addEventListener('input', updateSeniorFilters);
+  document.getElementById('resource-search')?.addEventListener('input', (event) => {
+    resourceState.query = event.target.value || '';
+    renderResources();
+  });
+  renderCampusGallery();
+  document.getElementById('campus-gallery-search')?.addEventListener('input', renderCampusGallery);
+  document.querySelectorAll('.campus-filter-btn').forEach((btn) => {
+    btn.addEventListener('click', () => setCampusGalleryFilter(btn.dataset.campusFilter || 'all'));
+  });
+  loadResourceFeed();
   updateSeniorFilters();
 });
 

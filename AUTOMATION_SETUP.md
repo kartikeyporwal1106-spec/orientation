@@ -22,7 +22,6 @@ Open the response Sheet, then Extensions > Apps Script. Paste this:
 
 ```js
 const SHEET_NAME = 'Form Responses 1';
-const ACCESS_CODES_SHEET = 'Access Codes';
 
 function rowToObject(headers, row) {
   const item = {};
@@ -40,48 +39,26 @@ function pick(row, ...keys) {
   return '';
 }
 
-function ensureAccessCodesSheet() {
-  const spreadsheet = SpreadsheetApp.getActive();
-  let sheet = spreadsheet.getSheetByName(ACCESS_CODES_SHEET);
-  if (!sheet) {
-    sheet = spreadsheet.insertSheet(ACCESS_CODES_SHEET);
-    sheet.appendRow(['code', 'expiresAt', 'usedAt']);
-  }
-  return sheet;
+function normalizeEnrollment(value) {
+  return String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
 }
 
-function createAccessCode(minutes) {
-  const sheet = ensureAccessCodesSheet();
-  const code = Utilities.getUuid().slice(0, 8).toUpperCase();
-  const expiresAt = new Date(Date.now() + (Number(minutes) || 30) * 60 * 1000);
-  sheet.appendRow([code, expiresAt, '']);
-  Logger.log('UPSIFS senior access code: ' + code);
-  return code;
-}
+function verifyEnrollment(enrollment) {
+  const cleanEnrollment = normalizeEnrollment(enrollment);
+  if (!cleanEnrollment) return false;
 
-function verifyAccessCode(code) {
-  if (!code) return false;
-  const sheet = ensureAccessCodesSheet();
+  const sheet = SpreadsheetApp.getActive().getSheetByName(SHEET_NAME);
   const rows = sheet.getDataRange().getValues();
-  const cleanCode = String(code).trim().toUpperCase();
-  const now = new Date();
+  const headers = rows.shift().map(header => String(header).trim());
 
-  for (let index = 1; index < rows.length; index += 1) {
-    const rowCode = String(rows[index][0] || '').trim().toUpperCase();
-    const expiresAt = rows[index][1];
-    const usedAt = rows[index][2];
-    const isExpired = expiresAt instanceof Date && expiresAt < now;
-    if (rowCode === cleanCode && !usedAt && !isExpired) {
-      sheet.getRange(index + 1, 3).setValue(now);
-      return true;
-    }
-  }
-
-  return false;
+  return rows.some(row => {
+    const item = rowToObject(headers, row);
+    return normalizeEnrollment(pick(item, 'Enrollment Number')) === cleanEnrollment;
+  });
 }
 
 function doGet(e) {
-  if (!verifyAccessCode(e.parameter.code)) {
+  if (!verifyEnrollment(e.parameter.code)) {
     return ContentService
       .createTextOutput(JSON.stringify({ error: 'ACCESS_DENIED' }))
       .setMimeType(ContentService.MimeType.JSON);
@@ -165,25 +142,164 @@ const SENIOR_FORM_ENDPOINT = 'PASTE_WEB_APP_URL_HERE';
 
 Rows stay unpublished until `approved` is set to `yes`.
 
-## Access Codes
+## Senior Access
 
-Create one-time codes from Apps Script:
+Each senior uses the enrollment number already present in the response sheet. Matching ignores spaces, punctuation, and letter case. The board still publishes only profiles whose `approved` column is `yes`.
 
-1. Select `createAccessCode` from the function dropdown.
-2. Click Run.
-3. Open View > Logs.
-4. Share the logged code with the student/group.
-
-Default expiry is 30 minutes. To create a longer code, run this from Apps Script console:
-
-```js
-createAccessCode(120)
-```
-
-The code is consumed on first successful unlock. The current browser tab keeps the board loaded, but a refresh needs a new code.
-
-For updates, compare enrollment number and WhatsApp before approving. A full identity check needs official login or OTP, but one-use codes plus manual approval keep the details out of the frontend source and stop random public viewing.
+Enrollment numbers are identifiers rather than strong passwords. Use institute login or OTP later if the board contains sensitive information.
 
 ## AI Cleanup
 
 Do not put an AI API key in website JavaScript. If you want AI cleanup, put it inside Apps Script using Script Properties, then write cleaned results into `displayName`, `displayTagline`, `displaySkills`, and `displayPlace`. The website will automatically prefer those cleaned `display...` fields.
+
+## Live Drive Resource Feed
+
+Use this when the Resources tab should stay synced with Google Drive. File and folder renames in Drive will appear on the website after refresh because the site reads the Drive tree from this endpoint.
+
+If Telegram should maintain the Drive folder, run the local bot from this repo. The website does not touch Telegram directly; it reads the updated Drive folder through this Apps Script feed.
+
+Create a new Apps Script project, paste this, then deploy it as a Web App:
+
+```js
+const RESOURCE_ROOT_FOLDER_ID = '1DTSwGkV4_jniit6tv9svFZba1oa7DuUT';
+function doGet() {
+  const root = DriveApp.getFolderById(RESOURCE_ROOT_FOLDER_ID);
+  const data = walkResourceFolder_(root, []);
+
+  return ContentService
+    .createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function walkResourceFolder_(folder, path) {
+  const items = [];
+  const folders = folder.getFolders();
+
+  while (folders.hasNext()) {
+    const child = folders.next();
+    items.push(...walkResourceFolder_(child, path.concat(child.getName())));
+  }
+
+  const files = folder.getFiles();
+
+  while (files.hasNext()) {
+    const file = files.next();
+    const id = file.getId();
+    const title = file.getName();
+    const mimeType = file.getMimeType();
+    const type = getResourceType_(title, mimeType);
+    const program = path[0] || 'General';
+    const academicYear = path[1] || 'Unsorted year';
+    const semester = path[2] || 'General';
+    const subject = path[3] || (semester === 'General' ? 'General' : 'Misc');
+    const teacher = path[4] || '';
+
+    items.push({
+      program,
+      academicYear,
+      semester,
+      subject,
+      teacher,
+      title,
+      type,
+      tags: buildResourceTags_(path, title, type),
+      viewUrl: `https://drive.google.com/file/d/${id}/view`,
+      downloadUrl: `https://drive.google.com/uc?export=download&id=${id}`
+    });
+  }
+
+  return items.sort((a, b) =>
+    [a.program, a.academicYear, a.semester, a.subject, a.teacher, a.title].join('\u0000')
+      .localeCompare([b.program, b.academicYear, b.semester, b.subject, b.teacher, b.title].join('\u0000'))
+  );
+}
+
+function getResourceType_(title, mimeType) {
+  const lower = String(title || '').toLowerCase();
+  const ext = lower.includes('.') ? lower.split('.').pop() : '';
+
+  if (ext) return ext.toUpperCase();
+  if (mimeType.includes('pdf')) return 'PDF';
+  if (mimeType.includes('presentation')) return 'PPTX';
+  if (mimeType.includes('document')) return 'DOCX';
+  if (mimeType.includes('image')) return 'IMAGE';
+  return 'FILE';
+}
+
+function buildResourceTags_(path, title, type) {
+  const text = path.concat(title, type).join(' ').toLowerCase();
+  const tags = new Set([...path, type]);
+
+  if (/pyq|question|paper/.test(text)) tags.add('PYQ');
+  if (/practical|lab|assignment/.test(text)) tags.add('Practical');
+  if (/note|unit|lecture|book|ebook/.test(text)) tags.add('Notes');
+  if (/ppt|slide/.test(text)) tags.add('Slides');
+  if (/syllabus/.test(text)) tags.add('Syllabus');
+  if (/calendar|schedule|timetable|tt|datesheet/.test(text)) tags.add('Schedule');
+
+  return Array.from(tags).filter(Boolean);
+}
+```
+
+Deploy settings:
+
+- Execute as: Me
+- Who has access: Anyone
+
+Copy the Web App URL into `script.js`:
+
+```js
+const RESOURCE_FEED_ENDPOINT = 'PASTE_RESOURCE_WEB_APP_URL_HERE';
+```
+
+Make sure the Drive folder/files are shared with the students. The endpoint can list files because it runs as you, but students still need Drive permission to open the View and Download links.
+
+## Telegram To Drive Bot
+
+The bot uploads Telegram files/photos into the Resources Drive folder. After upload, the website picks them up through the Live Drive Resource Feed.
+
+One-time Google setup:
+
+1. Create a Google Cloud service account.
+2. Enable the Google Drive API.
+3. Create a JSON key for the service account.
+4. Share the root `Resources` Drive folder with the service account email as Editor.
+
+Telegram setup:
+
+1. Create a bot with BotFather.
+2. Copy the bot token.
+3. Optional but recommended: get your Telegram chat/group ID and set it in `TELEGRAM_ALLOWED_CHAT_IDS`.
+
+Run locally:
+
+```sh
+export TELEGRAM_BOT_TOKEN='PASTE_TELEGRAM_BOT_TOKEN'
+export DRIVE_ROOT_FOLDER_ID='1DTSwGkV4_jniit6tv9svFZba1oa7DuUT'
+export GOOGLE_SERVICE_ACCOUNT_FILE='/absolute/path/to/downloaded-service-account.json'
+export TELEGRAM_ALLOWED_CHAT_IDS='123456789'
+npm run bot
+```
+
+Usage in Telegram:
+
+```text
+/upload BTech-MTech/2025-26/SEM II/Cyber Law/Pragati Ma'am
+```
+
+Attach a PDF/PPT/DOC/image and put that command in the caption. The bot will create missing Drive folders automatically and upload the file there.
+
+Examples:
+
+```text
+/upload BTech-MTech/2025-26/SEM I/Engineering Maths-I/Teacher Name
+/upload BTech-MTech/2025-26/SEM II/PYQs
+/upload BTech-MTech/2025-26/General
+/upload BSc/2025-26/SEM II/Forensic/Mansi Ma'am
+```
+
+Website flow:
+
+```text
+Telegram file -> bot uploads to Drive -> Apps Script lists Drive -> Resources tab shows View/Download
+```

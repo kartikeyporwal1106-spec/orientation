@@ -58,6 +58,19 @@
 
       <div class="sidebar-divider"></div>
 
+      <!-- ═══ Arcade Mode Selector ═══ -->
+      <div class="sidebar-section">
+        <span class="sidebar-section-title">// ARCADE MODES</span>
+        <ul>
+          <li><button class="theme-option active" type="button" data-theme-option="classic" onclick="selectArcadeTheme('classic'); closeSidebar();">▶ CLASSIC UPSIFS UI</button></li>
+          <li><button class="theme-option" type="button" data-theme-option="f1" onclick="selectArcadeTheme('f1'); closeSidebar();">▶ VERSTAPPEN RACING GAME</button></li>
+          <li><button class="theme-option" type="button" data-theme-option="pokemon" onclick="selectArcadeTheme('pokemon'); closeSidebar();">▶ POKEMON UI + GAME</button></li>
+          <li><button class="theme-option" type="button" onclick="changeArcadePlayerName(); closeSidebar();">▶ CHANGE PLAYER NAME</button></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-divider"></div>
+
       <!-- ═══ Connect with Batchmates ═══ -->
       <div class="sidebar-section">
         <span class="sidebar-section-title">// BATCHMATE COMMUNITY</span>
@@ -106,6 +119,27 @@
 
   <!-- ═══════════════ MAIN ARCADE STAGE ═══════════════ -->
   <main class="arcade-stage">
+    <div class="theme-quote-layer" aria-hidden="true">
+      <div class="theme-quote-card theme-quote-f1">
+        <span class="quote-kicker">F1 RADIO QUOTES</span>
+        <span class="quote-line quote-line-f1 q1">MAX: "Simply lovely."</span>
+        <span class="quote-line quote-line-f1 q2">CHARLES: "I am checking."</span>
+        <span class="quote-line quote-line-f1 q3">KIMI: "Leave me alone."</span>
+        <span class="quote-line quote-line-f1 q4">ALONSO: "GP2 engine."</span>
+        <span class="quote-line quote-line-f1 q5">LEWIS: "Still we rise."</span>
+        <span class="quote-line quote-line-f1 q6">SEB: "Grazie ragazzi."</span>
+        <span class="quote-line quote-line-f1 q7">SAINZ: "Smooth operator."</span>
+      </div>
+      <div class="theme-quote-card theme-quote-pokemon">
+        <span class="quote-kicker">UPSIFS DEX LOG</span>
+        <span class="quote-line quote-line-pokemon p1">ASH: "I choose you."</span>
+        <span class="quote-line quote-line-pokemon p2">ASH: "Gotta catch 'em all."</span>
+        <span class="quote-line quote-line-pokemon p3">PIKACHU: "Pika pika!"</span>
+        <span class="quote-line quote-line-pokemon p4">OAK: "Your very own legend is about to unfold."</span>
+        <span class="quote-line quote-line-pokemon p5">DEX: "A wild batchmate appeared."</span>
+        <span class="quote-line quote-line-pokemon p6">ASH: "There's no sense in going out of your way to get somebody to like you."</span>
+      </div>
+    </div>
     
     <!-- ═══ TAB 1: HOME (FRESHERS WELCOME) ═══ -->
     <div class="tab-content active" id="tab-home">
@@ -180,72 +214,22 @@
       </div>
 
       <h1 class="stage-title" id="resources-title">ACADEMIC RESOURCES</h1>
-      <p class="stage-subtitle" id="resources-subtitle">B.Tech - M.Tech Integrated Cyber Security</p>
+      <p class="stage-subtitle" id="resources-subtitle">2025-2026 Academic Resource Archive</p>
 
       <div class="pixel-starburst">✳ ✳ ✳</div>
 
-      <!-- TIER 1: SYLLABUS -->
-      <div class="resource-block">
-        <h2 class="res-block-title">[STAGE 1] SYLLABUS & CURRICULUM</h2>
-        <div class="res-grid">
-          <a href="#" class="res-pixel-card" onclick="alert('Downloading B.Sc/M.Sc Cyber Security Sem 1 Official Syllabus PDF...'); return false;">
-            <span class="card-icon">📄</span>
-            <div class="card-text">
-              <span class="c-title">Sem 1 Official Syllabus</span>
-              <span class="c-sub">Credit distribution, course structure & exam scheme</span>
-            </div>
-            <span class="c-btn">[DOWNLOAD]</span>
-          </a>
-          <a href="#" class="res-pixel-card" onclick="alert('Downloading Academic Calendar PDF...'); return false;">
-            <span class="card-icon">📅</span>
-            <div class="card-text">
-              <span class="c-title">Academic Calendar 2026-2027</span>
-              <span class="c-sub">Important dates, midterm & final exam schedule</span>
-            </div>
-            <span class="c-btn">[DOWNLOAD]</span>
-          </a>
+      <div class="resource-block resource-browser">
+        <div class="resource-toolbar">
+          <label class="resource-search-label" for="resource-search">SEARCH RESOURCES</label>
+          <input type="search" id="resource-search" placeholder="Search subject, file, tag..." autocomplete="off">
         </div>
-      </div>
-
-      <div class="pixel-starburst">✳ ✳ ✳</div>
-
-      <!-- TIER 2: SUBJECT NOTES -->
-      <div class="resource-block">
-        <h2 class="res-block-title">[STAGE 2] SUBJECT NOTES & LAB MANUALS</h2>
-        <div class="res-grid">
-          <a href="#" class="res-pixel-card" onclick="alert('Opening Cyber Security & Computer Fundamentals Drive...'); return false;">
-            <span class="card-icon">💻</span>
-            <div class="card-text">
-              <span class="c-title">Cyber Security Fundamentals</span>
-              <span class="c-sub">Lecture slides, unit notes & practice question sets</span>
-            </div>
-            <span class="c-btn">[ACCESS]</span>
-          </a>
-          <a href="#" class="res-pixel-card" onclick="alert('Opening C / Python Lab Manual...'); return false;">
-            <span class="card-icon">🔬</span>
-            <div class="card-text">
-              <span class="c-title">C & Python Programming Lab Manual</span>
-              <span class="c-sub">Practical code programs, lab viva questions & solutions</span>
-            </div>
-            <span class="c-btn">[ACCESS]</span>
-          </a>
-          <a href="#" class="res-pixel-card" onclick="alert('Opening Forensic Science Intro Notes...'); return false;">
-            <span class="card-icon">🔍</span>
-            <div class="card-text">
-              <span class="c-title">Intro to Forensic Science</span>
-              <span class="c-sub">Evidence preservation, crime scene investigation notes</span>
-            </div>
-            <span class="c-btn">[ACCESS]</span>
-          </a>
-          <a href="#" class="res-pixel-card" onclick="alert('Opening Applied Mathematics Drive...'); return false;">
-            <span class="card-icon">📐</span>
-            <div class="card-text">
-              <span class="c-title">Applied Mathematics I</span>
-              <span class="c-sub">Formula sheets, practice problems & solved PYQs</span>
-            </div>
-            <span class="c-btn">[ACCESS]</span>
-          </a>
-        </div>
+        <div class="resource-filter-row" id="resource-program-filters" aria-label="Program filters"></div>
+        <div class="resource-filter-row" id="resource-year-filters" aria-label="Academic year filters"></div>
+        <div class="resource-filter-row" id="resource-semester-filters" aria-label="Semester filters"></div>
+        <div class="resource-filter-row" id="resource-teacher-filters" aria-label="Teacher filters"></div>
+        <div class="resource-filter-row" id="resource-tag-filters" aria-label="Tag filters"></div>
+        <div class="resource-count" id="resource-count"></div>
+        <div class="resource-groups" id="resource-groups"></div>
       </div>
 
       <div class="pixel-starburst">✳ ✳ ✳</div>
@@ -360,16 +344,16 @@
         </div>
       </div>
 
-      <section class="senior-access-lock" id="senior-access-lock" aria-label="Seniors access code gate">
+      <section class="senior-access-lock" id="senior-access-lock" aria-label="Senior enrollment verification">
         <div class="lock-copy">
           <span class="board-kicker">PRIVATE BOARD</span>
-          <h2>Enter UPSIFS access code.</h2>
-          <p>Senior contacts are shown only after the shared UPSIFS code is verified.</p>
+          <h2>Enter your enrollment number.</h2>
+          <p>Senior contacts are shown only after your UPSIFS enrollment is verified.</p>
         </div>
         <form class="senior-lock-form" id="senior-lock-form">
           <label>
-            ACCESS CODE
-            <input type="password" id="senior-access-code" autocomplete="off" placeholder="ENTER CODE" required>
+            ENROLLMENT NUMBER
+            <input type="password" id="senior-access-code" inputmode="numeric" autocomplete="off" placeholder="ENTER ENROLLMENT NUMBER" required>
           </label>
           <button type="submit" class="submit-btn">[UNLOCK SENIORS]</button>
           <p class="senior-form-status" id="senior-lock-status" aria-live="polite"></p>
@@ -395,7 +379,7 @@
       </div>
     </div>
 
-    <!-- ═══ TAB 5: GALLERY — LAUNCHER ═══ -->
+    <!-- ═══ TAB 5: GALLERY — CAMPUS BOARD ═══ -->
     <div class="tab-content" id="tab-gallery">
       <div class="tab-top-bar">
         <button class="btn-back-home" onclick="switchTab('home')">
@@ -403,12 +387,46 @@
         </button>
       </div>
 
-      <h1 class="stage-title">STUDENT GALLERY</h1>
-      <p class="stage-subtitle">HOLOGRAPHIC ARCHIVE · IRON MAN PROTOCOL</p>
+      <h1 class="stage-title">COLLEGE GALLERY</h1>
+      <p class="stage-subtitle">SEARCH CAMPUS SPOTS · LABS · AUDITORIUM · LIBRARY</p>
 
       <div class="pixel-starburst">✳ ✳ ✳</div>
 
-      <div class="holo-launcher-box">
+      <section class="campus-gallery-panel" aria-labelledby="campus-gallery-title">
+        <div class="campus-gallery-heading">
+          <div>
+            <h2 id="campus-gallery-title">CAMPUS PHOTO BOARD</h2>
+            <p>Find library, labs, auditorium, hostels, and campus views fast.</p>
+          </div>
+          <span class="campus-gallery-count" id="campus-gallery-count">0 PHOTOS</span>
+        </div>
+
+        <label class="campus-search-wrap" for="campus-gallery-search">
+          <span>SEARCH</span>
+          <input
+            class="campus-gallery-search"
+            id="campus-gallery-search"
+            type="search"
+            placeholder="LIBRARY, AUDITORIUM, LABS..."
+            autocomplete="off"
+          />
+        </label>
+
+        <div class="campus-gallery-filters" aria-label="Campus gallery filters">
+          <button class="campus-filter-btn active" type="button" data-campus-filter="all">ALL</button>
+          <button class="campus-filter-btn" type="button" data-campus-filter="library">LIBRARY</button>
+          <button class="campus-filter-btn" type="button" data-campus-filter="auditorium">AUDITORIUM</button>
+          <button class="campus-filter-btn" type="button" data-campus-filter="labs">LABS</button>
+          <button class="campus-filter-btn" type="button" data-campus-filter="hostels">HOSTELS</button>
+          <button class="campus-filter-btn" type="button" data-campus-filter="campus">CAMPUS</button>
+          <button class="campus-filter-btn" type="button" data-campus-filter="nature">NATURE</button>
+        </div>
+
+        <div class="campus-gallery-grid" id="campus-gallery-grid" aria-live="polite"></div>
+        <p class="campus-gallery-empty" id="campus-gallery-empty" hidden>No matching photo found.</p>
+      </section>
+
+      <div class="holo-launcher-box student-archive-box">
         <button class="holo-launch-btn" onclick="openHologramFullscreen()">
           ⚡ LAUNCH STUDENT GALLERY
         </button>
@@ -429,21 +447,22 @@
     
     <!-- NES HUD SCORE BOARD -->
     <div class="nes-hud-bar">
-      <span>MARIO <span id="hud-score">004200</span></span>
-      <span>🪙x<span id="hud-coins">14</span></span>
-      <span>WORLD 1-1</span>
+      <span id="hud-player-label">MARIO <span id="hud-score">004200</span></span>
+      <span><span id="hud-collectible-icon">🪙</span>x<span id="hud-coins">14</span></span>
+      <span id="hud-world-label">WORLD 1-1</span>
       <span>TIME <span id="hud-time">285</span></span>
     </div>
 
     <!-- PROMINENT STUDENT NAME REVEAL OVERLAY BANNER -->
     <div class="student-reveal-banner" id="student-reveal-banner">
-      <span class="banner-icon">🍄</span>
+      <span class="banner-icon" id="game-banner-icon">🍄</span>
       <span class="banner-text" id="revealed-student-text">COLLECT COINS TO REVEAL BATCHMATES!</span>
     </div>
 
     <!-- GAME CANVAS CONTAINER -->
     <div class="three-mario-viewport" id="mario-viewport">
       <canvas id="mario-canvas"></canvas>
+      <canvas id="mode-game-canvas" aria-label="Selected arcade mode game"></canvas>
 
       <!-- Game State & Instructions Overlay -->
       <div class="game-overlay" id="game-overlay">
@@ -535,5 +554,6 @@
   </div>
 
   <script src="script.js"></script>
+  <script src="mode-games.js"></script>
 </body>
 </html>
