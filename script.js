@@ -176,9 +176,14 @@ const arcadeThemes = {
 };
 
 let activeArcadeTheme = 'classic';
+let activeTabName = 'home';
+const validTabNames = new Set(['home', 'about', 'resources', 'seniors', 'gallery', 'devs']);
 
 // ═══════════════ TAB SWITCHING ═══════════════
-function switchTab(tabName) {
+function switchTab(tabName, updateHistory = true) {
+  if (!validTabNames.has(tabName)) return;
+  const previousTabName = activeTabName;
+
   document.querySelectorAll('.nav-btn').forEach(btn => {
     const isActive = btn.dataset.tab === tabName;
     btn.classList.toggle('active', isActive);
@@ -199,15 +204,34 @@ function switchTab(tabName) {
 
   const target = document.getElementById('tab-' + tabName);
   if (target) {
+    activeTabName = tabName;
     target.classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (tabName === 'seniors') {
       updateSeniorFilters();
     }
+
+    if (updateHistory && previousTabName !== tabName && window.history?.pushState) {
+      const url = tabName === 'home' ? window.location.pathname : `#${tabName}`;
+      window.history.pushState({ tab: tabName }, '', url);
+    }
   }
 }
 
 window.switchTab = switchTab;
+
+window.addEventListener('popstate', (event) => {
+  const historyTab = event.state?.tab;
+  if (validTabNames.has(historyTab)) {
+    switchTab(historyTab, false);
+    return;
+  }
+
+  if (activeTabName !== 'home') {
+    switchTab('home', false);
+    window.history.replaceState({ tab: 'home' }, '', window.location.pathname);
+  }
+});
 
 function setTextById(id, value) {
   const element = document.getElementById(id);
@@ -220,17 +244,17 @@ const homeCopyByTheme = {
     subtitle: 'CLASS OF 2026 · PLAYER 1 READY?',
     resources: '📚 ACADEMIC RESOURCES',
     gallery: '🏛️ COLLEGE GALLERY',
-    community: 'JOIN UPSIFS',
+    community: 'JUNIOR DETAIL SUBMISSION',
     seniors: '🧑‍💻 CONNECT WITH SENIORS',
     profile: '📝 ADD / UPDATE PROFILE',
     feedback: 'FEEDBACK ↗'
   },
   app: {
     title: 'All your UPSIFS. Right Here',
-    subtitle: 'Topic-wise resources, campus gallery, seniors, and batchmate links in one student-built hub',
+    subtitle: 'Resources, gallery, seniors, and community in one student-built hub',
     resources: 'Explore Resources →',
     gallery: 'Campus Gallery →',
-    community: 'Join the Community',
+    community: 'Junior Detail Submission',
     seniors: 'Find Seniors →',
     profile: 'Update Profile →',
     feedback: 'Feedback →'
@@ -1783,6 +1807,7 @@ document.addEventListener('keydown', (e) => {
 // ═══════════════ INITIALIZATION ═══════════════
 window.addEventListener('DOMContentLoaded', () => {
   setupSidebarToggle();
+  window.history.replaceState({ tab: 'home' }, '', window.location.pathname);
   applyArcadeTheme(localStorage.getItem(ARCADE_THEME_KEY) || 'app');
 
   localStorage.removeItem('upsifs_senior_profile_submissions');
