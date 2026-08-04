@@ -162,7 +162,6 @@ function revealStudentName(nameText) {
 
 let activeSeniorYear = '2';
 let activeSeniorQuickFilter = '';
-const SENIOR_SUBMISSIONS_KEY = 'upsifs_senior_profile_submissions';
 const SENIOR_ACCESS_KEY = 'upsifs_senior_access_code';
 const SENIOR_FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzd55ExHTpaKooyEFivmZEQ38sAMfAahtCviZgUK4HYV-01-Nn8CS08P1omWKx3CdaPoQ/exec';
 
@@ -231,18 +230,6 @@ function toggleSeniorForm() {
 
 window.openSeniorForm = openSeniorForm;
 window.toggleSeniorForm = toggleSeniorForm;
-
-function getLocalSeniorSubmissions() {
-  try {
-    return JSON.parse(localStorage.getItem(SENIOR_SUBMISSIONS_KEY)) || [];
-  } catch {
-    return [];
-  }
-}
-
-function saveLocalSeniorSubmissions(items) {
-  localStorage.setItem(SENIOR_SUBMISSIONS_KEY, JSON.stringify(items));
-}
 
 function getSeniorAccessCode() {
   try {
@@ -349,19 +336,6 @@ function createSubmittedSeniorCard(profile) {
   return article;
 }
 
-function renderLocalSeniorSubmissions() {
-  if (!getSeniorAccessCode()) return;
-  const grid = document.querySelector('.seniors-grid');
-  if (!grid) return;
-
-  document.querySelectorAll('[data-source="local"]').forEach(card => card.remove());
-  const items = getLocalSeniorSubmissions();
-  const firstYearThree = grid.querySelector('[data-senior-year="3"]');
-  items.forEach(item => {
-    grid.insertBefore(createSubmittedSeniorCard({ ...item, source: 'local' }), firstYearThree);
-  });
-}
-
 function coalesceProfileValue(profile, ...keys) {
   for (const key of keys) {
     const value = profile[key];
@@ -458,7 +432,6 @@ async function unlockSeniorBoard(event) {
   saveSeniorAccessCode(code);
   setSeniorAreaLocked(true, 'Checking access...');
   await loadApprovedSeniorProfiles();
-  renderLocalSeniorSubmissions();
   updateSeniorFilters();
   if (input) input.value = '';
 }
@@ -472,18 +445,6 @@ async function submitSeniorProfile(event) {
   const profile = Object.fromEntries(new FormData(form).entries());
   profile.updatedAt = new Date().toISOString();
 
-  const items = getLocalSeniorSubmissions();
-  const key = seniorIdentityKey(profile);
-  const existingIndex = items.findIndex(item => seniorIdentityKey(item) === key);
-  if (existingIndex >= 0) {
-    items[existingIndex] = profile;
-  } else {
-    items.unshift(profile);
-  }
-  saveLocalSeniorSubmissions(items);
-  renderLocalSeniorSubmissions();
-  updateSeniorFilters();
-
   if (SENIOR_FORM_ENDPOINT) {
     try {
       await fetch(SENIOR_FORM_ENDPOINT, {
@@ -494,24 +455,14 @@ async function submitSeniorProfile(event) {
       });
       if (status) status.textContent = 'Submitted. Your profile update is queued for approval.';
     } catch {
-      if (status) status.textContent = 'Saved locally. Network submission can be retried later.';
+      if (status) status.textContent = 'Network error. Please try again in a moment.';
     }
   } else if (status) {
-    status.textContent = 'Saved as a local draft on this device. To publish for everyone, connect the Google Sheet endpoint.';
+    status.textContent = 'Profile update endpoint is not configured yet.';
   }
 
   form.reset();
 }
-
-function clearLocalSeniorSubmissions() {
-  saveLocalSeniorSubmissions([]);
-  renderLocalSeniorSubmissions();
-  updateSeniorFilters();
-  const status = document.getElementById('senior-form-status');
-  if (status) status.textContent = 'Local profile previews cleared.';
-}
-
-window.clearLocalSeniorSubmissions = clearLocalSeniorSubmissions;
 
 function normalizeSearchText(value) {
   return (value || '').toLowerCase().replace(/\s+/g, ' ').trim();
@@ -1309,7 +1260,7 @@ window.addEventListener('DOMContentLoaded', () => {
     window.initMarioGame();
   }
 
-  renderLocalSeniorSubmissions();
+  localStorage.removeItem('upsifs_senior_profile_submissions');
   if (getSeniorAccessCode()) {
     loadApprovedSeniorProfiles();
   } else {
