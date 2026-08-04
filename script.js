@@ -162,6 +162,8 @@ function revealStudentName(nameText) {
 
 let activeSeniorYear = '2';
 let activeSeniorQuickFilter = '';
+const SENIOR_SUBMISSIONS_KEY = 'upsifs_senior_profile_submissions';
+const SENIOR_FORM_ENDPOINT = '';
 
 // ═══════════════ TAB SWITCHING ═══════════════
 function switchTab(tabName) {
@@ -215,6 +217,157 @@ function setSeniorQuickFilter(filter) {
 }
 
 window.setSeniorQuickFilter = setSeniorQuickFilter;
+
+function openSeniorForm() {
+  const panel = document.getElementById('senior-submit-panel');
+  panel?.classList.add('active');
+  window.setTimeout(() => panel?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+}
+
+function toggleSeniorForm() {
+  document.getElementById('senior-submit-panel')?.classList.toggle('active');
+}
+
+window.openSeniorForm = openSeniorForm;
+window.toggleSeniorForm = toggleSeniorForm;
+
+function getLocalSeniorSubmissions() {
+  try {
+    return JSON.parse(localStorage.getItem(SENIOR_SUBMISSIONS_KEY)) || [];
+  } catch {
+    return [];
+  }
+}
+
+function saveLocalSeniorSubmissions(items) {
+  localStorage.setItem(SENIOR_SUBMISSIONS_KEY, JSON.stringify(items));
+}
+
+function normalizeInstagram(value) {
+  const clean = (value || '').trim();
+  if (!clean) return '';
+  if (clean.startsWith('http')) return clean;
+  return `https://www.instagram.com/${clean.replace(/^@/, '')}/`;
+}
+
+function normalizeWhatsapp(value) {
+  const digits = (value || '').replace(/\D/g, '');
+  if (!digits) return '';
+  return digits.length === 10 ? `91${digits}` : digits;
+}
+
+function initialsFromName(name) {
+  return (name || 'UP')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(part => part[0]?.toUpperCase())
+    .join('') || 'UP';
+}
+
+function createSubmittedSeniorCard(profile) {
+  const article = document.createElement('article');
+  article.className = 'senior-card submitted-card';
+  article.dataset.seniorYear = profile.year || '2';
+  article.dataset.localSubmission = 'true';
+
+  const place = (profile.place || 'PENDING').trim().toUpperCase();
+  const safeName = escapeHtml(profile.name || 'New Profile');
+  const safeTagline = escapeHtml(profile.tagline || 'Pending approval');
+  const safeSkills = escapeHtml(profile.skills || 'Profile update submitted');
+  const photo = (profile.photo || '').trim();
+  const whatsapp = normalizeWhatsapp(profile.whatsapp);
+  const instagram = normalizeInstagram(profile.instagram);
+  const resume = (profile.resume || '').trim();
+
+  const photoHtml = photo
+    ? `<img class="senior-photo" src="${escapeHtml(photo)}" alt="${safeName}">`
+    : `<div class="senior-photo" aria-label="${safeName} photo">${initialsFromName(profile.name)}</div>`;
+
+  const actions = [
+    whatsapp ? `<a href="https://wa.me/${whatsapp}" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>` : '',
+    instagram ? `<a href="${escapeHtml(instagram)}" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>` : '',
+    resume ? `<a href="${escapeHtml(resume)}" target="_blank" rel="noopener noreferrer" class="senior-connect">RESUME ↗</a>` : ''
+  ].filter(Boolean).join('');
+
+  article.innerHTML = `
+    <div class="senior-top">
+      <span class="senior-chip">${escapeHtml(place)}</span>
+    </div>
+    ${photoHtml}
+    <div class="senior-info">
+      <h2>${safeName}</h2>
+      <p>${safeTagline}</p>
+      <span>${safeSkills}</span>
+    </div>
+    <div class="senior-actions">
+      ${actions || '<span class="senior-connect senior-disabled">PENDING ↗</span>'}
+    </div>
+  `;
+
+  return article;
+}
+
+function renderLocalSeniorSubmissions() {
+  const grid = document.querySelector('.seniors-grid');
+  if (!grid) return;
+
+  document.querySelectorAll('[data-local-submission="true"]').forEach(card => card.remove());
+  const items = getLocalSeniorSubmissions();
+  const firstYearThree = grid.querySelector('[data-senior-year="3"]');
+  items.forEach(item => {
+    grid.insertBefore(createSubmittedSeniorCard(item), firstYearThree);
+  });
+}
+
+async function submitSeniorProfile(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const status = document.getElementById('senior-form-status');
+  const profile = Object.fromEntries(new FormData(form).entries());
+  profile.updatedAt = new Date().toISOString();
+
+  const items = getLocalSeniorSubmissions();
+  const phone = normalizeWhatsapp(profile.whatsapp);
+  const key = normalizeSearchText(phone || profile.name);
+  const existingIndex = items.findIndex(item => normalizeSearchText(normalizeWhatsapp(item.whatsapp) || item.name) === key);
+  if (existingIndex >= 0) {
+    items[existingIndex] = profile;
+  } else {
+    items.unshift(profile);
+  }
+  saveLocalSeniorSubmissions(items);
+  renderLocalSeniorSubmissions();
+  updateSeniorFilters();
+
+  if (SENIOR_FORM_ENDPOINT) {
+    try {
+      await fetch(SENIOR_FORM_ENDPOINT, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profile)
+      });
+      if (status) status.textContent = 'Submitted. Your profile update is queued for approval.';
+    } catch {
+      if (status) status.textContent = 'Saved locally. Network submission can be retried later.';
+    }
+  } else if (status) {
+    status.textContent = 'Preview added on this device. Admin can connect the sheet endpoint later.';
+  }
+
+  form.reset();
+}
+
+function clearLocalSeniorSubmissions() {
+  saveLocalSeniorSubmissions([]);
+  renderLocalSeniorSubmissions();
+  updateSeniorFilters();
+  const status = document.getElementById('senior-form-status');
+  if (status) status.textContent = 'Local profile previews cleared.';
+}
+
+window.clearLocalSeniorSubmissions = clearLocalSeniorSubmissions;
 
 function normalizeSearchText(value) {
   return (value || '').toLowerCase().replace(/\s+/g, ' ').trim();
@@ -1006,6 +1159,8 @@ window.addEventListener('DOMContentLoaded', () => {
     window.initMarioGame();
   }
 
+  renderLocalSeniorSubmissions();
+  document.getElementById('senior-profile-form')?.addEventListener('submit', submitSeniorProfile);
   document.getElementById('senior-search')?.addEventListener('input', updateSeniorFilters);
   updateSeniorFilters();
 });

@@ -137,9 +137,9 @@
             <button class="arcade-card-btn" onclick="switchTab('seniors')">
               🧑‍💻 CONNECT WITH SENIORS
             </button>
-            <a href="https://forms.gle/WurEYQVuinQKqtBP9" target="_blank" rel="noopener noreferrer" class="arcade-card-btn feedback-link">
-              📝 JUNIOR DETAILS FORM
-            </a>
+            <button class="arcade-card-btn feedback-link" onclick="switchTab('seniors'); openSeniorForm();">
+              📝 ADD / UPDATE PROFILE
+            </button>
           </div>
         </div>
       </div>
@@ -285,11 +285,67 @@
           <h2>Find the right senior before you ping.</h2>
           <p>Search by name, city, skill, internship, sports, coding, cybersecurity, or academics. Keep it friendly, specific, and respectful.</p>
         </div>
-        <a href="https://forms.gle/WurEYQVuinQKqtBP9" target="_blank" rel="noopener noreferrer" class="feedback-card">
-          <span class="feedback-card-title">JUNIOR DETAILS FORM</span>
-          <span class="feedback-card-copy">Submit junior details and game inputs here.</span>
+        <button type="button" class="feedback-card" onclick="openSeniorForm()">
+          <span class="feedback-card-title">ADD / UPDATE PROFILE</span>
+          <span class="feedback-card-copy">Seniors can submit fresh details or update an existing card.</span>
           <span class="feedback-card-btn">OPEN FORM ↗</span>
-        </a>
+        </button>
+      </section>
+
+      <section class="senior-submit-panel" id="senior-submit-panel" aria-label="Add or update senior profile form">
+        <div class="submit-panel-head">
+          <span class="board-kicker">PROFILE UPDATE</span>
+          <button type="button" class="senior-form-toggle" onclick="toggleSeniorForm()">CLOSE ✕</button>
+        </div>
+        <form class="senior-profile-form" id="senior-profile-form">
+          <div class="form-grid">
+            <label>
+              NAME *
+              <input type="text" name="name" placeholder="e.g. Kartikey Porwal" required>
+            </label>
+            <label>
+              COURSE / BOARD *
+              <select name="year" required>
+                <option value="2">B.Tech Year 2</option>
+                <option value="law2">B.Sc. LL.B Year 2</option>
+                <option value="3">B.Tech Year 3</option>
+              </select>
+            </label>
+            <label>
+              PLACE
+              <input type="text" name="place" placeholder="e.g. Lucknow">
+            </label>
+            <label>
+              WHATSAPP
+              <input type="tel" name="whatsapp" placeholder="10 digit number">
+            </label>
+            <label>
+              INSTAGRAM
+              <input type="text" name="instagram" placeholder="username or link">
+            </label>
+            <label>
+              PHOTO LINK
+              <input type="url" name="photo" placeholder="public image/Drive link">
+            </label>
+            <label>
+              RESUME LINK
+              <input type="url" name="resume" placeholder="optional">
+            </label>
+            <label>
+              TAGLINE
+              <input type="text" name="tagline" placeholder="short intro">
+            </label>
+          </div>
+          <label class="wide-field">
+            SKILLS / TOPICS *
+            <textarea name="skills" placeholder="Coding, Cybersecurity, Sports, Moot Court..." required></textarea>
+          </label>
+          <div class="form-actions">
+            <button type="submit" class="submit-btn">[SUBMIT UPDATE]</button>
+            <button type="button" class="senior-form-clear" onclick="clearLocalSeniorSubmissions()">CLEAR LOCAL PREVIEW</button>
+          </div>
+          <p class="senior-form-status" id="senior-form-status" aria-live="polite"></p>
+        </form>
       </section>
 
       <div class="senior-filter-bar" aria-label="Senior year filter">

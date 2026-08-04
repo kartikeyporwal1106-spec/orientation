@@ -549,6 +549,8 @@ body {
     linear-gradient(135deg, rgba(64, 208, 64, 0.82), rgba(255, 184, 0, 0.86)),
     #1a1a2e;
   transition: transform 0.16s ease, box-shadow 0.16s ease;
+  text-align: left;
+  appearance: none;
 }
 
 .feedback-card:hover {
@@ -575,6 +577,106 @@ body {
   border: 2px solid #000000;
   box-shadow: 2px 2px 0 #000000;
   padding: 0.42rem 0.6rem;
+}
+
+.senior-submit-panel {
+  display: none;
+  max-width: 1040px;
+  margin: 0 auto 1rem;
+  text-align: left;
+  background: rgba(17, 25, 50, 0.5);
+  border: 2px solid #ffffff;
+  box-shadow: 4px 4px 0 #000000;
+  padding: 1rem;
+}
+
+.senior-submit-panel.active {
+  display: block;
+}
+
+.submit-panel-head,
+.form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.senior-form-toggle,
+.senior-form-clear {
+  font-family: var(--font-pixel);
+  font-size: 0.58rem;
+  color: #000000;
+  background: #ffffff;
+  border: 2px solid #000000;
+  box-shadow: 2px 2px 0 #000000;
+  padding: 0.45rem 0.6rem;
+}
+
+.senior-profile-form {
+  margin-top: 0.8rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.senior-profile-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  font-family: var(--font-pixel);
+  font-size: 0.58rem;
+  color: #ffb800;
+  text-shadow: 1px 1px 0 #000000;
+}
+
+.senior-profile-form input,
+.senior-profile-form select,
+.senior-profile-form textarea {
+  width: 100%;
+  min-width: 0;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  font-weight: 750;
+  color: #000000;
+  background: #ffffff;
+  border: 2px solid #000000;
+  box-shadow: 2px 2px 0 #000000;
+  padding: 0.58rem 0.65rem;
+  outline: none;
+}
+
+.senior-profile-form textarea {
+  min-height: 86px;
+  resize: vertical;
+}
+
+.wide-field {
+  margin-top: 0.7rem;
+}
+
+.form-actions {
+  margin-top: 0.85rem;
+  align-items: stretch;
+}
+
+.senior-profile-form .submit-btn {
+  margin-top: 0;
+}
+
+.senior-form-clear {
+  min-width: 190px;
+}
+
+.senior-form-status {
+  min-height: 1.3rem;
+  margin-top: 0.7rem;
+  color: #ffffff;
+  font-weight: 800;
+  text-shadow: 1px 1px 0 #000000;
 }
 
 .senior-filter-bar {
@@ -1480,6 +1582,15 @@ body.game-collapsed .game-toggle-btn {
   }
   .board-copy h2 {
     font-size: 1.22rem;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-actions {
+    flex-direction: column;
+  }
+  .senior-form-clear {
+    min-width: 0;
   }
   .seniors-grid { grid-template-columns: 1fr; }
   .senior-filter-bar {
