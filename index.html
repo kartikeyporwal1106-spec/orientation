@@ -361,331 +361,38 @@
         </div>
       </div>
 
-      <div class="senior-toolbar">
-        <input class="senior-search" id="senior-search" type="search" placeholder="SEARCH SENIORS, SKILLS, PLACE..." autocomplete="off">
-        <span class="senior-count" id="senior-count">0 SENIORS</span>
-      </div>
+      <section class="senior-access-lock" id="senior-access-lock" aria-label="Seniors access code gate">
+        <div class="lock-copy">
+          <span class="board-kicker">PRIVATE BOARD</span>
+          <h2>Enter UPSIFS access code.</h2>
+          <p>Senior contacts are shown only after the shared UPSIFS code is verified.</p>
+        </div>
+        <form class="senior-lock-form" id="senior-lock-form">
+          <label>
+            ACCESS CODE
+            <input type="password" id="senior-access-code" autocomplete="off" placeholder="ENTER CODE" required>
+          </label>
+          <button type="submit" class="submit-btn">[UNLOCK SENIORS]</button>
+          <p class="senior-form-status" id="senior-lock-status" aria-live="polite"></p>
+        </form>
+      </section>
 
-      <div class="senior-quick-filters" aria-label="Senior skill quick filters">
-        <button class="senior-quick-btn active" type="button" data-filter="" onclick="setSeniorQuickFilter('')">ALL</button>
-        <button class="senior-quick-btn" type="button" data-filter="coding" onclick="setSeniorQuickFilter('coding')">CODING</button>
-        <button class="senior-quick-btn" type="button" data-filter="cyber" onclick="setSeniorQuickFilter('cyber')">CYBER</button>
-        <button class="senior-quick-btn" type="button" data-filter="research" onclick="setSeniorQuickFilter('research')">RESEARCH</button>
-        <button class="senior-quick-btn" type="button" data-filter="sports" onclick="setSeniorQuickFilter('sports')">SPORTS</button>
-        <button class="senior-quick-btn" type="button" data-filter="hackathon" onclick="setSeniorQuickFilter('hackathon')">HACKATHON</button>
-      </div>
+      <div class="senior-private-area locked" id="senior-private-area">
+        <div class="senior-toolbar">
+          <input class="senior-search" id="senior-search" type="search" placeholder="SEARCH SENIORS, SKILLS, PLACE..." autocomplete="off">
+          <span class="senior-count" id="senior-count">0 SENIORS</span>
+        </div>
 
-      <div class="seniors-grid">
-        <article class="senior-card" data-senior-year="2">
-          <div class="senior-top">
-            <span class="senior-chip">LUCKNOW</span>
-          </div>
-          <img class="senior-photo senior-photo-kartikey" src="assets/seniors/kartikey-porwal.png" alt="Kartikey Porwal">
-          <div class="senior-info">
-            <h2>Kartikey Porwal</h2>
-            <p>Research Intern @ IIIT-N</p>
-            <span>Research projects · AI/ML basics · Hyperspectral imaging · Hackathons · Internships</span>
-          </div>
-          <div class="senior-actions">
-            <a href="https://wa.me/919412856627" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
-            <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
-          </div>
-        </article>
+        <div class="senior-quick-filters" aria-label="Senior skill quick filters">
+          <button class="senior-quick-btn active" type="button" data-filter="" onclick="setSeniorQuickFilter('')">ALL</button>
+          <button class="senior-quick-btn" type="button" data-filter="coding" onclick="setSeniorQuickFilter('coding')">CODING</button>
+          <button class="senior-quick-btn" type="button" data-filter="cyber" onclick="setSeniorQuickFilter('cyber')">CYBER</button>
+          <button class="senior-quick-btn" type="button" data-filter="research" onclick="setSeniorQuickFilter('research')">RESEARCH</button>
+          <button class="senior-quick-btn" type="button" data-filter="sports" onclick="setSeniorQuickFilter('sports')">SPORTS</button>
+          <button class="senior-quick-btn" type="button" data-filter="hackathon" onclick="setSeniorQuickFilter('hackathon')">HACKATHON</button>
+        </div>
 
-        <article class="senior-card" data-senior-year="2">
-          <div class="senior-top">
-            <span class="senior-chip">KANPUR</span>
-          </div>
-          <img class="senior-photo" src="assets/seniors/arijit-singh.png" alt="Arijit Singh">
-          <div class="senior-info">
-            <h2>Arijit Singh</h2>
-            <p>Volleyball Sports Captain</p>
-            <span>Table tennis · Volleyball · Chess · Coding · Sports events</span>
-          </div>
-          <div class="senior-actions">
-            <a href="https://wa.me/919453644814" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
-            <a href="https://www.instagram.com/arijit49271/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
-          </div>
-        </article>
-
-        <article class="senior-card" data-senior-year="2">
-          <div class="senior-top">
-            <span class="senior-chip">KURUKSHETRA</span>
-          </div>
-          <img class="senior-photo" src="assets/seniors/ansh.png" alt="Ansh">
-          <div class="senior-info">
-            <h2>Ansh</h2>
-            <p>You can be winner at any point.</p>
-            <span>Table tennis · Spiritual balance with studies · Reading books · Journaling</span>
-          </div>
-          <div class="senior-actions">
-            <a href="https://wa.me/917056582882" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
-          </div>
-        </article>
-
-        <article class="senior-card" data-senior-year="2">
-          <div class="senior-top">
-            <span class="senior-chip">KANPUR</span>
-          </div>
-          <img class="senior-photo" src="assets/seniors/shivang-shukla.png" alt="Shivang Shukla">
-          <div class="senior-info">
-            <h2>Shivang Shukla</h2>
-            <p>Vibe Coder</p>
-            <span>Coding · Cyber security · Web dev · Software dev · Kali Linux · OSINT · Ethical hacking · Java/C++/Python</span>
-          </div>
-          <div class="senior-actions">
-            <a href="https://wa.me/919236809518" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
-            <a href="https://www.instagram.com/swiftlysurreal/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
-            <a href="https://www.linkedin.com/in/amshivang" target="_blank" rel="noopener noreferrer" class="senior-connect senior-linkedin">LINKEDIN ↗</a>
-            <a href="https://github.com/amshivang" target="_blank" rel="noopener noreferrer" class="senior-connect senior-github">GITHUB ↗</a>
-          </div>
-        </article>
-
-        <article class="senior-card" data-senior-year="2">
-          <div class="senior-top">
-            <span class="senior-chip">HAPUR</span>
-          </div>
-          <div class="senior-photo" aria-label="Akshat Siddhu photo">AS</div>
-          <div class="senior-info">
-            <h2>Akshat Siddhu</h2>
-            <p>Curious by nature, consistent by choice</p>
-            <span>Competitive programming · Web/App dev · Cybersecurity · Hackathons</span>
-          </div>
-          <div class="senior-actions">
-            <a href="https://wa.me/919084924880" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
-          </div>
-        </article>
-
-        <article class="senior-card" data-senior-year="2">
-          <div class="senior-top">
-            <span class="senior-chip">PATNA</span>
-          </div>
-          <img class="senior-photo" src="assets/seniors/aryan-anand.png" alt="Aryan Anand">
-          <div class="senior-info">
-            <h2>Aryan Anand</h2>
-            <p>Consistency is the Key</p>
-            <span>Academic life · Personal life · Cyberspace</span>
-          </div>
-          <div class="senior-actions">
-            <a href="https://wa.me/917292835500" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
-            <a href="https://www.instagram.com/aaryan_7452/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
-          </div>
-        </article>
-
-        <article class="senior-card" data-senior-year="2">
-          <div class="senior-top">
-            <span class="senior-chip">VARANASI</span>
-          </div>
-          <img class="senior-photo" src="assets/seniors/sarthak-sharma.png" alt="Sarthak Sharma">
-          <div class="senior-info">
-            <h2>Sarthak Sharma</h2>
-            <p>Do not stop until victory is achieved</p>
-            <span>C · C++ · Python · Studies</span>
-          </div>
-          <div class="senior-actions">
-            <a href="https://wa.me/918887954259" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
-            <a href="https://www.instagram.com/sarthakshrm3333/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
-          </div>
-        </article>
-
-        <article class="senior-card" data-senior-year="2">
-          <div class="senior-top">
-            <span class="senior-chip">PRAYAGRAJ</span>
-          </div>
-          <img class="senior-photo" src="assets/seniors/saksham-singh.png" alt="Saksham Singh">
-          <div class="senior-info">
-            <h2>Saksham Singh</h2>
-            <p>Project AstraMED</p>
-            <span>Web Development· Python · DSA </span>
-          </div>
-          <div class="senior-actions">
-            <a href="https://wa.me/917060780882" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
-          </div>
-        </article>
-
-        <article class="senior-card" data-senior-year="2">
-          <div class="senior-top">
-            <span class="senior-chip">KOLKATA</span>
-          </div>
-          <img class="senior-photo" src="assets/seniors/aritra-santra.png" alt="Aritra Santra">
-          <div class="senior-info">
-            <h2>Aritra Santra</h2>
-            <p>IIC Council Member</p>
-            <span>Management · Communication Skills & Connections · Cyber security · Digital forensics · Web Development</span>
-          </div>
-          <div class="senior-actions">
-            <a href="https://wa.me/919903502192" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
-            <a href="https://www.instagram.com/a.r.i.t.r.a_14/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
-          </div>
-        </article>
-
-        <article class="senior-card" data-senior-year="2">
-          <div class="senior-top">
-            <span class="senior-chip">KANPUR</span>
-          </div>
-          <img class="senior-photo" src="assets/seniors/shreya-trivedi.png" alt="Shreya Trivedi">
-          <div class="senior-info">
-            <h2>Shreya Trivedi</h2>
-            <p>Research Intern @ IITK</p>
-            <span>C/C++/Python · Academics · Filesystem forensics · Cybersecurity basics</span>
-          </div>
-          <div class="senior-actions">
-            <a href="https://wa.me/917007676337" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
-            <a href="https://www.instagram.com/Shre_17_rsh/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
-          </div>
-        </article>
-
-        <article class="senior-card" data-senior-year="2">
-          <div class="senior-top">
-            <span class="senior-chip">MATHURA</span>
-          </div>
-          <img class="senior-photo" src="assets/seniors/himanshu-chaube.png" alt="Himanshu Chaube">
-          <div class="senior-info">
-            <h2>Himanshu Chaube</h2>
-            <p></p>
-            <span>AI & Cybersecurity · Python · C/C++ · Git/GitHub · Web Development · Resume Guidance · Hackathons</span>
-          </div>
-          <div class="senior-actions">
-            <a href="https://wa.me/917878626349" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
-            <a href="https://www.instagram.com/himanshuchaube.387/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
-          </div>
-        </article>
-
-        <article class="senior-card" data-senior-year="2">
-          <div class="senior-top">
-            <span class="senior-chip">MORADABAD</span>
-          </div>
-          <img class="senior-photo" src="assets/seniors/abhinay-kumar.png" alt="Abhinay Kumar">
-          <div class="senior-info">
-            <h2>Abhinay Kumar</h2>
-            <p>Systems Thinker & Builder</p>
-            <span>AI system design · B2B startups · Prompt engineering · AI prototyping · Photography</span>
-          </div>
-          <div class="senior-actions">
-            <a href="https://wa.me/919897713420" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
-          </div>
-        </article>
-
-        <article class="senior-card" data-senior-year="2">
-          <div class="senior-top">
-            <span class="senior-chip">GHAZIPUR</span>
-          </div>
-          <div class="senior-photo" aria-label="Ravishankar Kushwaha photo">RK</div>
-          <div class="senior-info">
-            <h2>Ravishankar Kushwaha</h2>
-            <p>GPCSSI Intern · I4C Delhi selected</p>
-            <span>Cybersecurity · Internship guidance · Police cyber exposure · General mentoring</span>
-          </div>
-          <div class="senior-actions">
-            <a href="https://wa.me/917905751041" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
-          </div>
-        </article>
-
-        <article class="senior-card" data-senior-year="2">
-          <div class="senior-top">
-            <span class="senior-chip">LUCKNOW</span>
-          </div>
-          <img class="senior-photo" src="assets/seniors/rishabh-tripathi.png" alt="Rishabh Tripathi">
-          <div class="senior-info">
-            <h2>Rishabh Tripathi</h2>
-            <p>Let's just say I know a guy...</p>
-            <span>C/C++ · Python · DSA fundamentals · Cybersecurity · eSports · Poetry</span>
-          </div>
-          <div class="senior-actions">
-            <a href="https://wa.me/917302046539" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
-            <a href="https://www.instagram.com/Rishabh_tri22/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
-          </div>
-        </article>
-
-        <article class="senior-card" data-senior-year="2">
-          <div class="senior-top">
-            <span class="senior-chip">PATNA</span>
-          </div>
-          <img class="senior-photo" src="assets/seniors/piyush-jiloka.png" alt="Piyush Jiloka">
-          <div class="senior-info">
-            <h2>Piyush Jiloka</h2>
-            <p>Compiling life, code, everything...</p>
-            <span>C/C++ · Java · OOPs · Web basics · Cricket · Dance · Judo · UI/UX</span>
-          </div>
-          <div class="senior-actions">
-            <a href="https://wa.me/919431283598" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
-            <a href="https://www.instagram.com/piyush_jiloka/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
-          </div>
-        </article>
-
-        <article class="senior-card" data-senior-year="2">
-          <div class="senior-top">
-            <span class="senior-chip">BALLIA</span>
-          </div>
-          <img class="senior-photo" src="assets/seniors/purnendu-rai.png" alt="Purnendu Rai">
-          <div class="senior-info">
-            <h2>Purnendu Rai</h2>
-            <p>Interned @ IIT Jammu · GPCSSI 2026</p>
-            <span>Ethical hacking · Penetration testing · Hacking tools · Cybersecurity</span>
-          </div>
-          <div class="senior-actions">
-            <a href="https://wa.me/919305067512" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
-            <a href="https://www.instagram.com/raipurnendu/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
-          </div>
-        </article>
-
-        <article class="senior-card" data-senior-year="2">
-          <div class="senior-top">
-            <span class="senior-chip">PRAYAGRAJ</span>
-          </div>
-          <img class="senior-photo" src="assets/seniors/aditya-pandey.png" alt="Aditya Pandey">
-          <div class="senior-info">
-            <h2>Aditya Pandey</h2>
-            <p>Hostel Representative · Swimmer · Gym enthusiast</p>
-            <span>CS basics · Programming · Sports events · Anchoring · Hostel coordination · Creative editing</span>
-          </div>
-          <div class="senior-actions">
-            <a href="https://wa.me/918765149300" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
-            <a href="https://www.instagram.com/aditypand3y/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
-          </div>
-        </article>
-
-        <article class="senior-card hidden" data-senior-year="law2">
-          <div class="senior-top">
-            <span class="senior-chip">LUCKNOW</span>
-          </div>
-          <div class="senior-photo" aria-label="Shashwat Pande photo">SP</div>
-          <div class="senior-info">
-            <h2>Shashwat Pande</h2>
-            <p>Ex NCC SUO · Moot achievements</p>
-            <span>Moot Court · Sports · Public speaking · Legal competitions · Event organising</span>
-          </div>
-          <div class="senior-actions">
-            <a href="https://wa.me/917651960198" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>
-            <a href="https://www.instagram.com/sshashwatpande/" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>
-          </div>
-        </article>
-
-        <article class="senior-card hidden" data-senior-year="3">
-          <div class="senior-top">
-            <span class="senior-chip">YEAR 3</span>
-          </div>
-          <div class="senior-photo" aria-label="Kabir Khan photo">KK</div>
-          <div class="senior-info">
-            <h2>Year 3 Senior</h2>
-            <p>“Add profile details when seniors confirm.”</p>
-            <span>Advanced courses · Internships · Projects · Clubs</span>
-          </div>
-          <a href="https://www.reddit.com/r/upsifs/" target="_blank" rel="noopener noreferrer" class="senior-connect">CONNECT ↗</a>
-        </article>
-
-        <article class="senior-card hidden" data-senior-year="3">
-          <div class="senior-top">
-            <span class="senior-chip">YEAR 3</span>
-          </div>
-          <div class="senior-photo" aria-label="Priya Sharma photo">PS</div>
-          <div class="senior-info">
-            <h2>Year 3 Senior</h2>
-            <p>“Add profile details when seniors confirm.”</p>
-            <span>Semester planning · Hackathons · Placements prep · PYQs</span>
-          </div>
-          <a href="https://www.reddit.com/r/upsifs/" target="_blank" rel="noopener noreferrer" class="senior-connect">CONNECT ↗</a>
-        </article>
+        <div class="seniors-grid" aria-live="polite"></div>
       </div>
     </div>
 

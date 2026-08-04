@@ -22,6 +22,7 @@ Open the response Sheet, then Extensions > Apps Script. Paste this:
 
 ```js
 const SHEET_NAME = 'Form Responses 1';
+const ACCESS_CODES_SHEET = 'Access Codes';
 
 function rowToObject(headers, row) {
   const item = {};
@@ -39,7 +40,53 @@ function pick(row, ...keys) {
   return '';
 }
 
-function doGet() {
+function ensureAccessCodesSheet() {
+  const spreadsheet = SpreadsheetApp.getActive();
+  let sheet = spreadsheet.getSheetByName(ACCESS_CODES_SHEET);
+  if (!sheet) {
+    sheet = spreadsheet.insertSheet(ACCESS_CODES_SHEET);
+    sheet.appendRow(['code', 'expiresAt', 'usedAt']);
+  }
+  return sheet;
+}
+
+function createAccessCode(minutes) {
+  const sheet = ensureAccessCodesSheet();
+  const code = Utilities.getUuid().slice(0, 8).toUpperCase();
+  const expiresAt = new Date(Date.now() + (Number(minutes) || 30) * 60 * 1000);
+  sheet.appendRow([code, expiresAt, '']);
+  Logger.log('UPSIFS senior access code: ' + code);
+  return code;
+}
+
+function verifyAccessCode(code) {
+  if (!code) return false;
+  const sheet = ensureAccessCodesSheet();
+  const rows = sheet.getDataRange().getValues();
+  const cleanCode = String(code).trim().toUpperCase();
+  const now = new Date();
+
+  for (let index = 1; index < rows.length; index += 1) {
+    const rowCode = String(rows[index][0] || '').trim().toUpperCase();
+    const expiresAt = rows[index][1];
+    const usedAt = rows[index][2];
+    const isExpired = expiresAt instanceof Date && expiresAt < now;
+    if (rowCode === cleanCode && !usedAt && !isExpired) {
+      sheet.getRange(index + 1, 3).setValue(now);
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function doGet(e) {
+  if (!verifyAccessCode(e.parameter.code)) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ error: 'ACCESS_DENIED' }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
   const sheet = SpreadsheetApp.getActive().getSheetByName(SHEET_NAME);
   const rows = sheet.getDataRange().getValues();
   const headers = rows.shift().map(header => String(header).trim());
@@ -118,4 +165,25 @@ const SENIOR_FORM_ENDPOINT = 'PASTE_WEB_APP_URL_HERE';
 
 Rows stay unpublished until `approved` is set to `yes`.
 
-For updates, compare enrollment number and WhatsApp before approving. A full identity check needs login or OTP, but this keeps the workflow lightweight and prevents random frontend changes from going live.
+## Access Codes
+
+Create one-time codes from Apps Script:
+
+1. Select `createAccessCode` from the function dropdown.
+2. Click Run.
+3. Open View > Logs.
+4. Share the logged code with the student/group.
+
+Default expiry is 30 minutes. To create a longer code, run this from Apps Script console:
+
+```js
+createAccessCode(120)
+```
+
+The code is consumed on first successful unlock. The current browser tab keeps the board loaded, but a refresh needs a new code.
+
+For updates, compare enrollment number and WhatsApp before approving. A full identity check needs official login or OTP, but one-use codes plus manual approval keep the details out of the frontend source and stop random public viewing.
+
+## AI Cleanup
+
+Do not put an AI API key in website JavaScript. If you want AI cleanup, put it inside Apps Script using Script Properties, then write cleaned results into `displayName`, `displayTagline`, `displaySkills`, and `displayPlace`. The website will automatically prefer those cleaned `display...` fields.

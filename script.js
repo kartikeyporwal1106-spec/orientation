@@ -163,6 +163,7 @@ function revealStudentName(nameText) {
 let activeSeniorYear = '2';
 let activeSeniorQuickFilter = '';
 const SENIOR_SUBMISSIONS_KEY = 'upsifs_senior_profile_submissions';
+const SENIOR_ACCESS_KEY = 'upsifs_senior_access_code';
 const SENIOR_FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzd55ExHTpaKooyEFivmZEQ38sAMfAahtCviZgUK4HYV-01-Nn8CS08P1omWKx3CdaPoQ/exec';
 
 // ═══════════════ TAB SWITCHING ═══════════════
@@ -241,6 +242,29 @@ function getLocalSeniorSubmissions() {
 
 function saveLocalSeniorSubmissions(items) {
   localStorage.setItem(SENIOR_SUBMISSIONS_KEY, JSON.stringify(items));
+}
+
+function getSeniorAccessCode() {
+  try {
+    return sessionStorage.getItem(SENIOR_ACCESS_KEY) || '';
+  } catch {
+    return '';
+  }
+}
+
+function saveSeniorAccessCode(code) {
+  try {
+    sessionStorage.setItem(SENIOR_ACCESS_KEY, code);
+  } catch {
+    // Ignore private-browsing storage failures.
+  }
+}
+
+function setSeniorAreaLocked(isLocked, message = '') {
+  document.getElementById('senior-private-area')?.classList.toggle('locked', isLocked);
+  document.getElementById('senior-access-lock')?.classList.toggle('unlocked', !isLocked);
+  const status = document.getElementById('senior-lock-status');
+  if (status && message) status.textContent = message;
 }
 
 function normalizeInstagram(value) {
@@ -326,6 +350,7 @@ function createSubmittedSeniorCard(profile) {
 }
 
 function renderLocalSeniorSubmissions() {
+  if (!getSeniorAccessCode()) return;
   const grid = document.querySelector('.seniors-grid');
   if (!grid) return;
 
@@ -382,13 +407,22 @@ function hideStaticSeniorDuplicates(remoteProfiles) {
 
 async function loadApprovedSeniorProfiles() {
   if (!SENIOR_FORM_ENDPOINT) return;
+  const code = getSeniorAccessCode();
+  if (!code) {
+    setSeniorAreaLocked(true);
+    return;
+  }
+
   const grid = document.querySelector('.seniors-grid');
   if (!grid) return;
 
   try {
-    const response = await fetch(SENIOR_FORM_ENDPOINT, { method: 'GET' });
-    if (!response.ok) throw new Error('Endpoint not ready');
+    const url = new URL(SENIOR_FORM_ENDPOINT);
+    url.searchParams.set('code', code);
+    const response = await fetch(url.toString(), { method: 'GET' });
+    if (!response.ok) throw new Error('Access denied');
     const rows = await response.json();
+    if (rows?.error) throw new Error(rows.error);
     if (!Array.isArray(rows)) return;
 
     const profilesByKey = new Map();
@@ -400,6 +434,7 @@ async function loadApprovedSeniorProfiles() {
     const profiles = [...profilesByKey.values()];
     document.querySelectorAll('[data-source="remote"]').forEach(card => card.remove());
     hideStaticSeniorDuplicates(profiles);
+    setSeniorAreaLocked(false, 'Access granted. Senior board loaded.');
 
     const firstYearThree = grid.querySelector('[data-senior-year="3"]');
     profiles.forEach(profile => {
@@ -408,9 +443,27 @@ async function loadApprovedSeniorProfiles() {
 
     updateSeniorFilters();
   } catch (error) {
+    saveSeniorAccessCode('');
+    setSeniorAreaLocked(true, 'Wrong code or senior board endpoint is not ready.');
     console.warn('Senior sheet sync skipped:', error);
   }
 }
+
+async function unlockSeniorBoard(event) {
+  event.preventDefault();
+  const input = document.getElementById('senior-access-code');
+  const code = (input?.value || '').trim();
+  if (!code) return;
+
+  saveSeniorAccessCode(code);
+  setSeniorAreaLocked(true, 'Checking access...');
+  await loadApprovedSeniorProfiles();
+  renderLocalSeniorSubmissions();
+  updateSeniorFilters();
+  if (input) input.value = '';
+}
+
+window.unlockSeniorBoard = unlockSeniorBoard;
 
 async function submitSeniorProfile(event) {
   event.preventDefault();
@@ -465,6 +518,12 @@ function normalizeSearchText(value) {
 }
 
 function updateSeniorFilters() {
+  if (!getSeniorAccessCode()) {
+    const count = document.getElementById('senior-count');
+    if (count) count.textContent = 'LOCKED';
+    return;
+  }
+
   const search = normalizeSearchText(document.getElementById('senior-search')?.value);
   const cards = [...document.querySelectorAll('[data-senior-year]')];
   let visibleCount = 0;
@@ -1251,8 +1310,13 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   renderLocalSeniorSubmissions();
-  loadApprovedSeniorProfiles();
+  if (getSeniorAccessCode()) {
+    loadApprovedSeniorProfiles();
+  } else {
+    setSeniorAreaLocked(true);
+  }
   document.getElementById('senior-profile-form')?.addEventListener('submit', submitSeniorProfile);
+  document.getElementById('senior-lock-form')?.addEventListener('submit', unlockSeniorBoard);
   document.getElementById('senior-search')?.addEventListener('input', updateSeniorFilters);
   updateSeniorFilters();
 });
