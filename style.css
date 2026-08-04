@@ -801,6 +801,10 @@ body {
   display: none;
 }
 
+.senior-card.hidden-by-remote {
+  display: none;
+}
+
 .senior-card.filtered-out {
   display: none;
 }

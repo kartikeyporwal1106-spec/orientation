@@ -163,7 +163,7 @@ function revealStudentName(nameText) {
 let activeSeniorYear = '2';
 let activeSeniorQuickFilter = '';
 const SENIOR_SUBMISSIONS_KEY = 'upsifs_senior_profile_submissions';
-const SENIOR_FORM_ENDPOINT = '';
+const SENIOR_FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzd55ExHTpaKooyEFivmZEQ38sAMfAahtCviZgUK4HYV-01-Nn8CS08P1omWKx3CdaPoQ/exec';
 
 // ═══════════════ TAB SWITCHING ═══════════════
 function switchTab(tabName) {
@@ -250,10 +250,24 @@ function normalizeInstagram(value) {
   return `https://www.instagram.com/${clean.replace(/^@/, '')}/`;
 }
 
+function normalizeLinkedIn(value) {
+  const clean = (value || '').trim();
+  if (!clean) return '';
+  if (clean.startsWith('http')) return clean;
+  const slug = clean.replace(/^@/, '').replace(/^in\//, '');
+  return `https://www.linkedin.com/in/${slug}`;
+}
+
 function normalizeWhatsapp(value) {
   const digits = (value || '').replace(/\D/g, '');
   if (!digits) return '';
   return digits.length === 10 ? `91${digits}` : digits;
+}
+
+function seniorIdentityKey(profile) {
+  const enrollment = normalizeSearchText(profile.enrollment || profile.enrollmentNumber || profile.roll || '');
+  const phone = normalizeWhatsapp(profile.whatsapp || profile.mobile || '');
+  return enrollment || phone || normalizeSearchText(profile.name || '');
 }
 
 function initialsFromName(name) {
@@ -268,8 +282,9 @@ function initialsFromName(name) {
 function createSubmittedSeniorCard(profile) {
   const article = document.createElement('article');
   article.className = 'senior-card submitted-card';
-  article.dataset.seniorYear = profile.year || '2';
-  article.dataset.localSubmission = 'true';
+  article.dataset.seniorYear = profile.year || profile.board || '2';
+  if (profile.source) article.dataset.source = profile.source;
+  if (profile.enrollment) article.dataset.enrollment = profile.enrollment;
 
   const place = (profile.place || 'PENDING').trim().toUpperCase();
   const safeName = escapeHtml(profile.name || 'New Profile');
@@ -278,6 +293,7 @@ function createSubmittedSeniorCard(profile) {
   const photo = (profile.photo || '').trim();
   const whatsapp = normalizeWhatsapp(profile.whatsapp);
   const instagram = normalizeInstagram(profile.instagram);
+  const linkedin = normalizeLinkedIn(profile.linkedin);
   const resume = (profile.resume || '').trim();
 
   const photoHtml = photo
@@ -287,6 +303,7 @@ function createSubmittedSeniorCard(profile) {
   const actions = [
     whatsapp ? `<a href="https://wa.me/${whatsapp}" target="_blank" rel="noopener noreferrer" class="senior-connect">WHATSAPP ↗</a>` : '',
     instagram ? `<a href="${escapeHtml(instagram)}" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">INSTAGRAM ↗</a>` : '',
+    linkedin ? `<a href="${escapeHtml(linkedin)}" target="_blank" rel="noopener noreferrer" class="senior-connect senior-linkedin">LINKEDIN ↗</a>` : '',
     resume ? `<a href="${escapeHtml(resume)}" target="_blank" rel="noopener noreferrer" class="senior-connect">RESUME ↗</a>` : ''
   ].filter(Boolean).join('');
 
@@ -312,12 +329,87 @@ function renderLocalSeniorSubmissions() {
   const grid = document.querySelector('.seniors-grid');
   if (!grid) return;
 
-  document.querySelectorAll('[data-local-submission="true"]').forEach(card => card.remove());
+  document.querySelectorAll('[data-source="local"]').forEach(card => card.remove());
   const items = getLocalSeniorSubmissions();
   const firstYearThree = grid.querySelector('[data-senior-year="3"]');
   items.forEach(item => {
-    grid.insertBefore(createSubmittedSeniorCard(item), firstYearThree);
+    grid.insertBefore(createSubmittedSeniorCard({ ...item, source: 'local' }), firstYearThree);
   });
+}
+
+function coalesceProfileValue(profile, ...keys) {
+  for (const key of keys) {
+    const value = profile[key];
+    if (value !== undefined && value !== null && String(value).trim()) {
+      return String(value).trim();
+    }
+  }
+  return '';
+}
+
+function normalizeRemoteSeniorProfile(row) {
+  const name = coalesceProfileValue(row, 'displayName', 'name', 'Your Name');
+  const course = coalesceProfileValue(row, 'displayBoard', 'board', 'year', 'Your Course And Semester', 'Your Course');
+  const board = /law|llb/i.test(course) ? 'law2' : /^(3|b\.?tech\s*y?3|year\s*3)$/i.test(course) ? '3' : '2';
+  const photo = coalesceProfileValue(row, 'displayPhoto', 'photo', 'Profile Photo', 'Profile Photo (if you want)');
+
+  return {
+    source: 'remote',
+    name,
+    year: board === 'law2' ? 'law2' : board === '3' ? '3' : '2',
+    enrollment: coalesceProfileValue(row, 'displayEnrollment', 'enrollment', 'Enrollment Number'),
+    place: coalesceProfileValue(row, 'displayPlace', 'place', 'Place (Kha se Hai Aap)'),
+    tagline: coalesceProfileValue(row, 'displayTagline', 'tagline', 'TagLine (Experience or Something good about u)', 'TagLine (Experience or Something good about u) like IIC Member/ Interned at etc kuch bhi cool aapne kiya ho'),
+    skills: coalesceProfileValue(row, 'displaySkills', 'skills', 'Topics You Can Guide On', 'Your Interest (This will appear on your profile)'),
+    photo,
+    whatsapp: coalesceProfileValue(row, 'displayWhatsapp', 'whatsapp', 'Your Mobile Number (Whatsapp)'),
+    instagram: coalesceProfileValue(row, 'displayInstagram', 'instagram', 'Your Instagram'),
+    linkedin: coalesceProfileValue(row, 'displayLinkedin', 'linkedin'),
+    resume: coalesceProfileValue(row, 'displayResume', 'resume', 'Resume')
+  };
+}
+
+function hideStaticSeniorDuplicates(remoteProfiles) {
+  const remoteKeys = new Set(remoteProfiles.flatMap(profile => [
+    seniorIdentityKey(profile),
+    normalizeSearchText(profile.name || '')
+  ]).filter(Boolean));
+  document.querySelectorAll('.senior-card:not([data-source])').forEach(card => {
+    const name = card.querySelector('h2')?.textContent || '';
+    card.classList.toggle('hidden-by-remote', remoteKeys.has(normalizeSearchText(name)));
+  });
+}
+
+async function loadApprovedSeniorProfiles() {
+  if (!SENIOR_FORM_ENDPOINT) return;
+  const grid = document.querySelector('.seniors-grid');
+  if (!grid) return;
+
+  try {
+    const response = await fetch(SENIOR_FORM_ENDPOINT, { method: 'GET' });
+    if (!response.ok) throw new Error('Endpoint not ready');
+    const rows = await response.json();
+    if (!Array.isArray(rows)) return;
+
+    const profilesByKey = new Map();
+    rows
+      .map(normalizeRemoteSeniorProfile)
+      .filter(profile => profile.name && seniorIdentityKey(profile))
+      .forEach(profile => profilesByKey.set(seniorIdentityKey(profile), profile));
+
+    const profiles = [...profilesByKey.values()];
+    document.querySelectorAll('[data-source="remote"]').forEach(card => card.remove());
+    hideStaticSeniorDuplicates(profiles);
+
+    const firstYearThree = grid.querySelector('[data-senior-year="3"]');
+    profiles.forEach(profile => {
+      grid.insertBefore(createSubmittedSeniorCard(profile), firstYearThree);
+    });
+
+    updateSeniorFilters();
+  } catch (error) {
+    console.warn('Senior sheet sync skipped:', error);
+  }
 }
 
 async function submitSeniorProfile(event) {
@@ -328,9 +420,8 @@ async function submitSeniorProfile(event) {
   profile.updatedAt = new Date().toISOString();
 
   const items = getLocalSeniorSubmissions();
-  const phone = normalizeWhatsapp(profile.whatsapp);
-  const key = normalizeSearchText(phone || profile.name);
-  const existingIndex = items.findIndex(item => normalizeSearchText(normalizeWhatsapp(item.whatsapp) || item.name) === key);
+  const key = seniorIdentityKey(profile);
+  const existingIndex = items.findIndex(item => seniorIdentityKey(item) === key);
   if (existingIndex >= 0) {
     items[existingIndex] = profile;
   } else {
@@ -353,7 +444,7 @@ async function submitSeniorProfile(event) {
       if (status) status.textContent = 'Saved locally. Network submission can be retried later.';
     }
   } else if (status) {
-    status.textContent = 'Preview added on this device. Admin can connect the sheet endpoint later.';
+    status.textContent = 'Saved as a local draft on this device. To publish for everyone, connect the Google Sheet endpoint.';
   }
 
   form.reset();
@@ -1160,6 +1251,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   renderLocalSeniorSubmissions();
+  loadApprovedSeniorProfiles();
   document.getElementById('senior-profile-form')?.addEventListener('submit', submitSeniorProfile);
   document.getElementById('senior-search')?.addEventListener('input', updateSeniorFilters);
   updateSeniorFilters();
