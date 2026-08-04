@@ -182,6 +182,20 @@ const arcadeThemes = {
     overlayText: '♦ UPSIFS SUPER BROS ♦',
     overlaySub: 'PRESS ENTER / TAP TO START'
   },
+  app: {
+    bodyClass: 'theme-app',
+    logo: 'UPSIFS Hub',
+    sidebarBrand: 'APP MENU',
+    gameButton: 'ARCADE ▼',
+    hudPlayer: 'UPSIFS',
+    hudWorld: 'CAMPUS HUB',
+    collectibleIcon: '•',
+    bannerIcon: '✦',
+    bannerText: 'Explore resources, gallery, seniors, and batchmate links.',
+    overlayTitle: 'CAMPUS HUB',
+    overlayText: 'UPSIFS APP MODE',
+    overlaySub: 'PRESS ENTER / TAP TO START'
+  },
   f1: {
     bodyClass: 'theme-f1',
     logo: 'UPSIFS RACING',
@@ -265,7 +279,7 @@ function applyArcadeTheme(themeName) {
       ? arcadePlayerNames.pokemon
       : theme.hudPlayer;
 
-  document.body.classList.remove('theme-f1', 'theme-pokemon');
+  document.body.classList.remove('theme-app', 'theme-f1', 'theme-pokemon');
   if (theme.bodyClass) {
     document.body.classList.add(theme.bodyClass);
   }
@@ -327,7 +341,7 @@ window.getCurrentArcadeMode = function () {
 };
 
 function changeArcadePlayerName() {
-  if (activeArcadeTheme === 'classic') {
+  if (activeArcadeTheme === 'classic' || activeArcadeTheme === 'app') {
     alert('Switch to Formula 1 or Pokemon first, then set the character name.');
     return;
   }
