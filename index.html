@@ -7,13 +7,11 @@
   <meta name="description" content="UPSIFS Retro 8-Bit Arcade Portal — B.Tech-M.Tech Integrated Cyber Security Freshers Class of 2026.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Instrument+Serif:ital@0;1&family=Kalam:wght@300;400;700&family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <!-- GSAP & Three.js Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <!-- Mario Platformer Game Engine -->
-  <script src="game.js" defer></script>
 </head>
 <body>
 
@@ -31,16 +29,20 @@
       <button class="nav-btn" data-tab="resources" onclick="switchTab('resources')">RESOURCES</button>
       <button class="nav-btn" data-tab="seniors" onclick="switchTab('seniors')">SENIORS</button>
       <button class="nav-btn" data-tab="gallery" onclick="switchTab('gallery')">GALLERY</button>
+      <button class="nav-btn" data-tab="devs" onclick="switchTab('devs')">DEVS</button>
     </nav>
     <a href="https://www.reddit.com/r/upsifs/" target="_blank" rel="noopener noreferrer" class="btn-buy-pass">
-      JOIN R/UPSIFS
+      JOIN / LOGIN
     </a>
   </header>
 
   <!-- ═══════════════ SIDEBAR MENU ═══════════════ -->
   <aside class="sidebar" id="main-sidebar">
     <div class="sidebar-header">
-      <span class="sidebar-brand">PAUSE MENU</span>
+      <div class="sidebar-title-row">
+        <span class="sidebar-brand">PAUSE MENU</span>
+        <button class="sidebar-close-btn" type="button" onclick="closeSidebar()" aria-label="Close Menu">×</button>
+      </div>
       <span class="sidebar-version">B.TECH-M.TECH CYBER SEC 2026</span>
     </div>
 
@@ -53,20 +55,18 @@
           <li><a href="#resources" onclick="switchTab('resources'); closeSidebar();">▶ ACADEMIC RESOURCES</a></li>
           <li><a href="#gallery" onclick="switchTab('gallery'); switchGalleryView('college'); closeSidebar();">▶ 🏛️ CAMPUS GALLERY</a></li>
           <li><a href="#seniors" onclick="switchTab('seniors'); closeSidebar();">▶ 🧑‍💻 CONNECT SENIORS</a></li>
+          <li><a href="#devs" onclick="switchTab('devs'); closeSidebar();">▶ BUILT BY STUDENTS</a></li>
         </ul>
       </div>
 
       <div class="sidebar-divider"></div>
 
-      <!-- ═══ Arcade Mode Selector ═══ -->
+      <!-- ═══ UI Style Selector ═══ -->
       <div class="sidebar-section">
-        <span class="sidebar-section-title">// ARCADE MODES</span>
+        <span class="sidebar-section-title">// UI STYLE</span>
         <ul>
           <li><button class="theme-option active" type="button" data-theme-option="classic" onclick="selectArcadeTheme('classic'); closeSidebar();">▶ CLASSIC UPSIFS UI</button></li>
           <li><button class="theme-option" type="button" data-theme-option="app" onclick="selectArcadeTheme('app'); closeSidebar();">▶ SOFT APP UI</button></li>
-          <li><button class="theme-option" type="button" data-theme-option="f1" onclick="selectArcadeTheme('f1'); closeSidebar();">▶ VERSTAPPEN RACING GAME</button></li>
-          <li><button class="theme-option" type="button" data-theme-option="pokemon" onclick="selectArcadeTheme('pokemon'); closeSidebar();">▶ POKEMON UI + GAME</button></li>
-          <li><button class="theme-option" type="button" onclick="changeArcadePlayerName(); closeSidebar();">▶ CHANGE PLAYER NAME</button></li>
         </ul>
       </div>
 
@@ -122,37 +122,37 @@
   <main class="arcade-stage">
     <div class="theme-quote-layer" aria-hidden="true">
       <div class="theme-quote-card theme-quote-f1">
-        <span class="quote-kicker">F1 RADIO QUOTES</span>
-        <span class="quote-line quote-line-f1 q1">MAX: "Simply lovely."</span>
-        <span class="quote-line quote-line-f1 q2">CHARLES: "I am checking."</span>
-        <span class="quote-line quote-line-f1 q3">KIMI: "Leave me alone."</span>
-        <span class="quote-line quote-line-f1 q4">ALONSO: "GP2 engine."</span>
-        <span class="quote-line quote-line-f1 q5">LEWIS: "Still we rise."</span>
-        <span class="quote-line quote-line-f1 q6">SEB: "Grazie ragazzi."</span>
-        <span class="quote-line quote-line-f1 q7">SAINZ: "Smooth operator."</span>
+        <span class="quote-kicker">UPSIFS NOTEBOOK</span>
+        <span class="quote-line quote-line-f1 q1">notes: keep it useful.</span>
+        <span class="quote-line quote-line-f1 q2">gallery: save the campus bits.</span>
+        <span class="quote-line quote-line-f1 q3">seniors: ask nicely.</span>
+        <span class="quote-line quote-line-f1 q4">resources: upload clean files.</span>
+        <span class="quote-line quote-line-f1 q5">batch: share what helps.</span>
+        <span class="quote-line quote-line-f1 q6">freshers: start here.</span>
+        <span class="quote-line quote-line-f1 q7">upsifs: made by students.</span>
       </div>
       <div class="theme-quote-card theme-quote-pokemon">
-        <span class="quote-kicker">UPSIFS DEX LOG</span>
-        <span class="quote-line quote-line-pokemon p1">ASH: "I choose you."</span>
-        <span class="quote-line quote-line-pokemon p2">ASH: "Gotta catch 'em all."</span>
-        <span class="quote-line quote-line-pokemon p3">PIKACHU: "Pika pika!"</span>
-        <span class="quote-line quote-line-pokemon p4">OAK: "Your very own legend is about to unfold."</span>
-        <span class="quote-line quote-line-pokemon p5">DEX: "A wild batchmate appeared."</span>
-        <span class="quote-line quote-line-pokemon p6">ASH: "There's no sense in going out of your way to get somebody to like you."</span>
+        <span class="quote-kicker">CAMPUS LOG</span>
+        <span class="quote-line quote-line-pokemon p1">library, auditorium, labs.</span>
+        <span class="quote-line quote-line-pokemon p2">hostels, roads, sunsets.</span>
+        <span class="quote-line quote-line-pokemon p3">one small hub for the batch.</span>
+        <span class="quote-line quote-line-pokemon p4">built with love and zest.</span>
+        <span class="quote-line quote-line-pokemon p5">a helpful senior appeared.</span>
+        <span class="quote-line quote-line-pokemon p6">leave something better for the next person.</span>
       </div>
     </div>
     
     <!-- ═══ TAB 1: HOME (FRESHERS WELCOME) ═══ -->
     <div class="tab-content active" id="tab-home">
-      <h1 class="stage-title">WELCOME FRESHERS</h1>
-      <p class="stage-subtitle">CLASS OF 2026 · PLAYER 1 READY?</p>
+      <h1 class="stage-title" id="home-title">WELCOME FRESHERS</h1>
+      <p class="stage-subtitle" id="home-subtitle">CLASS OF 2026 · PLAYER 1 READY?</p>
 
       <div class="pixel-starburst">✳ ✳ ✳</div>
 
       <div class="lineup-grid">
         <div class="lineup-tier tier-2">
           <p class="welcome-sub">
-            Grab notes, slides, labs, campus photos, and batchmate links from one tiny arcade hub.
+            Grab notes, slides, labs, campus photos, and batchmate links from one tiny student hub.
           </p>
         </div>
 
@@ -160,23 +160,45 @@
 
         <div class="lineup-tier tier-3">
           <div class="quick-action-row">
-            <button class="arcade-card-btn" onclick="switchTab('resources')">
+            <button class="arcade-card-btn" id="home-resources-btn" onclick="switchTab('resources')">
               📚 ACADEMIC RESOURCES
             </button>
-            <button class="arcade-card-btn" onclick="switchTab('gallery'); switchGalleryView('college');">
+            <button class="arcade-card-btn" id="home-gallery-btn" onclick="switchTab('gallery'); switchGalleryView('college');">
               🏛️ COLLEGE GALLERY
             </button>
-            <a href="https://www.reddit.com/r/upsifs/" target="_blank" rel="noopener noreferrer" class="arcade-card-btn highlight">
-              👾 JOIN r/upsifs REDDIT
+            <a href="https://www.reddit.com/r/upsifs/" target="_blank" rel="noopener noreferrer" class="arcade-card-btn highlight" id="home-community-btn">
+              JOIN UPSIFS
             </a>
-            <button class="arcade-card-btn" onclick="switchTab('seniors')">
+            <button class="arcade-card-btn" id="home-seniors-btn" onclick="switchTab('seniors')">
               🧑‍💻 CONNECT WITH SENIORS
             </button>
-            <button class="arcade-card-btn feedback-link" onclick="switchTab('seniors'); openSeniorForm();">
+            <button class="arcade-card-btn feedback-link" id="home-profile-btn" onclick="switchTab('seniors'); openSeniorForm();">
               📝 ADD / UPDATE PROFILE
+            </button>
+            <button class="arcade-card-btn feedback-link" id="home-feedback-btn" onclick="openJuniorCommunity()">
+              FEEDBACK ↗
             </button>
           </div>
         </div>
+
+        <section class="junior-community-panel" id="junior-community-panel" aria-label="Junior community feedback">
+          <div class="junior-paper-head">
+            <span class="board-kicker">JUNIOR COMMUNITY</span>
+            <button type="button" class="senior-form-toggle" onclick="closeJuniorCommunity()">CLOSE ✕</button>
+          </div>
+          <form class="junior-feedback-form" id="junior-feedback-form">
+            <label>
+              YOUR NAME
+              <input type="text" id="junior-feedback-name" placeholder="write your name" required>
+            </label>
+            <label>
+              YOUR NOTE
+              <textarea id="junior-feedback-message" placeholder="leave a tiny note for the batch..." required></textarea>
+            </label>
+            <button type="submit" class="submit-btn">PRINT NOTE</button>
+          </form>
+          <div class="junior-notes-wall" id="junior-notes-wall" aria-live="polite"></div>
+        </section>
       </div>
     </div>
 
@@ -188,7 +210,7 @@
         </button>
       </div>
 
-      <h1 class="stage-title">ABOUT UPSIFS</h1>
+      <h1 class="stage-title" id="about-title">about upsifs</h1>
       <p class="stage-subtitle">UTTAR PRADESH STATE INSTITUTE OF FORENSIC SCIENCES</p>
 
       <div class="pixel-starburst">✳ ✳ ✳</div>
@@ -245,7 +267,7 @@
               <span class="c-title">r/upsifs Subreddit</span>
               <span class="c-sub">Ask seniors, find roommates & connect with batchmates</span>
             </div>
-            <span class="c-btn">[JOIN REDDIT ↗]</span>
+            <span class="c-btn">[JOIN UPSIFS ↗]</span>
           </a>
         </div>
       </div>
@@ -354,7 +376,7 @@
         <form class="senior-lock-form" id="senior-lock-form">
           <label>
             ENROLLMENT NUMBER
-            <input type="password" id="senior-access-code" inputmode="numeric" autocomplete="off" placeholder="ENTER ENROLLMENT NUMBER" required>
+            <input type="text" id="senior-access-code" inputmode="numeric" autocomplete="off" placeholder="ENTER ENROLLMENT NUMBER" required>
           </label>
           <button type="submit" class="submit-btn">[UNLOCK SENIORS]</button>
           <p class="senior-form-status" id="senior-lock-status" aria-live="polite"></p>
@@ -408,7 +430,7 @@
             class="campus-gallery-search"
             id="campus-gallery-search"
             type="search"
-            placeholder="LIBRARY, AUDITORIUM, LABS..."
+            placeholder=""
             autocomplete="off"
           />
         </label>
@@ -437,61 +459,66 @@
       </div>
     </div>
 
-  </main>
-
-  <!-- ═══════════════ THREE.JS + GSAP 90s NES SUPER MARIO GAME CONTAINER ═══════════════ -->
-  <button class="game-toggle-btn" id="game-toggle-btn" type="button" onclick="toggleGameDock()" aria-expanded="true" aria-controls="mario-game-dock">
-    GAME ▼
-  </button>
-
-  <div class="mario-bottom-bar-container" id="mario-game-dock">
-    
-    <!-- NES HUD SCORE BOARD -->
-    <div class="nes-hud-bar">
-      <span id="hud-player-label">MARIO <span id="hud-score">004200</span></span>
-      <span><span id="hud-collectible-icon">🪙</span>x<span id="hud-coins">14</span></span>
-      <span id="hud-world-label">WORLD 1-1</span>
-      <span>TIME <span id="hud-time">285</span></span>
-    </div>
-
-    <!-- PROMINENT STUDENT NAME REVEAL OVERLAY BANNER -->
-    <div class="student-reveal-banner" id="student-reveal-banner">
-      <span class="banner-icon" id="game-banner-icon">🍄</span>
-      <span class="banner-text" id="revealed-student-text">COLLECT COINS TO REVEAL BATCHMATES!</span>
-    </div>
-
-    <!-- GAME CANVAS CONTAINER -->
-    <div class="three-mario-viewport" id="mario-viewport">
-      <canvas id="mario-canvas"></canvas>
-      <canvas id="mode-game-canvas" aria-label="Selected arcade mode game"></canvas>
-
-      <!-- Game State & Instructions Overlay -->
-      <div class="game-overlay" id="game-overlay">
-        <div class="game-overlay-title" id="game-overlay-title">WORLD 1-1</div>
-        <div class="game-overlay-text" id="game-overlay-text">♦ UPSIFS SUPER BROS ♦</div>
-        <div class="game-overlay-sub" id="game-overlay-sub">PRESS ENTER / TAP TO START</div>
+    <!-- ═══ TAB 6: DEVS / TEAM ═══ -->
+    <div class="tab-content" id="tab-devs">
+      <div class="tab-top-bar">
+        <button class="btn-back-home" onclick="switchTab('home')">
+          ◄ BACK TO HOME
+        </button>
       </div>
 
-      <!-- Mobile Touch Controls -->
-      <div class="touch-controls" id="touch-controls">
-        <div class="touch-dpad">
-          <button class="touch-btn" id="touch-left" aria-label="Move Left">◄</button>
-          <button class="touch-btn" id="touch-down" aria-label="Down / Pipe">▼</button>
-          <button class="touch-btn" id="touch-right" aria-label="Move Right">►</button>
+      <section class="dev-team-section" aria-labelledby="dev-team-title">
+        <p class="dev-kicker">the team</p>
+        <h1 class="stage-title dev-title" id="dev-team-title">built by students, <span>for students</span></h1>
+        <p class="stage-subtitle">upsifs 2026 is maintained by students who wanted one clean place for resources, seniors, gallery, and community.</p>
+
+        <div class="dev-team-layout">
+          <article class="dev-profile-card">
+            <p class="dev-role">creator</p>
+            <h2>kartikey</h2>
+            <p>built the upsifs 2026 portal experience, gallery, senior board, resource hub, and visual system for the batch.</p>
+            <div class="dev-links">
+              <a href="https://github.com/kartikeyporwal1106-spec" target="_blank" rel="noopener noreferrer" aria-label="Kartikey GitHub">GH</a>
+              <a href="https://www.linkedin.com/in/kartikeynfsu/" target="_blank" rel="noopener noreferrer" aria-label="Kartikey LinkedIn">IN</a>
+              <a href="assets/seniors/kartikey-porwal-resume.pdf" target="_blank" rel="noopener noreferrer" aria-label="Kartikey resume">CV</a>
+              <a href="https://www.reddit.com/r/upsifs/" target="_blank" rel="noopener noreferrer" aria-label="UPSIFS Reddit">RD</a>
+            </div>
+          </article>
+
+          <div class="dev-photo-frame" aria-label="UPSIFS developer card">
+            <div class="dev-photo-placeholder">
+              <span>kartikey</span>
+              <strong>&</strong>
+              <span>anubhav</span>
+            </div>
+          </div>
+
+          <article class="dev-profile-card">
+            <p class="dev-role">co-founder</p>
+            <h2>anubhav</h2>
+            <p>helped shape the student-first direction, community flow, and the idea of keeping everything simple for freshers.</p>
+            <div class="dev-links">
+              <a href="https://forms.gle/WurEYQVuinQKqtBP9" target="_blank" rel="noopener noreferrer" aria-label="Details form">FM</a>
+              <a href="#seniors" onclick="switchTab('seniors')" aria-label="Senior board">SR</a>
+            </div>
+          </article>
         </div>
-        <button class="touch-btn touch-action" id="touch-jump" aria-label="Jump">JUMP</button>
-      </div>
+      </section>
     </div>
 
-  </div>
+  </main>
 
   <!-- ═══════════════ 8-BIT FOOTER BAR ═══════════════ -->
   <footer class="arcade-footer">
     <div class="footer-left">
       <a href="https://www.reddit.com/r/upsifs/" target="_blank" class="footer-link">R/UPSIFS</a>
       <a href="#gallery" onclick="switchTab('gallery')" class="footer-link">GALLERY</a>
+      <a href="#devs" onclick="switchTab('devs')" class="footer-link">DEVS</a>
+      <a href="https://www.linkedin.com/in/kartikeynfsu/" target="_blank" rel="noopener noreferrer" class="footer-link">LINKEDIN</a>
+      <a href="assets/seniors/kartikey-porwal-resume.pdf" target="_blank" rel="noopener noreferrer" class="footer-link">RESUME</a>
       <a href="https://forms.gle/WurEYQVuinQKqtBP9" target="_blank" rel="noopener noreferrer" class="footer-link">DETAILS</a>
     </div>
+    <p class="footer-love">#createdwithlove&zest <span>❤️</span> ~ kartikey & anu</p>
     <div class="footer-right">
       <a href="https://www.reddit.com/r/upsifs/" target="_blank" class="social-pixel-btn" title="Reddit">👾 REDDIT</a>
     </div>
@@ -555,6 +582,5 @@
   </div>
 
   <script src="script.js"></script>
-  <script src="mode-games.js"></script>
 </body>
 </html>

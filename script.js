@@ -138,41 +138,19 @@ const studentNames = [
   "STUDENT 130: SHIVANI TANDON (CYBER CRIMINOLOGY)"
 ];
 
-let currentStudentIndex = 0;
-
-// Game HUD Stats — managed by game.js, these are legacy hooks
-let score = 0;
-let coins = 0;
-
-function revealStudentName(nameText) {
-  const bannerText = document.getElementById('revealed-student-text');
-  const banner = document.getElementById('student-reveal-banner');
-  if (bannerText) {
-    bannerText.textContent = nameText;
-  }
-  if (banner && typeof gsap !== 'undefined') {
-    gsap.fromTo(banner, 
-      { scale: 0.9, opacity: 0.7, borderColor: "#ffffff" }, 
-      { scale: 1.05, opacity: 1, borderColor: "#ffb800", duration: 0.3, yoyo: true, repeat: 1, ease: "back.out(2)" }
-    );
-  }
-}
-
-// ═══════════════ (GAME ENGINE IS IN game.js) ═══════════════
-
 let activeSeniorYear = '2';
 let activeSeniorQuickFilter = '';
 const SENIOR_ACCESS_KEY = 'upsifs_senior_access_code';
 const SENIOR_FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzd55ExHTpaKooyEFivmZEQ38sAMfAahtCviZgUK4HYV-01-Nn8CS08P1omWKx3CdaPoQ/exec';
 const RESOURCE_FEED_ENDPOINT = '';
 const ARCADE_THEME_KEY = 'upsifs_arcade_theme';
+const JUNIOR_FEEDBACK_KEY = 'upsifs_junior_feedback_notes';
 
 const arcadeThemes = {
   classic: {
     bodyClass: '',
     logo: 'UPSIFS 2026',
     sidebarBrand: 'PAUSE MENU',
-    gameButton: 'GAME ▼',
     hudPlayer: 'MARIO',
     hudWorld: 'WORLD 1-1',
     collectibleIcon: '🪙',
@@ -184,9 +162,8 @@ const arcadeThemes = {
   },
   app: {
     bodyClass: 'theme-app',
-    logo: 'UPSIFS Hub',
+    logo: '',
     sidebarBrand: 'APP MENU',
-    gameButton: 'ARCADE ▼',
     hudPlayer: 'UPSIFS',
     hudWorld: 'CAMPUS HUB',
     collectibleIcon: '•',
@@ -195,43 +172,10 @@ const arcadeThemes = {
     overlayTitle: 'CAMPUS HUB',
     overlayText: 'UPSIFS APP MODE',
     overlaySub: 'PRESS ENTER / TAP TO START'
-  },
-  f1: {
-    bodyClass: 'theme-f1',
-    logo: 'UPSIFS RACING',
-    sidebarBrand: 'VERSTAPPEN PIT WALL',
-    gameButton: 'MAX GP ▼',
-    hudPlayer: 'MAX VERSTAPPEN',
-    hudWorld: 'MAX GP CIRCUIT',
-    collectibleIcon: '🏁',
-    bannerIcon: '🏎️',
-    bannerText: 'DRS OPEN: HIT APEX MARKERS TO REVEAL BATCHMATES!',
-    overlayTitle: 'MAX GP CIRCUIT',
-    overlayText: '♦ UPSIFS VERSTAPPEN RACING ♦',
-    overlaySub: 'PRESS ENTER / TAP FOR LIGHTS OUT'
-  },
-  pokemon: {
-    bodyClass: 'theme-pokemon',
-    logo: 'UPSIFS DEX',
-    sidebarBrand: 'POKE MENU',
-    gameButton: 'POKEMON GAME ▼',
-    hudPlayer: 'ASH KETCHUM',
-    hudWorld: 'KANTO ROUTE 26',
-    collectibleIcon: '⚡',
-    bannerIcon: '🔴',
-    bannerText: 'ASH KETCHUM: CATCH AND BATTLE TO DISCOVER BATCHMATES!',
-    overlayTitle: 'KANTO ROUTE 26',
-    overlayText: '♦ UPSIFS POKEMON GAME ♦',
-    overlaySub: 'PRESS ENTER / TAP TO TRAIN'
   }
 };
 
 let activeArcadeTheme = 'classic';
-const savedPokemonTrainerName = localStorage.getItem('upsifs_pokemon_trainer_name');
-let arcadePlayerNames = {
-  f1: localStorage.getItem('upsifs_f1_driver_name') || 'Max Verstappen',
-  pokemon: savedPokemonTrainerName && savedPokemonTrainerName !== 'Trainer' ? savedPokemonTrainerName : 'Ash Ketchum'
-};
 
 // ═══════════════ TAB SWITCHING ═══════════════
 function switchTab(tabName) {
@@ -270,25 +214,50 @@ function setTextById(id, value) {
   if (element) element.textContent = value;
 }
 
+const homeCopyByTheme = {
+  classic: {
+    title: 'WELCOME FRESHERS',
+    subtitle: 'CLASS OF 2026 · PLAYER 1 READY?',
+    resources: '📚 ACADEMIC RESOURCES',
+    gallery: '🏛️ COLLEGE GALLERY',
+    community: 'JOIN UPSIFS',
+    seniors: '🧑‍💻 CONNECT WITH SENIORS',
+    profile: '📝 ADD / UPDATE PROFILE',
+    feedback: 'FEEDBACK ↗'
+  },
+  app: {
+    title: 'All your UPSIFS. Right Here',
+    subtitle: 'Topic-wise resources, campus gallery, seniors, and batchmate links in one student-built hub',
+    resources: 'Explore Resources →',
+    gallery: 'Campus Gallery →',
+    community: 'Join the Community',
+    seniors: 'Find Seniors →',
+    profile: 'Update Profile →',
+    feedback: 'Feedback →'
+  }
+};
+
+function applyHomeCopy(themeName) {
+  const copy = homeCopyByTheme[themeName] || homeCopyByTheme.classic;
+  setTextById('home-title', copy.title);
+  setTextById('home-subtitle', copy.subtitle);
+  setTextById('home-resources-btn', copy.resources);
+  setTextById('home-gallery-btn', copy.gallery);
+  setTextById('home-community-btn', copy.community);
+  setTextById('home-seniors-btn', copy.seniors);
+  setTextById('home-profile-btn', copy.profile);
+  setTextById('home-feedback-btn', copy.feedback);
+}
+
 function applyArcadeTheme(themeName) {
   const theme = arcadeThemes[themeName] || arcadeThemes.classic;
   activeArcadeTheme = arcadeThemes[themeName] ? themeName : 'classic';
-  const playerName = activeArcadeTheme === 'f1'
-    ? arcadePlayerNames.f1
-    : activeArcadeTheme === 'pokemon'
-      ? arcadePlayerNames.pokemon
-      : theme.hudPlayer;
 
-  document.body.classList.remove('theme-app', 'theme-f1', 'theme-pokemon');
+  document.body.classList.remove('theme-app');
   if (theme.bodyClass) {
     document.body.classList.add(theme.bodyClass);
   }
-
-  setTextById('game-toggle-btn', theme.gameButton);
-  setTextById('hud-world-label', theme.hudWorld);
-  setTextById('hud-collectible-icon', theme.collectibleIcon);
-  setTextById('game-banner-icon', theme.bannerIcon);
-  setTextById('revealed-student-text', theme.bannerText);
+  applyHomeCopy(activeArcadeTheme === 'app' ? 'app' : 'classic');
 
   const logo = document.querySelector('.logo-text');
   if (logo) logo.textContent = theme.logo;
@@ -296,28 +265,9 @@ function applyArcadeTheme(themeName) {
   const sidebarBrand = document.querySelector('.sidebar-brand');
   if (sidebarBrand) sidebarBrand.textContent = theme.sidebarBrand;
 
-  const hudScore = document.getElementById('hud-score')?.textContent || '000000';
-  const playerLabel = document.getElementById('hud-player-label');
-  if (playerLabel) playerLabel.innerHTML = `${playerName.toUpperCase()} <span id="hud-score">${hudScore}</span>`;
-
   document.querySelectorAll('.theme-option').forEach(button => {
     button.classList.toggle('active', button.dataset.themeOption === activeArcadeTheme);
   });
-
-  const overlay = document.getElementById('game-overlay');
-  if (overlay && !overlay.classList.contains('hidden')) {
-    setTextById('game-overlay-title', theme.overlayTitle);
-    const overlayText = document.getElementById('game-overlay-text');
-    const hasControlBox = overlayText?.querySelector('.ctrl-box');
-    if (overlayText && !hasControlBox) {
-      overlayText.textContent = theme.overlayText;
-    }
-    setTextById('game-overlay-sub', theme.overlaySub);
-  }
-
-  if (typeof window.activateModeGame === 'function') {
-    window.activateModeGame(activeArcadeTheme, playerName);
-  }
 }
 
 function selectArcadeTheme(themeName) {
@@ -332,34 +282,12 @@ window.getActiveArcadeThemeConfig = function () {
 window.getCurrentArcadeMode = function () {
   return {
     theme: activeArcadeTheme,
-    playerName: activeArcadeTheme === 'f1'
-      ? arcadePlayerNames.f1
-      : activeArcadeTheme === 'pokemon'
-        ? arcadePlayerNames.pokemon
-        : 'Mario'
+    playerName: 'UPSIFS'
   };
 };
 
 function changeArcadePlayerName() {
-  if (activeArcadeTheme === 'classic' || activeArcadeTheme === 'app') {
-    alert('Switch to Formula 1 or Pokemon first, then set the character name.');
-    return;
-  }
-
-  const label = activeArcadeTheme === 'f1' ? 'driver' : 'trainer';
-  const currentName = activeArcadeTheme === 'f1' ? arcadePlayerNames.f1 : arcadePlayerNames.pokemon;
-  const nextName = prompt(`Enter ${label} name`, currentName);
-  if (!nextName || !nextName.trim()) return;
-
-  const cleanName = nextName.trim().slice(0, 24);
-  if (activeArcadeTheme === 'f1') {
-    arcadePlayerNames.f1 = cleanName;
-    localStorage.setItem('upsifs_f1_driver_name', cleanName);
-  } else {
-    arcadePlayerNames.pokemon = cleanName;
-    localStorage.setItem('upsifs_pokemon_trainer_name', cleanName);
-  }
-  applyArcadeTheme(activeArcadeTheme);
+  alert('Player names are no longer used on this site.');
 }
 
 window.changeArcadePlayerName = changeArcadePlayerName;
@@ -528,7 +456,7 @@ function renderResources() {
   renderResourceFilters(resources);
   const visible = filteredResources(resources);
   if (count) {
-    const sourceLabel = RESOURCE_FEED_ENDPOINT ? 'Drive sync' : 'Drive sync pending';
+    const sourceLabel = RESOURCE_FEED_ENDPOINT ? 'Drive sync' : 'resources pending';
     const yearLabel = resourceState.academicYear === 'All' ? 'all academic years' : resourceState.academicYear;
     count.textContent = `${visible.length} files · ${yearLabel} · ${sourceLabel}`;
   }
@@ -585,7 +513,7 @@ async function loadResourceFeed() {
     resourceState.items = [];
     renderResources();
     const groupWrap = document.getElementById('resource-groups');
-    if (groupWrap) groupWrap.innerHTML = '<p class="resource-empty">Drive resource sync is not configured yet.</p>';
+    if (groupWrap) groupWrap.innerHTML = '';
     return;
   }
 
@@ -604,7 +532,7 @@ async function loadResourceFeed() {
     resourceState.items = [];
     renderResources();
     const groupWrap = document.getElementById('resource-groups');
-    if (groupWrap) groupWrap.innerHTML = '<p class="resource-empty">Drive resources are temporarily unavailable.</p>';
+    if (groupWrap) groupWrap.innerHTML = '';
   }
 }
 
@@ -749,7 +677,11 @@ function coalesceProfileValue(profile, ...keys) {
 function normalizeRemoteSeniorProfile(row) {
   const name = coalesceProfileValue(row, 'displayName', 'name', 'Your Name');
   const course = coalesceProfileValue(row, 'displayBoard', 'board', 'year', 'Your Course And Semester', 'Your Course');
-  const board = /law|llb/i.test(course) ? 'law2' : /^(3|b\.?tech\s*y?3|year\s*3)$/i.test(course) ? '3' : '2';
+  const forcedLawNames = ['shashwat pande', 'shashwat pandey', 'pranav sagar', 'pranavsagar'];
+  const normalizedName = normalizeSearchText(name);
+  const board = forcedLawNames.some(forcedName => normalizedName.includes(forcedName))
+    ? 'law2'
+    : /law|llb/i.test(course) ? 'law2' : /^(3|b\.?tech\s*y?3|year\s*3)$/i.test(course) ? '3' : '2';
   const photo = coalesceProfileValue(row, 'displayPhoto', 'photo', 'Profile Photo', 'Profile Photo (if you want)');
 
   return {
@@ -777,6 +709,21 @@ function hideStaticSeniorDuplicates(remoteProfiles) {
     const name = card.querySelector('h2')?.textContent || '';
     card.classList.toggle('hidden-by-remote', remoteKeys.has(normalizeSearchText(name)));
   });
+}
+
+function sortSeniorCardsAlphabetically() {
+  const grid = document.querySelector('.seniors-grid');
+  if (!grid) return;
+  [...grid.querySelectorAll('.senior-card')]
+    .sort((a, b) => {
+      const yearA = a.dataset.seniorYear || '';
+      const yearB = b.dataset.seniorYear || '';
+      if (yearA !== yearB) return yearA.localeCompare(yearB);
+      const nameA = normalizeSearchText(a.querySelector('h2')?.textContent || '');
+      const nameB = normalizeSearchText(b.querySelector('h2')?.textContent || '');
+      return nameA.localeCompare(nameB);
+    })
+    .forEach(card => grid.appendChild(card));
 }
 
 async function loadApprovedSeniorProfiles() {
@@ -810,11 +757,11 @@ async function loadApprovedSeniorProfiles() {
     hideStaticSeniorDuplicates(profiles);
     setSeniorAreaLocked(false, 'Access granted. Senior board loaded.');
 
-    const firstYearThree = grid.querySelector('[data-senior-year="3"]');
     profiles.forEach(profile => {
-      grid.insertBefore(createSubmittedSeniorCard(profile), firstYearThree);
+      grid.appendChild(createSubmittedSeniorCard(profile));
     });
 
+    sortSeniorCardsAlphabetically();
     updateSeniorFilters();
   } catch (error) {
     saveSeniorAccessCode('');
@@ -833,7 +780,6 @@ async function unlockSeniorBoard(event) {
   setSeniorAreaLocked(true, 'Checking access...');
   await loadApprovedSeniorProfiles();
   updateSeniorFilters();
-  if (input) input.value = '';
 }
 
 window.unlockSeniorBoard = unlockSeniorBoard;
@@ -875,6 +821,7 @@ function updateSeniorFilters() {
     return;
   }
 
+  sortSeniorCardsAlphabetically();
   const search = normalizeSearchText(document.getElementById('senior-search')?.value);
   const cards = [...document.querySelectorAll('[data-senior-year]')];
   let visibleCount = 0;
@@ -904,25 +851,71 @@ function updateSeniorFilters() {
 
 window.updateSeniorFilters = updateSeniorFilters;
 
-function toggleGameDock() {
-  const collapsed = document.body.classList.toggle('game-collapsed');
-  const btn = document.getElementById('game-toggle-btn');
-  if (btn) {
-    const theme = arcadeThemes[activeArcadeTheme] || arcadeThemes.classic;
-    const openLabel = theme.gameButton || 'GAME ▼';
-    btn.textContent = collapsed ? openLabel.replace('▼', '▲') : openLabel;
-    btn.setAttribute('aria-expanded', String(!collapsed));
-  }
-}
-
-window.toggleGameDock = toggleGameDock;
-
 function closeSidebar() {
   const toggle = document.getElementById('sidebar-toggle');
   if (toggle) toggle.checked = false;
   document.body.classList.remove('sidebar-open');
 }
 window.closeSidebar = closeSidebar;
+
+function getJuniorFeedbackNotes() {
+  try {
+    return JSON.parse(localStorage.getItem(JUNIOR_FEEDBACK_KEY) || '[]');
+  } catch {
+    return [];
+  }
+}
+
+function saveJuniorFeedbackNotes(notes) {
+  try {
+    localStorage.setItem(JUNIOR_FEEDBACK_KEY, JSON.stringify(notes.slice(0, 12)));
+  } catch {
+    // Ignore storage failures.
+  }
+}
+
+function renderJuniorFeedbackNotes() {
+  const wall = document.getElementById('junior-notes-wall');
+  if (!wall) return;
+  const notes = getJuniorFeedbackNotes();
+  if (!notes.length) {
+    wall.innerHTML = '<p class="junior-empty-note">first note goes here.</p>';
+    return;
+  }
+  wall.innerHTML = notes.map((note, index) => `
+    <article class="junior-note-card" style="--note-tilt:${index % 2 ? '1.2deg' : '-1deg'}">
+      <p>${escapeHtml(note.message)}</p>
+      <span>~ ${escapeHtml(note.name)}</span>
+    </article>
+  `).join('');
+}
+
+function openJuniorCommunity() {
+  const panel = document.getElementById('junior-community-panel');
+  panel?.classList.add('active');
+  renderJuniorFeedbackNotes();
+  window.setTimeout(() => panel?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 80);
+}
+
+function closeJuniorCommunity() {
+  document.getElementById('junior-community-panel')?.classList.remove('active');
+}
+
+function submitJuniorFeedback(event) {
+  event.preventDefault();
+  const nameInput = document.getElementById('junior-feedback-name');
+  const messageInput = document.getElementById('junior-feedback-message');
+  const name = (nameInput?.value || '').trim();
+  const message = (messageInput?.value || '').trim();
+  if (!name || !message) return;
+  const notes = [{ name, message, createdAt: new Date().toISOString() }, ...getJuniorFeedbackNotes()];
+  saveJuniorFeedbackNotes(notes);
+  renderJuniorFeedbackNotes();
+  event.currentTarget.reset();
+}
+
+window.openJuniorCommunity = openJuniorCommunity;
+window.closeJuniorCommunity = closeJuniorCommunity;
 
 function setupSidebarToggle() {
   const toggle = document.getElementById('sidebar-toggle');
@@ -1790,11 +1783,7 @@ document.addEventListener('keydown', (e) => {
 // ═══════════════ INITIALIZATION ═══════════════
 window.addEventListener('DOMContentLoaded', () => {
   setupSidebarToggle();
-  applyArcadeTheme(localStorage.getItem(ARCADE_THEME_KEY) || 'classic');
-
-  if (typeof window.initMarioGame === 'function') {
-    window.initMarioGame();
-  }
+  applyArcadeTheme(localStorage.getItem(ARCADE_THEME_KEY) || 'app');
 
   localStorage.removeItem('upsifs_senior_profile_submissions');
   if (getSeniorAccessCode()) {
@@ -1805,6 +1794,8 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('senior-profile-form')?.addEventListener('submit', submitSeniorProfile);
   document.getElementById('senior-lock-form')?.addEventListener('submit', unlockSeniorBoard);
   document.getElementById('senior-search')?.addEventListener('input', updateSeniorFilters);
+  document.getElementById('junior-feedback-form')?.addEventListener('submit', submitJuniorFeedback);
+  renderJuniorFeedbackNotes();
   document.getElementById('resource-search')?.addEventListener('input', (event) => {
     resourceState.query = event.target.value || '';
     renderResources();
