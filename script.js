@@ -965,7 +965,7 @@ const CAMPUS_GALLERY_ITEMS = [
   { title: 'Medical Drill Campus Road', category: 'campus', label: 'CAMPUS', tags: 'campus medical drill road students activity', src: 'assets/gallery/campus/medical-drill-campus-road.jpg' },
   { title: 'Cyber Security Floor Art', category: 'campus', label: 'CAMPUS', tags: 'campus cyber security ai floor art do not cross', src: 'assets/gallery/campus/campus-gallery-upload-0499.jpg' },
   { title: 'Academic Block Entrance', category: 'campus', label: 'ACADEMIC', tags: 'academic block entrance building campus', src: 'assets/gallery/campus/academic-block-entrance.jpg' },
-  { title: 'Auditorium Cultural Event', category: 'auditorium', label: 'AUDITORIUM', tags: 'auditorium cultural event stage chairs performance', src: 'assets/gallery/campus/auditorium-cultural-event.jpg' },
+  { title: 'Cafeteria Cultural Event', category: 'campus', label: 'CAFETERIA', tags: 'cafeteria cultural event stage chairs performance campus', src: 'assets/gallery/campus/auditorium-cultural-event.jpg' },
   { title: 'Hostel Block Day', category: 'hostels', label: 'HOSTELS', tags: 'hostel building residence block day', src: 'assets/gallery/campus/hostel-block-day.jpg' },
   { title: 'Hostel Blocks Blue Sky', category: 'hostels', label: 'HOSTELS', tags: 'hostel buildings blue sky road campus view', src: 'assets/gallery/campus/hostel-blocks-blue-sky.jpg' },
   { title: 'Hostel Tower In Sun', category: 'hostels', label: 'HOSTELS', tags: 'hostel building residence tower sun campus', src: 'assets/gallery/campus/hostel-tower-sun.jpg' },
