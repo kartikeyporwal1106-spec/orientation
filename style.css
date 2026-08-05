@@ -3,6 +3,8 @@
    Three.js WebGL & GSAP Endless Looping 90s NES Super Mario Game Engine
    ═══════════════════════════════════════════════ */
 
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap');
+
 /* ═══ CSS CUSTOM PROPERTIES ═══ */
 :root {
   --sky-bg: #74a4ff;
@@ -21,6 +23,7 @@
   --card-bg: rgba(255, 255, 255, 0.15);
   --card-border: #ffffff;
   --font-pixel: 'Silkscreen', 'Press Start 2P', monospace;
+  --font-hand: 'Kalam', 'Comic Sans MS', 'Trebuchet MS', cursive;
   --font-sans: 'Outfit', 'Inter', system-ui, sans-serif;
   --transition: 0.1s ease;
 }
@@ -2128,7 +2131,7 @@ body.theme-app .arcade-header {
 body.theme-app .logo-text {
   position: relative;
   color: #17120f;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-size: 1.42rem;
   font-weight: 700;
   letter-spacing: 0;
@@ -2176,7 +2179,7 @@ body.theme-app .sidebar-handle {
   padding: 0.48rem 0.8rem;
   border-color: rgba(23, 18, 15, 0.18);
   box-shadow: none;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-size: 1rem;
   font-weight: 700;
   transform: rotate(-1deg);
@@ -2202,7 +2205,7 @@ body.theme-app .header-nav {
 
 body.theme-app .nav-btn {
   color: #4f473c;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-size: 1.04rem;
   font-weight: 800;
   padding: 0.38rem 0.92rem;
@@ -2221,7 +2224,7 @@ body.theme-app .nav-btn:hover {
 }
 
 body.theme-app .btn-buy-pass {
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-size: 1.2rem;
   color: #261f1c;
   background: #ffd34d;
@@ -2239,7 +2242,7 @@ body.theme-app .arcade-stage {
 
 body.theme-app .stage-title {
   color: #261f1c;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-size: clamp(1.55rem, 3.2vw, 2.45rem);
   font-weight: 700;
   line-height: 0.96;
@@ -2264,7 +2267,7 @@ body.theme-app .campus-gallery-heading p,
 body.theme-app .senior-info p,
 body.theme-app .senior-info span {
   color: #716a5d;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-weight: 400;
   letter-spacing: 0;
   text-shadow: none;
@@ -2381,7 +2384,7 @@ body.theme-app .welcome-sub {
 body.theme-app #tab-home .stage-subtitle,
 body.theme-app #tab-home .welcome-sub {
   color: #6f685c;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-size: clamp(0.98rem, 1.8vw, 1.2rem);
   font-weight: 700;
   line-height: 1.45;
@@ -2418,7 +2421,7 @@ body.theme-app .arcade-card-btn:hover {
 
 body.theme-app .arcade-card-btn::before {
   color: #e7b12b;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-size: 1.55rem;
   line-height: 1;
 }
@@ -2440,7 +2443,7 @@ body.theme-app .campus-gallery-heading h2,
 body.theme-app .board-copy h2,
 body.theme-app .senior-info h2 {
   color: #261f1c;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   letter-spacing: 0;
   text-shadow: none;
 }
@@ -2476,7 +2479,7 @@ body.theme-app .resource-tags span {
   border: 1px solid rgba(231, 177, 43, 0.38);
   border-radius: 10px;
   box-shadow: none;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   letter-spacing: 0;
 }
 
@@ -2491,7 +2494,7 @@ body.theme-app .campus-gallery-search {
   border: 1px solid rgba(82, 69, 51, 0.24);
   border-radius: 6px;
   box-shadow: 3px 4px 0 rgba(23, 18, 15, 0.08);
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
 }
 
 body.theme-app .sidebar {
@@ -2526,7 +2529,7 @@ body.theme-app .footer-link,
 body.theme-app .social-pixel-btn,
 body.theme-app .footer-love {
   color: #261f1c;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   letter-spacing: 0;
   text-shadow: none;
 }
@@ -2550,7 +2553,7 @@ body.theme-app .dev-team-section {
 body.theme-app .dev-kicker,
 body.theme-app .dev-role {
   color: #8a7560;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: 0.22em;
@@ -2591,7 +2594,7 @@ body.theme-app .dev-profile-card h2 {
 
 body.theme-app .dev-profile-card p {
   color: #716a5d;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-size: 1.18rem;
   font-weight: 400;
   line-height: 1.7;
@@ -2603,7 +2606,7 @@ body.theme-app .dev-links a {
   border: 1px solid rgba(38, 31, 28, 0.12);
   border-radius: 50%;
   box-shadow: none;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-weight: 900;
 }
 
@@ -2670,7 +2673,7 @@ body.theme-app .header-left {
 }
 
 body.theme-app .sidebar-handle {
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-size: 1rem;
   box-shadow: none;
 }
@@ -2725,7 +2728,7 @@ body.theme-app #tab-home .arcade-card-btn {
   border: 2px solid rgba(23, 18, 15, 0.76);
   border-radius: 2px;
   box-shadow: 3px 3px 0 rgba(23, 18, 15, 0.24);
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-size: 1.05rem;
   line-height: 1.1;
 }
@@ -2782,7 +2785,7 @@ body.theme-app .junior-feedback-form {
 
 body.theme-app .junior-feedback-form label {
   color: #8a7560;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-weight: 700;
 }
 
@@ -2822,7 +2825,7 @@ body.theme-app .junior-note-card::before {
 
 body.theme-app .junior-note-card p {
   color: #261f1c;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-size: clamp(1.15rem, 2vw, 1.55rem);
   line-height: 1.4;
 }
@@ -2832,7 +2835,7 @@ body.theme-app .junior-empty-note {
   display: block;
   margin-top: 0.75rem;
   color: #8a7560;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-weight: 700;
   text-align: right;
   font-size: clamp(1rem, 1.7vw, 1.35rem);
@@ -2849,7 +2852,7 @@ body.theme-app .sidebar {
 body.theme-app .sidebar a,
 body.theme-app .theme-option,
 body.theme-app .add-photo-btn {
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-size: 1.05rem;
   font-weight: 700;
   text-transform: lowercase;
@@ -2880,7 +2883,7 @@ body.theme-app .sidebar-close-btn {
   border: 1px solid rgba(23, 18, 15, 0.42);
   border-radius: 999px;
   box-shadow: none;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-size: 1.2rem;
   line-height: 1;
 }
@@ -2967,7 +2970,7 @@ body.theme-app .senior-chip {
   border: 0;
   box-shadow: none;
   padding: 0;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-size: 0.74rem;
   font-weight: 700;
 }
@@ -2979,7 +2982,7 @@ body.theme-app .senior-photo {
   border-radius: 2px;
   border: 0;
   box-shadow: none;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-size: 1.25rem;
   color: #17120f;
   background:
@@ -2989,7 +2992,7 @@ body.theme-app .senior-photo {
 
 body.theme-app .senior-form-status {
   color: #4f473c;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-size: 1rem;
   font-weight: 700;
   text-shadow: none;
@@ -3063,7 +3066,7 @@ body.theme-app .senior-connect {
   border-radius: 999px;
   box-shadow: none;
   padding: 0.32rem 0.5rem;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-size: 0.68rem;
   text-transform: lowercase;
 }
@@ -3083,7 +3086,7 @@ body.theme-app .campus-gallery-panel {
 body.theme-app .resource-search-label,
 body.theme-app .campus-search-wrap span {
   color: #8a7560;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-size: 0.9rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -3107,7 +3110,7 @@ body.theme-app .campus-filter-btn {
   border: 1px solid rgba(82, 69, 51, 0.34);
   border-radius: 4px;
   box-shadow: 2px 2px 0 rgba(23, 18, 15, 0.18);
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-size: 0.84rem;
   font-weight: 800;
   padding: 0.42rem 0.68rem;
@@ -3145,7 +3148,7 @@ body.theme-app .campus-gallery-empty {
   background: transparent;
   border: 0;
   box-shadow: none;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-size: 1rem;
   font-weight: 700;
   text-shadow: none;
@@ -3171,7 +3174,7 @@ body.theme-app .resource-action {
   border: 1px solid rgba(82, 69, 51, 0.34);
   border-radius: 4px;
   box-shadow: 2px 2px 0 rgba(23, 18, 15, 0.18);
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   text-transform: lowercase;
 }
 
@@ -3257,7 +3260,7 @@ body.theme-app .campus-gallery-chip {
 
 body.theme-app .campus-gallery-copy strong {
   color: #261f1c;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-size: 1rem;
   font-weight: 700;
 }
@@ -3287,7 +3290,7 @@ body.theme-app .s-val,
 body.theme-app .pixel-link {
   color: #4f473c;
   text-shadow: none;
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   font-weight: 700;
   letter-spacing: 0;
 }
@@ -3334,7 +3337,7 @@ body.theme-app .reddit-card .c-btn {
   background: #ffd34d;
   border: 1px solid rgba(23, 18, 15, 0.7);
   box-shadow: 2px 2px 0 rgba(23, 18, 15, 0.24);
-  font-family: 'Kalam', var(--font-sans);
+  font-family: var(--font-hand);
   text-transform: lowercase;
 }
 
