@@ -707,7 +707,7 @@ body.sidebar-open .sidebar-handle {
 
 .resource-file-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 0.65rem;
 }
 
@@ -740,13 +740,14 @@ body.sidebar-open .sidebar-handle {
 }
 
 .resource-file-card {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 0.7rem;
   padding: 0.8rem;
   background: rgba(0, 0, 0, 0.34);
   border: 2px solid #ffffff;
   box-shadow: 3px 3px 0 #000000;
+  min-height: 146px;
 }
 
 .resource-file-icon {
@@ -760,8 +761,8 @@ body.sidebar-open .sidebar-handle {
 
 .resource-file-main h4 {
   color: #ffffff;
-  font-size: 0.98rem;
-  line-height: 1.2;
+  font-size: 1rem;
+  line-height: 1.18;
   overflow-wrap: anywhere;
   text-shadow: 1px 1px 0 #000000;
 }
@@ -769,8 +770,20 @@ body.sidebar-open .sidebar-handle {
 .resource-file-main p {
   margin-top: 0.25rem;
   color: #d9e4ff;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 700;
+}
+
+.resource-type-chip {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0.38rem;
+  padding: 0.08rem 0.34rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  line-height: 1.2;
+  text-transform: lowercase;
 }
 
 .resource-tags {
@@ -790,10 +803,10 @@ body.sidebar-open .sidebar-handle {
 }
 
 .resource-actions {
-  grid-column: 1 / -1;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.45rem;
+  margin-top: auto;
 }
 
 .resource-action {
@@ -3917,6 +3930,31 @@ body.theme-app .resource-action.download {
   background: #ffd34d;
 }
 
+body.theme-app .resource-file-card {
+  min-height: 138px;
+  background:
+    linear-gradient(rgba(23, 18, 15, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23, 18, 15, 0.025) 1px, transparent 1px),
+    rgba(255, 252, 241, 0.9);
+  background-size: 22px 22px;
+}
+
+body.theme-app .resource-file-main h4 {
+  font-size: 1.02rem;
+  line-height: 1.15;
+}
+
+body.theme-app .resource-file-main p {
+  color: #6f685c;
+  font-size: 0.76rem;
+}
+
+body.theme-app .resource-type-chip {
+  color: #b88300;
+  border-color: rgba(184, 131, 0, 0.42);
+  background: rgba(255, 211, 77, 0.2);
+}
+
 body.theme-app .resource-action:disabled {
   color: rgba(38, 31, 28, 0.42);
   background: rgba(255, 252, 241, 0.6);
@@ -3927,6 +3965,21 @@ body.theme-app .resource-action:hover {
   background: #ffd34d;
   color: #17120f;
   transform: translateY(-1px);
+}
+
+@media (max-width: 640px) {
+  .resource-file-grid,
+  .resource-folder-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .resource-file-card {
+    min-height: auto;
+  }
+
+  .resource-actions {
+    grid-template-columns: 1fr;
+  }
 }
 
 body.theme-app .campus-search-wrap {

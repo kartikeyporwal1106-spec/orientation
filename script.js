@@ -502,12 +502,12 @@ function renderFolderCard(item) {
 function renderResourceCard(item) {
   const card = document.createElement('article');
   card.className = 'resource-file-card';
+  const typeLabel = resourceIcon(item);
 
   card.innerHTML = `
-    <div class="resource-file-icon" aria-hidden="true">${resourceIcon(item)}</div>
     <div class="resource-file-main">
       <h4>${escapeResourceText(item.name)}</h4>
-      <p>${escapeResourceText(item.mimeType || 'file')} · ${formatBytes(item.size)} · ${formatResourceDate(item.modifiedTime)}</p>
+      <p><span class="resource-type-chip">${escapeResourceText(typeLabel)}</span>${formatBytes(item.size)} · ${formatResourceDate(item.modifiedTime)}</p>
     </div>
     <div class="resource-actions">
       <button class="resource-action view" type="button" ${item.previewable ? '' : 'disabled'}>preview</button>
