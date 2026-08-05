@@ -177,6 +177,7 @@ const arcadeThemes = {
 
 let activeArcadeTheme = 'classic';
 let activeTabName = 'home';
+let arcadeGameInitialized = false;
 const validTabNames = new Set(['home', 'about', 'resources', 'seniors', 'gallery', 'devs']);
 
 // ═══════════════ TAB SWITCHING ═══════════════
@@ -250,7 +251,7 @@ const homeCopyByTheme = {
     feedback: 'FEEDBACK ↗'
   },
   app: {
-    title: 'All your UPSIFS. Right Here',
+    title: 'Welcome Freshers 2026',
     subtitle: 'Resources, gallery, seniors, and community in one student-built hub',
     resources: 'academic resources →',
     gallery: 'college gallery →',
@@ -262,6 +263,7 @@ const homeCopyByTheme = {
 };
 
 const homeHeadlineLines = [
+  'Welcome Freshers 2026',
   'All your UPSIFS. Right Here',
   'Notes? Photos? Seniors? Found.',
   'One tiny hub. Big campus energy.',
@@ -297,7 +299,7 @@ function redrawHomeTitleSketch() {
   sketch.classList.add('draw-now');
   window.setTimeout(() => {
     sketch.classList.remove('is-redrawing', 'draw-now');
-  }, 2100);
+  }, 3000);
 }
 
 function startHomeHeadlineRotation() {
@@ -350,8 +352,27 @@ function applyArcadeTheme(themeName) {
     startHomeHeadlineRotation();
   } else {
     stopHomeHeadlineRotation();
+    ensureArcadeGame();
   }
 }
+
+function ensureArcadeGame() {
+  if (arcadeGameInitialized || typeof window.initMarioGame !== 'function') return;
+  arcadeGameInitialized = true;
+  window.initMarioGame();
+}
+
+function toggleGameDock() {
+  if (activeArcadeTheme === 'app') return;
+  const collapsed = document.body.classList.toggle('game-collapsed');
+  const button = document.getElementById('game-toggle-btn');
+  if (button) {
+    button.textContent = collapsed ? 'GAME ▲' : 'GAME ▼';
+    button.setAttribute('aria-expanded', String(!collapsed));
+  }
+}
+
+window.toggleGameDock = toggleGameDock;
 
 function selectArcadeTheme(themeName) {
   applyArcadeTheme(themeName);

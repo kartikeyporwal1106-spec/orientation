@@ -12,8 +12,9 @@
   <!-- GSAP & Three.js Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="game.js" defer></script>
 </head>
-<body>
+<body class="theme-app">
 
   <!-- ═══════════════ 8-BIT HEADER BAR ═══════════════ -->
   <header class="arcade-header">
@@ -521,6 +522,43 @@
     </div>
 
   </main>
+
+  <!-- ═══════════════ ARCADE-ONLY MARIO GAME DOCK ═══════════════ -->
+  <button class="game-toggle-btn" id="game-toggle-btn" type="button" onclick="toggleGameDock()" aria-expanded="true" aria-controls="mario-game-dock">
+    GAME ▼
+  </button>
+
+  <div class="mario-bottom-bar-container" id="mario-game-dock">
+    <div class="nes-hud-bar">
+      <span>MARIO <span id="hud-score">000000</span></span>
+      <span>🪙x<span id="hud-coins">00</span></span>
+      <span>WORLD 1-1</span>
+      <span>TIME <span id="hud-time">600</span></span>
+    </div>
+
+    <div class="student-reveal-banner" id="student-reveal-banner">
+      <span class="banner-icon">🍄</span>
+      <span class="banner-text" id="revealed-student-text">COLLECT COINS TO REVEAL BATCHMATES!</span>
+    </div>
+
+    <div class="three-mario-viewport" id="mario-viewport">
+      <canvas id="mario-canvas"></canvas>
+      <div class="game-overlay" id="game-overlay">
+        <div class="game-overlay-title" id="game-overlay-title">WORLD 1-1</div>
+        <div class="game-overlay-text" id="game-overlay-text">♦ UPSIFS SUPER BROS ♦</div>
+        <div class="game-overlay-sub" id="game-overlay-sub">PRESS ENTER / TAP TO START</div>
+      </div>
+
+      <div class="touch-controls" id="touch-controls">
+        <div class="touch-dpad">
+          <button class="touch-btn" id="touch-left" aria-label="Move Left">◄</button>
+          <button class="touch-btn" id="touch-down" aria-label="Down / Pipe">▼</button>
+          <button class="touch-btn" id="touch-right" aria-label="Move Right">►</button>
+        </div>
+        <button class="touch-btn touch-action" id="touch-jump" aria-label="Jump">JUMP</button>
+      </div>
+    </div>
+  </div>
 
   <div class="site-toast" id="site-toast" role="status" aria-live="polite"></div>
 

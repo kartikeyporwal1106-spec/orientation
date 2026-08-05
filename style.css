@@ -69,6 +69,11 @@ body {
   image-rendering: pixelated;
 }
 
+/* Legacy mode-copy stays out of the live Arcade and Softer interfaces. */
+.theme-quote-layer {
+  display: none !important;
+}
+
 /* ═══════════════ 8-BIT HEADER BAR ═══════════════ */
 .arcade-header {
   height: 54px;
@@ -1855,6 +1860,268 @@ body.sidebar-open .sidebar-handle {
   text-transform: uppercase;
   opacity: 0.85;
   text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+}
+
+/* ═══════════════ ARCADE-ONLY MARIO GAME DOCK ═══════════════ */
+.mario-bottom-bar-container {
+  position: fixed;
+  bottom: 42px;
+  left: 0;
+  width: 100vw;
+  height: 175px;
+  z-index: 25;
+  pointer-events: auto;
+  overflow: hidden;
+  box-shadow: 0 -3px 0 #000000;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease-out;
+}
+
+body.theme-app .mario-bottom-bar-container,
+body.theme-app .game-toggle-btn {
+  display: none !important;
+}
+
+body:not(.theme-app) .arcade-stage {
+  padding-bottom: 14rem;
+}
+
+body.game-collapsed .mario-bottom-bar-container {
+  transform: translateY(calc(100% + 42px));
+}
+
+.game-toggle-btn {
+  position: fixed;
+  right: 1.2rem;
+  bottom: 225px;
+  z-index: 60;
+  font-family: var(--font-pixel);
+  font-size: 0.62rem;
+  color: #000000;
+  background: #ffffff;
+  border: 2px solid #000000;
+  box-shadow: 2px 2px 0 #000000;
+  padding: 0.42rem 0.65rem;
+  transition: all 0.25s ease-out;
+}
+
+.game-toggle-btn:hover {
+  background: var(--orange-title);
+  color: #ffffff;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #000000;
+}
+
+body.game-collapsed .game-toggle-btn {
+  bottom: 54px;
+}
+
+.nes-hud-bar {
+  height: 22px;
+  flex: 0 0 22px;
+  width: 100%;
+  position: relative;
+  z-index: 40;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: #000000;
+  color: #ffffff;
+  border-top: 2px solid #000000;
+  font-family: var(--font-pixel);
+  font-size: 0.65rem;
+  letter-spacing: 0;
+}
+
+.student-reveal-banner {
+  position: absolute;
+  top: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  max-width: 90%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 1rem;
+  background: #111122;
+  border: 2px solid #ffb800;
+  box-shadow: 2px 2px 0 #000000;
+  pointer-events: none;
+  white-space: normal;
+}
+
+.banner-icon {
+  font-size: 0.9rem;
+}
+
+.banner-text {
+  color: #ffffff;
+  font-family: var(--font-pixel);
+  font-size: 0.68rem;
+  letter-spacing: 0;
+  text-shadow: 1px 1px 0 #000000;
+}
+
+.three-mario-viewport {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: #6cb4ee;
+}
+
+#mario-canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.game-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.75);
+  pointer-events: none;
+}
+
+.game-overlay.hidden {
+  display: none;
+}
+
+.game-overlay-title {
+  color: var(--orange-title);
+  font-family: var(--font-pixel);
+  font-size: 1.3rem;
+  letter-spacing: 0;
+  text-shadow: 2px 2px 0 #000000;
+}
+
+.game-overlay-text {
+  color: #ffffff;
+  font-family: var(--font-pixel);
+  font-size: 0.72rem;
+  text-shadow: 1px 1px 0 #000000;
+}
+
+.ctrl-box {
+  margin: 0.2rem 0;
+  padding: 0.3rem 0.8rem;
+  border: 1px dashed rgba(255, 255, 255, 0.4);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.6);
+  text-align: left;
+}
+
+.ctrl-row {
+  color: #dddddd;
+  font-size: 0.62rem;
+  line-height: 1.35;
+}
+
+.ctrl-row strong {
+  color: #ffffff;
+}
+
+.game-overlay-sub {
+  color: #40d040;
+  font-family: var(--font-pixel);
+  font-size: 0.6rem;
+  letter-spacing: 0;
+  text-shadow: 1px 1px 0 #000000;
+  animation: blink 1.2s step-end infinite;
+}
+
+.touch-controls {
+  display: none;
+  position: absolute;
+  right: 0;
+  bottom: 6px;
+  left: 0;
+  z-index: 15;
+  padding: 0 10px;
+  justify-content: space-between;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.touch-dpad {
+  display: flex;
+  gap: 4px;
+  pointer-events: auto;
+}
+
+.touch-btn {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+  font-family: var(--font-pixel);
+  font-size: 0.85rem;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+}
+
+.touch-action {
+  width: 52px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: rgba(64, 208, 64, 0.4);
+  border-color: rgba(64, 208, 64, 0.8);
+}
+
+@media (pointer: coarse), (max-width: 768px) {
+  .touch-controls {
+    display: flex;
+  }
+
+  .mario-bottom-bar-container {
+    height: 155px;
+  }
+
+  .game-toggle-btn {
+    right: 0.8rem;
+    bottom: 205px;
+    font-size: 0.58rem;
+  }
+
+  body.game-collapsed .game-toggle-btn {
+    bottom: 54px;
+  }
+
+  .nes-hud-bar,
+  .banner-text {
+    font-size: 0.6rem;
+  }
+
+  .student-reveal-banner {
+    top: 23px;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .game-overlay-title {
+    font-size: 1rem;
+  }
+
+  .game-overlay-text {
+    font-size: 0.7rem;
+  }
 }
 
 /* ═══════════════ 8-BIT FOOTER BAR ═══════════════ */
