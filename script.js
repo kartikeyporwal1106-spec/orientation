@@ -680,7 +680,7 @@ function createSubmittedSeniorCard(profile) {
 
   const place = (profile.place || 'PENDING').trim().toUpperCase();
   const safeName = escapeHtml(profile.name || 'New Profile');
-  const safeTagline = escapeHtml(profile.tagline || 'Pending approval');
+  const safeTagline = escapeHtml(profile.tagline || 'student profile');
   const safeSkills = escapeHtml(profile.skills || 'Profile update submitted');
   const photo = (profile.photo || '').trim();
   const whatsapp = normalizeWhatsapp(profile.whatsapp);
