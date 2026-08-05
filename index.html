@@ -297,7 +297,7 @@
         </div>
         <button type="button" class="feedback-card" onclick="openSeniorForm()">
           <span class="feedback-card-title">ADD / UPDATE PROFILE</span>
-          <span class="feedback-card-copy">Seniors can submit fresh details or update an existing card.</span>
+          <span class="feedback-card-copy">Students can submit fresh details or update an existing card.</span>
           <span class="feedback-card-btn">OPEN FORM ↗</span>
         </button>
       </section>
@@ -316,6 +316,7 @@
             <label>
               COURSE / BOARD *
               <select name="year" required>
+                <option value="junior">B.Tech-M.Tech Sem I</option>
                 <option value="2">B.Tech Year 2</option>
                 <option value="law2">B.Sc. LL.B Year 2</option>
                 <option value="3">B.Tech Year 3</option>
@@ -359,6 +360,18 @@
           </div>
           <p class="senior-form-status" id="senior-form-status" aria-live="polite"></p>
         </form>
+      </section>
+
+      <section class="junior-profile-board" aria-label="Junior profile board">
+        <div class="junior-profile-head">
+          <div>
+            <span class="board-kicker">JUNIOR PROFILES</span>
+            <h2>Freshers in the batch.</h2>
+            <p>Course, interests, topics, and batch feedback in one clean board.</p>
+          </div>
+          <button type="button" class="feedback-card-btn junior-update-btn" onclick="openSeniorForm()">update profile ↗</button>
+        </div>
+        <div class="junior-profile-grid" id="junior-profile-grid" aria-live="polite"></div>
       </section>
 
       <div class="senior-filter-bar" aria-label="Senior year filter">

@@ -145,6 +145,54 @@ const SENIOR_FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzd55ExHTp
 const RESOURCE_FEED_ENDPOINT = '/api/resources/list';
 const ARCADE_THEME_KEY = 'upsifs_arcade_theme';
 const JUNIOR_FEEDBACK_KEY = 'upsifs_junior_feedback_notes';
+const JUNIOR_PROFILES = [
+  {
+    name: 'Aryan Tiwari',
+    course: 'B.Tech-M.Tech Sem I',
+    accessCode: '492008',
+    place: 'Kanpur',
+    interests: 'Cricket, politics',
+    topics: 'Important skills',
+    tagline: '.',
+    feedback: 'Photos of playground and courts',
+    whatsapp: '8869935689',
+    instagram: 't.aryan4'
+  },
+  {
+    name: 'Dhruv Saxena',
+    course: 'B.Tech-M.Tech Sem I',
+    accessCode: 'Dhruv07',
+    place: 'Prayagraj',
+    interests: 'Quantum computing, research, drone & robotics technology',
+    topics: 'How to join the drone and robotics lab',
+    tagline: 'Playing football and coder',
+    feedback: 'Everything is best',
+    whatsapp: '6386246598',
+    instagram: 'No',
+    photo: 'assets/juniors/dhruv-saxena.png'
+  },
+  {
+    name: 'Sanskar Yadav',
+    course: 'B.Tech-M.Tech Sem I',
+    accessCode: '241280',
+    place: 'Lalitpur, UP',
+    interests: 'Video editing, graphic designing, robotics, travelling, badminton',
+    topics: 'Startup, innovation, creativity',
+    tagline: 'I think I’m quite stubborn with problems',
+    feedback: 'Just Include my profile. Website is damn good btw...',
+    whatsapp: '9935675543',
+    instagram: "I don't use Currently.",
+    photo: 'assets/juniors/sanskar-yadav.png'
+  }
+].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+
+const DEFAULT_JUNIOR_FEEDBACK_NOTES = JUNIOR_PROFILES
+  .filter(profile => profile.feedback)
+  .map(profile => ({
+    name: profile.name,
+    message: profile.feedback,
+    createdAt: '2026-08-05T00:00:00.000Z'
+  }));
 
 const arcadeThemes = {
   classic: {
@@ -638,6 +686,7 @@ function setSeniorAreaLocked(isLocked, message = '') {
 function normalizeInstagram(value) {
   const clean = (value || '').trim();
   if (!clean) return '';
+  if (/^(no|none|na|n\/a|i don'?t use currently\.?|i don't use)$/i.test(clean)) return '';
   if (clean.startsWith('http')) return clean;
   return `https://www.instagram.com/${clean.replace(/^@/, '')}/`;
 }
@@ -715,6 +764,51 @@ function createSubmittedSeniorCard(profile) {
   `;
 
   return article;
+}
+
+function createJuniorProfileCard(profile) {
+  const article = document.createElement('article');
+  article.className = 'junior-profile-card';
+
+  const safeName = escapeHtml(profile.name);
+  const tagline = (profile.tagline || '').trim();
+  const displayTagline = tagline && tagline !== '.' ? tagline : 'student profile';
+  const photo = (profile.photo || '').trim();
+  const instagram = normalizeInstagram(profile.instagram);
+  const whatsapp = normalizeWhatsapp(profile.whatsapp);
+  const photoHtml = photo
+    ? `<img class="junior-profile-photo" src="${escapeHtml(photo)}" alt="${safeName}">`
+    : `<div class="junior-profile-photo junior-profile-initials" aria-label="${safeName} photo">${initialsFromName(profile.name)}</div>`;
+
+  const actions = [
+    whatsapp ? `<a href="https://wa.me/${whatsapp}" target="_blank" rel="noopener noreferrer" class="senior-connect">whatsapp ↗</a>` : '',
+    instagram ? `<a href="${escapeHtml(instagram)}" target="_blank" rel="noopener noreferrer" class="senior-connect senior-instagram">instagram ↗</a>` : ''
+  ].filter(Boolean).join('');
+
+  article.innerHTML = `
+    ${photoHtml}
+    <div class="junior-profile-copy">
+      <h3>${safeName}</h3>
+      <p class="junior-course">${escapeHtml(profile.course)}</p>
+      <p class="junior-tagline">${escapeHtml(displayTagline)}</p>
+      <dl>
+        <div><dt>place</dt><dd>${escapeHtml(profile.place)}</dd></div>
+        <div><dt>interests</dt><dd>${escapeHtml(profile.interests)}</dd></div>
+        <div><dt>wants guidance on</dt><dd>${escapeHtml(profile.topics)}</dd></div>
+      </dl>
+    </div>
+    <div class="senior-actions junior-profile-actions">
+      ${actions || '<span class="senior-connect senior-disabled">no socials</span>'}
+    </div>
+  `;
+
+  return article;
+}
+
+function renderJuniorProfiles() {
+  const grid = document.getElementById('junior-profile-grid');
+  if (!grid) return;
+  grid.replaceChildren(...JUNIOR_PROFILES.map(createJuniorProfileCard));
 }
 
 function coalesceProfileValue(profile, ...keys) {
@@ -912,11 +1006,19 @@ function closeSidebar() {
 window.closeSidebar = closeSidebar;
 
 function getJuniorFeedbackNotes() {
+  let saved = [];
   try {
-    return JSON.parse(localStorage.getItem(JUNIOR_FEEDBACK_KEY) || '[]');
+    saved = JSON.parse(localStorage.getItem(JUNIOR_FEEDBACK_KEY) || '[]');
   } catch {
-    return [];
+    saved = [];
   }
+  const seen = new Set();
+  return [...saved, ...DEFAULT_JUNIOR_FEEDBACK_NOTES].filter(note => {
+    const key = `${normalizeSearchText(note.name)}::${normalizeSearchText(note.message)}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 function saveJuniorFeedbackNotes(notes) {
@@ -1886,6 +1988,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('senior-lock-form')?.addEventListener('submit', unlockSeniorBoard);
   document.getElementById('senior-search')?.addEventListener('input', updateSeniorFilters);
   document.getElementById('junior-feedback-form')?.addEventListener('submit', submitJuniorFeedback);
+  renderJuniorProfiles();
   document.getElementById('resource-preview-modal')?.addEventListener('click', (event) => {
     if (event.target.id === 'resource-preview-modal') closeResourcePreview();
   });
