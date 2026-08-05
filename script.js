@@ -490,7 +490,6 @@ function renderFolderCard(item) {
   card.type = 'button';
   card.className = 'resource-folder-card';
   card.innerHTML = `
-    <span class="resource-file-icon" aria-hidden="true">${resourceIcon(item)}</span>
     <span>${escapeResourceText(item.name)}</span>
   `;
   card.addEventListener('click', () => {
@@ -530,12 +529,12 @@ function renderResources() {
 
   if (resourceState.loading) {
     if (count) count.textContent = 'loading academic resources...';
-    groupWrap.innerHTML = '<p class="resource-empty">Fetching folders from Drive...</p>';
+    groupWrap.innerHTML = '<p class="resource-empty">loading resources...</p>';
     return;
   }
 
   if (resourceState.error) {
-    if (count) count.textContent = 'resource sync unavailable';
+    if (count) count.textContent = 'resources unavailable';
     groupWrap.innerHTML = `<p class="resource-empty">${escapeResourceText(resourceState.error)}</p>`;
     return;
   }
@@ -578,7 +577,7 @@ async function loadResourceFolder(folderId = resourceState.folderId) {
   } catch (error) {
     console.warn('Live Drive resource sync failed.', error);
     resourceState.items = [];
-    resourceState.error = 'Drive resources could not load. Check owner OAuth env vars and folder access.';
+    resourceState.error = 'resources could not load right now.';
   } finally {
     resourceState.loading = false;
     renderResources();

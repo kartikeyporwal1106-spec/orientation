@@ -8,3 +8,5 @@ token.json
 service-account*.json
 google-tokens*.json
 .data/
+.vercel
+.env*

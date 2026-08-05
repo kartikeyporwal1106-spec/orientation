@@ -19,6 +19,9 @@ module.exports = async function handler(req, res) {
     return res.status(200).json(data);
   } catch (error) {
     console.error('Drive resource listing failed:', error);
-    return res.status(500).json({ error: 'Could not load Drive resources.' });
+    return res.status(500).json({
+      error: 'Could not load Drive resources.',
+      detail: process.env.NODE_ENV === 'production' ? undefined : error.message
+    });
   }
 };
