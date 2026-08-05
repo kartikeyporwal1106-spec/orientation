@@ -849,30 +849,41 @@ function setJuniorAreaLocked(isLocked, message = '') {
   if (status) status.textContent = message;
 }
 
-function unlockJuniorBoard(event) {
+function unlockJuniorProfiles(message = 'Access granted. Batchmate board loaded.') {
+  renderJuniorProfiles();
+  setJuniorAreaLocked(false, message);
+}
+
+async function unlockJuniorBoard(event) {
   event.preventDefault();
   const input = document.getElementById('junior-access-code');
   const code = (input?.value || '').trim();
   if (!code) return;
 
-  if (!isValidJuniorAccessCode(code)) {
-    saveJuniorAccessCode('');
-    setJuniorAreaLocked(true, 'Access code not found. Please check your 6 digit code.');
+  if (isValidJuniorAccessCode(code)) {
+    saveJuniorAccessCode(code);
+    unlockJuniorProfiles('Access granted. Batchmate board loaded.');
     return;
   }
 
-  saveJuniorAccessCode(code);
-  renderJuniorProfiles();
-  setJuniorAreaLocked(false, 'Access granted. Batchmate board loaded.');
+  saveSeniorAccessCode(code);
+  saveJuniorAccessCode('');
+  setJuniorAreaLocked(true, 'Checking senior enrollment...');
+  const seniorUnlocked = await loadApprovedSeniorProfiles();
+
+  if (seniorUnlocked) {
+    unlockJuniorProfiles('Senior enrollment verified. Batchmate board loaded.');
+  } else {
+    setJuniorAreaLocked(true, 'Access code or senior enrollment not found.');
+  }
 }
 
 function openJuniorProfiles() {
   switchTab('seniors');
   window.setTimeout(() => {
     const savedCode = getJuniorAccessCode();
-    if (isValidJuniorAccessCode(savedCode)) {
-      renderJuniorProfiles();
-      setJuniorAreaLocked(false);
+    if (isValidJuniorAccessCode(savedCode) || getSeniorAccessCode()) {
+      unlockJuniorProfiles('');
     } else {
       setJuniorAreaLocked(true);
     }
@@ -946,15 +957,15 @@ function sortSeniorCardsAlphabetically() {
 }
 
 async function loadApprovedSeniorProfiles() {
-  if (!SENIOR_FORM_ENDPOINT) return;
+  if (!SENIOR_FORM_ENDPOINT) return false;
   const code = getSeniorAccessCode();
   if (!code) {
     setSeniorAreaLocked(true);
-    return;
+    return false;
   }
 
   const grid = document.querySelector('.seniors-grid');
-  if (!grid) return;
+  if (!grid) return false;
 
   try {
     const url = new URL(SENIOR_FORM_ENDPOINT);
@@ -963,7 +974,7 @@ async function loadApprovedSeniorProfiles() {
     if (!response.ok) throw new Error('Access denied');
     const rows = await response.json();
     if (rows?.error) throw new Error(rows.error);
-    if (!Array.isArray(rows)) return;
+    if (!Array.isArray(rows)) return false;
 
     const profilesByKey = new Map();
     rows
@@ -982,10 +993,13 @@ async function loadApprovedSeniorProfiles() {
 
     sortSeniorCardsAlphabetically();
     updateSeniorFilters();
+    unlockJuniorProfiles('');
+    return true;
   } catch (error) {
     saveSeniorAccessCode('');
     setSeniorAreaLocked(true, 'Enrollment number not found or senior board endpoint is not ready.');
     console.warn('Senior sheet sync skipped:', error);
+    return false;
   }
 }
 
