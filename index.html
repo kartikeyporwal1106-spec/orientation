@@ -255,6 +255,23 @@
         <div class="resource-groups" id="resource-groups"></div>
       </div>
 
+      <div class="resource-block drive-integration-block">
+        <h2 class="res-block-title">google drive</h2>
+        <article class="res-pixel-card google-drive-card" id="google-drive-card" data-drive-state="loading">
+          <span class="card-icon" aria-hidden="true">▱</span>
+          <div class="card-text">
+            <span class="c-title" id="google-drive-title">checking google drive...</span>
+            <span class="c-sub" id="google-drive-copy">Checking whether Telegram uploads can reach your Drive folder.</span>
+            <span class="drive-status-line" id="google-drive-meta" aria-live="polite"></span>
+          </div>
+          <div class="drive-actions">
+            <a class="c-btn" id="google-drive-connect" href="/api/google/auth">connect google drive</a>
+            <button class="c-btn ghost" id="google-drive-change-folder" type="button" disabled>change folder</button>
+            <button class="c-btn ghost danger" id="google-drive-disconnect" type="button">disconnect</button>
+          </div>
+        </article>
+      </div>
+
       <div class="pixel-starburst">✳ ✳ ✳</div>
 
       <!-- Batchmate community link -->
@@ -507,6 +524,8 @@
     </div>
 
   </main>
+
+  <div class="site-toast" id="site-toast" role="status" aria-live="polite"></div>
 
   <!-- ═══════════════ 8-BIT FOOTER BAR ═══════════════ -->
   <footer class="arcade-footer">

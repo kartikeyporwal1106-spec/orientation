@@ -977,6 +977,98 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
+function showSiteToast(message, type = 'success') {
+  const toast = document.getElementById('site-toast');
+  if (!toast) return;
+  toast.textContent = message;
+  toast.className = `site-toast active ${type}`;
+  window.clearTimeout(showSiteToast.timer);
+  showSiteToast.timer = window.setTimeout(() => {
+    toast.classList.remove('active');
+  }, 4200);
+}
+
+function setGoogleDriveCardState(state, status = {}) {
+  const card = document.getElementById('google-drive-card');
+  const title = document.getElementById('google-drive-title');
+  const copy = document.getElementById('google-drive-copy');
+  const meta = document.getElementById('google-drive-meta');
+  const connect = document.getElementById('google-drive-connect');
+  const changeFolder = document.getElementById('google-drive-change-folder');
+  const disconnect = document.getElementById('google-drive-disconnect');
+  if (!card || !title || !copy || !meta || !connect || !changeFolder || !disconnect) return;
+
+  card.dataset.driveState = state;
+  connect.hidden = state === 'connected' || state === 'loading';
+  disconnect.hidden = state !== 'connected';
+  changeFolder.hidden = state !== 'connected';
+  changeFolder.disabled = state !== 'connected';
+
+  if (state === 'loading') {
+    title.textContent = 'checking google drive...';
+    copy.textContent = 'Checking whether Telegram uploads can reach your Drive folder.';
+    meta.textContent = '';
+    return;
+  }
+
+  if (state === 'connected') {
+    title.textContent = 'google drive connected';
+    copy.textContent = 'Telegram file uploads will use this Google account.';
+    const folder = status.folderName || status.folderId || 'folder from GOOGLE_DRIVE_FOLDER_ID';
+    meta.textContent = `${status.email || 'connected account'} · ${folder}`;
+    return;
+  }
+
+  if (state === 'error') {
+    title.textContent = 'google drive needs attention';
+    copy.textContent = 'Could not check the connection. Try again after confirming the OAuth environment variables.';
+    meta.textContent = '';
+    return;
+  }
+
+  title.textContent = 'google drive';
+  copy.textContent = 'Connect your Google account so Telegram files can upload into your Drive folder.';
+  meta.textContent = 'not connected';
+}
+
+async function loadGoogleDriveStatus() {
+  if (!document.getElementById('google-drive-card')) return;
+  setGoogleDriveCardState('loading');
+  try {
+    const response = await fetch('/api/google/status', { headers: { accept: 'application/json' } });
+    const status = await response.json();
+    setGoogleDriveCardState(status.connected ? 'connected' : 'disconnected', status);
+  } catch {
+    setGoogleDriveCardState('error');
+  }
+}
+
+async function disconnectGoogleDrive() {
+  setGoogleDriveCardState('loading');
+  try {
+    const response = await fetch('/api/google/disconnect', { method: 'POST' });
+    if (!response.ok) throw new Error('disconnect failed');
+    setGoogleDriveCardState('disconnected');
+    showSiteToast('Google Drive disconnected.', 'success');
+  } catch {
+    setGoogleDriveCardState('error');
+    showSiteToast('Could not disconnect Google Drive.', 'error');
+  }
+}
+
+function handleGoogleOAuthResult() {
+  const params = new URLSearchParams(window.location.search);
+  const result = params.get('google');
+  if (!result) return;
+  switchTab('resources', false);
+  if (result === 'connected') showSiteToast('Google Drive connected.', 'success');
+  if (result === 'error') showSiteToast('Google Drive connection failed. Try again.', 'error');
+  params.delete('google');
+  const nextQuery = params.toString();
+  const nextUrl = `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ''}${window.location.hash || '#resources'}`;
+  window.history.replaceState({ tab: 'resources' }, '', nextUrl);
+}
+
 // ═══════════════ CAMPUS GALLERY BOARD ═══════════════
 const CAMPUS_GALLERY_ITEMS = [
   { title: 'Library Reading Hall', category: 'library', label: 'LIBRARY', tags: 'library reading hall study tables quiet academic', src: 'assets/gallery/campus/library-reading-hall.jpg' },
@@ -1807,8 +1899,12 @@ document.addEventListener('keydown', (e) => {
 // ═══════════════ INITIALIZATION ═══════════════
 window.addEventListener('DOMContentLoaded', () => {
   setupSidebarToggle();
-  window.history.replaceState({ tab: 'home' }, '', window.location.pathname);
+  const hasGoogleOAuthResult = new URLSearchParams(window.location.search).has('google');
+  if (!hasGoogleOAuthResult) {
+    window.history.replaceState({ tab: 'home' }, '', window.location.pathname);
+  }
   applyArcadeTheme(localStorage.getItem(ARCADE_THEME_KEY) || 'app');
+  handleGoogleOAuthResult();
 
   localStorage.removeItem('upsifs_senior_profile_submissions');
   if (getSeniorAccessCode()) {
@@ -1820,6 +1916,10 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('senior-lock-form')?.addEventListener('submit', unlockSeniorBoard);
   document.getElementById('senior-search')?.addEventListener('input', updateSeniorFilters);
   document.getElementById('junior-feedback-form')?.addEventListener('submit', submitJuniorFeedback);
+  document.getElementById('google-drive-disconnect')?.addEventListener('click', disconnectGoogleDrive);
+  document.getElementById('google-drive-change-folder')?.addEventListener('click', () => {
+    showSiteToast('Folder picker is coming next. Current folder comes from GOOGLE_DRIVE_FOLDER_ID.', 'success');
+  });
   renderJuniorFeedbackNotes();
   document.getElementById('resource-search')?.addEventListener('input', (event) => {
     resourceState.query = event.target.value || '';
@@ -1831,6 +1931,7 @@ window.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => setCampusGalleryFilter(btn.dataset.campusFilter || 'all'));
   });
   loadResourceFeed();
+  loadGoogleDriveStatus();
   updateSeniorFilters();
 });
 

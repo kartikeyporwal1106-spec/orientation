@@ -1804,6 +1804,36 @@ body.sidebar-open .sidebar-handle {
   white-space: nowrap;
 }
 
+.site-toast {
+  position: fixed;
+  right: 1rem;
+  bottom: 4.2rem;
+  z-index: 360;
+  display: none;
+  max-width: min(360px, calc(100vw - 2rem));
+  color: #000000;
+  background: #ffffff;
+  border: 2px solid #000000;
+  box-shadow: 4px 4px 0 #000000;
+  padding: 0.8rem 1rem;
+  font-family: var(--font-pixel);
+  font-size: 0.62rem;
+  line-height: 1.55;
+}
+
+.site-toast.active {
+  display: block;
+}
+
+.site-toast.success {
+  background: var(--green-btn);
+  color: #ffffff;
+}
+
+.site-toast.error {
+  background: #ffdfdf;
+}
+
 /* ═══════════════ MODAL & LIGHTBOX ═══════════════ */
 .modal-overlay {
   display: none;
@@ -3404,6 +3434,104 @@ body.theme-app .reddit-card .c-btn {
   text-transform: lowercase;
 }
 
+body.theme-app .drive-integration-block {
+  margin-top: 1rem;
+}
+
+body.theme-app .google-drive-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  text-decoration: none;
+}
+
+body.theme-app .google-drive-card .card-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  aspect-ratio: 1;
+  color: #e7b12b;
+  background: rgba(255, 211, 77, 0.18);
+  border: 1px solid rgba(231, 177, 43, 0.42);
+  border-radius: 10px;
+  font-family: var(--font-hand);
+  font-size: 1.8rem;
+}
+
+body.theme-app .google-drive-card .card-text {
+  gap: 0.24rem;
+}
+
+body.theme-app .google-drive-card .c-title {
+  font-family: var(--font-hand);
+  font-size: 1.28rem;
+  text-transform: lowercase;
+}
+
+body.theme-app .google-drive-card .c-sub,
+body.theme-app .drive-status-line {
+  color: #6f6659;
+  font-family: var(--font-hand);
+  font-size: 0.98rem;
+  line-height: 1.35;
+}
+
+.drive-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.55rem;
+}
+
+.drive-actions .c-btn {
+  cursor: pointer;
+}
+
+.drive-actions .c-btn[disabled] {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+body.theme-app .drive-actions .c-btn.ghost {
+  color: #261f1c;
+  background: rgba(255, 252, 241, 0.88);
+}
+
+body.theme-app .drive-actions .c-btn.danger {
+  border-color: rgba(160, 49, 42, 0.45);
+}
+
+body.theme-app .google-drive-card[data-drive-state="connected"] .card-icon {
+  color: #246b37;
+  background: rgba(72, 176, 92, 0.14);
+  border-color: rgba(72, 176, 92, 0.36);
+}
+
+body.theme-app .google-drive-card[data-drive-state="error"] .card-icon {
+  color: #a0312a;
+  background: rgba(217, 54, 47, 0.12);
+  border-color: rgba(217, 54, 47, 0.3);
+}
+
+body.theme-app .site-toast {
+  color: #261f1c;
+  background: rgba(255, 252, 241, 0.96);
+  border-color: rgba(23, 18, 15, 0.58);
+  border-radius: 10px;
+  box-shadow: 4px 4px 0 rgba(23, 18, 15, 0.18);
+  font-family: var(--font-hand);
+  font-size: 1rem;
+}
+
+body.theme-app .site-toast.success {
+  background: #ffd34d;
+}
+
+body.theme-app .site-toast.error {
+  background: #ffe6df;
+}
+
 @media (max-width: 768px) {
   body.theme-app .arcade-header {
     height: 64px;
@@ -3549,6 +3677,31 @@ body.theme-app .reddit-card .c-btn {
 
   body.theme-app .junior-note-card p {
     font-size: 1.05rem;
+  }
+
+  body.theme-app .google-drive-card {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  body.theme-app .google-drive-card .card-icon {
+    width: 42px;
+  }
+
+  body.theme-app .drive-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  body.theme-app .drive-actions .c-btn {
+    flex: 1 1 100%;
+    text-align: center;
+  }
+
+  .site-toast {
+    right: 0.6rem;
+    bottom: 5.5rem;
+    max-width: calc(100vw - 1.2rem);
   }
 
   body.theme-app .senior-board-hero,

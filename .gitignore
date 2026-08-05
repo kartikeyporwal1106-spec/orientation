@@ -2,5 +2,9 @@ node_modules/
 .DS_Store
 orientation/
 .env
+credentials.json
+token.json
 *.service-account.json
 service-account*.json
+google-tokens*.json
+.data/
