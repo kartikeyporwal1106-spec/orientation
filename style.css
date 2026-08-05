@@ -2281,6 +2281,21 @@ body.theme-app .stage-subtitle {
   line-height: 1.7;
 }
 
+body.theme-app #tab-seniors {
+  padding-top: 2.5rem;
+}
+
+body.theme-app #tab-seniors .stage-title {
+  color: #2f2922;
+  margin-top: 1.2rem;
+  margin-bottom: 1.15rem;
+}
+
+body.theme-app #tab-seniors .stage-subtitle {
+  color: #7d7468;
+  margin-bottom: 1.45rem;
+}
+
 body.theme-app .pixel-starburst,
 body.theme-app .theme-quote-layer {
   display: none;
@@ -2313,6 +2328,26 @@ body.theme-app .senior-access-lock {
   border-radius: 8px;
   box-shadow: 12px 14px 0 rgba(23, 18, 15, 0.08), 0 18px 48px rgba(84, 72, 48, 0.1);
   backdrop-filter: none;
+}
+
+body.theme-app .senior-board-hero {
+  background:
+    linear-gradient(90deg, rgba(231, 177, 43, 0.2) 0 1px, transparent 1px 100%) 42px 0 / 100% 100%,
+    repeating-linear-gradient(0deg, rgba(255, 251, 235, 0.92) 0 34px, rgba(119, 112, 92, 0.1) 35px 36px),
+    #fff6dc;
+  border-color: rgba(82, 69, 51, 0.3);
+  box-shadow: 8px 10px 0 rgba(23, 18, 15, 0.14), 0 16px 36px rgba(84, 72, 48, 0.12);
+}
+
+body.theme-app .senior-board-hero .board-copy {
+  background: rgba(255, 251, 235, 0.5);
+  border-color: rgba(82, 69, 51, 0.34);
+  box-shadow: none;
+}
+
+body.theme-app .senior-board-hero .board-copy p {
+  color: #5f574d;
+  text-shadow: none;
 }
 
 body.theme-app .lineup-grid::before,
