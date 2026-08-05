@@ -242,20 +242,20 @@ const homeCopyByTheme = {
   classic: {
     title: 'WELCOME FRESHERS',
     subtitle: 'CLASS OF 2026 · PLAYER 1 READY?',
-    resources: '📚 ACADEMIC RESOURCES',
-    gallery: '🏛️ COLLEGE GALLERY',
+    resources: 'academic resources',
+    gallery: 'college gallery',
     community: 'JUNIOR DETAIL SUBMISSION',
-    seniors: '🧑‍💻 CONNECT WITH SENIORS',
+    seniors: 'connect with seniors',
     profile: '📝 ADD / UPDATE PROFILE',
     feedback: 'FEEDBACK ↗'
   },
   app: {
     title: 'All your UPSIFS. Right Here',
     subtitle: 'Resources, gallery, seniors, and community in one student-built hub',
-    resources: 'Explore Resources →',
-    gallery: 'Campus Gallery →',
+    resources: 'academic resources →',
+    gallery: 'college gallery →',
     community: 'Junior Detail Submission',
-    seniors: 'Find Seniors →',
+    seniors: 'connect with seniors →',
     profile: 'Update Profile →',
     feedback: 'Feedback →'
   }

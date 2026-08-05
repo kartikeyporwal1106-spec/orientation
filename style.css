@@ -2580,6 +2580,34 @@ body.theme-app .footer-love span {
   color: #d9362f;
 }
 
+body.theme-app .tab-top-bar {
+  margin-bottom: 1.25rem;
+}
+
+body.theme-app .btn-back-home {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #261f1c;
+  background: rgba(255, 252, 241, 0.82);
+  border: 2px solid rgba(23, 18, 15, 0.58);
+  border-radius: 10px;
+  box-shadow: 4px 4px 0 rgba(23, 18, 15, 0.18);
+  padding: 0.55rem 0.95rem;
+  font-family: 'Kalam', var(--font-sans);
+  font-size: 1rem;
+  font-weight: 800;
+  text-transform: lowercase;
+}
+
+body.theme-app .btn-back-home:hover {
+  color: #17120f;
+  background: #ffd34d;
+  transform: translateY(-2px);
+  box-shadow: 4px 5px 0 #17120f;
+}
+
 body.theme-app .dev-team-section {
   padding-top: 2.5rem;
   color: #17120f;
