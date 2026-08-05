@@ -179,7 +179,7 @@
             <button class="arcade-card-btn" id="home-seniors-btn" onclick="switchTab('seniors')">
               connect with seniors
             </button>
-            <button class="arcade-card-btn feedback-link" id="home-profile-btn" onclick="switchTab('seniors'); openSeniorForm();">
+            <button class="arcade-card-btn feedback-link" id="home-profile-btn" onclick="openJuniorProfiles()">
               📝 ADD / UPDATE PROFILE
             </button>
             <button class="arcade-card-btn feedback-link" id="home-feedback-btn" onclick="openJuniorCommunity()">
@@ -362,16 +362,33 @@
         </form>
       </section>
 
-      <section class="junior-profile-board" aria-label="Junior profile board">
+      <section class="junior-profile-board" id="junior-profile-board" aria-label="Junior profile board">
         <div class="junior-profile-head">
           <div>
             <span class="board-kicker">JUNIOR PROFILES</span>
             <h2>Freshers in the batch.</h2>
             <p>Course, interests, topics, and batch feedback in one clean board.</p>
           </div>
-          <button type="button" class="feedback-card-btn junior-update-btn" onclick="openSeniorForm()">update profile ↗</button>
+          <button type="button" class="feedback-card-btn junior-update-btn" onclick="openJuniorProfiles()">connect with batchmates ↗</button>
         </div>
-        <div class="junior-profile-grid" id="junior-profile-grid" aria-live="polite"></div>
+        <section class="junior-access-lock" id="junior-access-lock" aria-label="Junior access verification">
+          <div class="lock-copy">
+            <span class="board-kicker">BATCHMATE ACCESS</span>
+            <h2>Enter your access code.</h2>
+            <p>Junior profiles are visible only to the listed batchmates.</p>
+          </div>
+          <form class="senior-lock-form" id="junior-lock-form">
+            <label>
+              ACCESS CODE
+              <input type="text" id="junior-access-code" autocomplete="off" placeholder="ENTER ACCESS CODE" required>
+            </label>
+            <button type="submit" class="submit-btn">[UNLOCK BATCHMATES]</button>
+            <p class="senior-form-status" id="junior-lock-status" aria-live="polite"></p>
+          </form>
+        </section>
+        <div class="junior-private-area locked" id="junior-private-area">
+          <div class="junior-profile-grid" id="junior-profile-grid" aria-live="polite"></div>
+        </div>
       </section>
 
       <div class="senior-filter-bar" aria-label="Senior year filter">

@@ -141,6 +141,7 @@ const studentNames = [
 let activeSeniorYear = '2';
 let activeSeniorQuickFilter = '';
 const SENIOR_ACCESS_KEY = 'upsifs_senior_access_code';
+const JUNIOR_ACCESS_KEY = 'upsifs_junior_access_code';
 const SENIOR_FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzd55ExHTpaKooyEFivmZEQ38sAMfAahtCviZgUK4HYV-01-Nn8CS08P1omWKx3CdaPoQ/exec';
 const RESOURCE_FEED_ENDPOINT = '/api/resources/list';
 const ARCADE_THEME_KEY = 'upsifs_arcade_theme';
@@ -295,7 +296,7 @@ const homeCopyByTheme = {
     gallery: 'college gallery',
     community: 'JUNIOR DETAIL SUBMISSION',
     seniors: 'connect with seniors',
-    profile: '📝 ADD / UPDATE PROFILE',
+    profile: 'connect with batchmates',
     feedback: 'FEEDBACK ↗'
   },
   app: {
@@ -305,7 +306,7 @@ const homeCopyByTheme = {
     gallery: 'college gallery →',
     community: 'Junior Detail Submission',
     seniors: 'connect with seniors →',
-    profile: 'Update Profile →',
+    profile: 'connect with batchmates →',
     feedback: 'Feedback →'
   }
 };
@@ -810,6 +811,77 @@ function renderJuniorProfiles() {
   if (!grid) return;
   grid.replaceChildren(...JUNIOR_PROFILES.map(createJuniorProfileCard));
 }
+
+function normalizeAccessCode(code) {
+  return (code || '').trim().toLowerCase();
+}
+
+function getJuniorAccessCode() {
+  try {
+    return sessionStorage.getItem(JUNIOR_ACCESS_KEY) || '';
+  } catch {
+    return '';
+  }
+}
+
+function saveJuniorAccessCode(code) {
+  try {
+    if (code) {
+      sessionStorage.setItem(JUNIOR_ACCESS_KEY, code);
+    } else {
+      sessionStorage.removeItem(JUNIOR_ACCESS_KEY);
+    }
+  } catch {
+    // Ignore private-browsing storage failures.
+  }
+}
+
+function isValidJuniorAccessCode(code) {
+  const normalizedCode = normalizeAccessCode(code);
+  if (!normalizedCode) return false;
+  return JUNIOR_PROFILES.some(profile => normalizeAccessCode(profile.accessCode) === normalizedCode);
+}
+
+function setJuniorAreaLocked(isLocked, message = '') {
+  document.getElementById('junior-private-area')?.classList.toggle('locked', isLocked);
+  document.getElementById('junior-access-lock')?.classList.toggle('unlocked', !isLocked);
+  const status = document.getElementById('junior-lock-status');
+  if (status) status.textContent = message;
+}
+
+function unlockJuniorBoard(event) {
+  event.preventDefault();
+  const input = document.getElementById('junior-access-code');
+  const code = (input?.value || '').trim();
+  if (!code) return;
+
+  if (!isValidJuniorAccessCode(code)) {
+    saveJuniorAccessCode('');
+    setJuniorAreaLocked(true, 'Access code not found. Please check your 6 digit code.');
+    return;
+  }
+
+  saveJuniorAccessCode(code);
+  renderJuniorProfiles();
+  setJuniorAreaLocked(false, 'Access granted. Batchmate board loaded.');
+}
+
+function openJuniorProfiles() {
+  switchTab('seniors');
+  window.setTimeout(() => {
+    const savedCode = getJuniorAccessCode();
+    if (isValidJuniorAccessCode(savedCode)) {
+      renderJuniorProfiles();
+      setJuniorAreaLocked(false);
+    } else {
+      setJuniorAreaLocked(true);
+    }
+    document.getElementById('junior-profile-board')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 80);
+}
+
+window.unlockJuniorBoard = unlockJuniorBoard;
+window.openJuniorProfiles = openJuniorProfiles;
 
 function coalesceProfileValue(profile, ...keys) {
   for (const key of keys) {
@@ -1987,8 +2059,15 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('senior-profile-form')?.addEventListener('submit', submitSeniorProfile);
   document.getElementById('senior-lock-form')?.addEventListener('submit', unlockSeniorBoard);
   document.getElementById('senior-search')?.addEventListener('input', updateSeniorFilters);
+  document.getElementById('junior-lock-form')?.addEventListener('submit', unlockJuniorBoard);
   document.getElementById('junior-feedback-form')?.addEventListener('submit', submitJuniorFeedback);
-  renderJuniorProfiles();
+  if (isValidJuniorAccessCode(getJuniorAccessCode())) {
+    renderJuniorProfiles();
+    setJuniorAreaLocked(false);
+  } else {
+    saveJuniorAccessCode('');
+    setJuniorAreaLocked(true);
+  }
   document.getElementById('resource-preview-modal')?.addEventListener('click', (event) => {
     if (event.target.id === 'resource-preview-modal') closeResourcePreview();
   });
