@@ -1,120 +1,24 @@
 const crypto = require('crypto');
-const fs = require('fs');
 const { loadLocalEnv } = require('./lib/load-env');
+const {
+  DRIVE_ROOT_FOLDER_ID,
+  ensureDrivePath,
+  sanitizeDrivePath,
+  uploadBufferToDrive
+} = require('./lib/google-drive-service');
 
 loadLocalEnv();
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_ADMIN_CHAT_ID = process.env.TELEGRAM_ADMIN_CHAT_ID;
-const DRIVE_ROOT_FOLDER_ID = process.env.DRIVE_ROOT_FOLDER_ID || '1DTSwGkV4_jniit6tv9svFZba1oa7DuUT';
-const GOOGLE_SERVICE_ACCOUNT_JSON = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
-const GOOGLE_SERVICE_ACCOUNT_FILE = process.env.GOOGLE_SERVICE_ACCOUNT_FILE;
-const MAX_FOLDER_DEPTH = Number(process.env.DRIVE_MAX_FOLDER_DEPTH || 8);
-const MAX_FOLDER_PART_LENGTH = Number(process.env.DRIVE_MAX_FOLDER_PART_LENGTH || 80);
 
 if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_ADMIN_CHAT_ID) {
   console.error('Missing TELEGRAM_BOT_TOKEN or TELEGRAM_ADMIN_CHAT_ID.');
   process.exit(1);
 }
 
-if (!GOOGLE_SERVICE_ACCOUNT_JSON && !GOOGLE_SERVICE_ACCOUNT_FILE) {
-  console.error('Missing GOOGLE_SERVICE_ACCOUNT_JSON or GOOGLE_SERVICE_ACCOUNT_FILE.');
-  process.exit(1);
-}
-
-const serviceAccount = JSON.parse(
-  GOOGLE_SERVICE_ACCOUNT_JSON || fs.readFileSync(GOOGLE_SERVICE_ACCOUNT_FILE, 'utf8')
-);
 const pendingUploads = new Map();
-const folderCache = new Map();
 let telegramOffset = 0;
-let googleToken = null;
-
-function base64url(input) {
-  return Buffer.from(input)
-    .toString('base64')
-    .replace(/=/g, '')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_');
-}
-
-async function getGoogleAccessToken() {
-  const now = Math.floor(Date.now() / 1000);
-  if (googleToken && googleToken.expiresAt - 60 > now) return googleToken.accessToken;
-
-  const header = base64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
-  const claim = base64url(JSON.stringify({
-    iss: serviceAccount.client_email,
-    scope: 'https://www.googleapis.com/auth/drive',
-    aud: 'https://oauth2.googleapis.com/token',
-    exp: now + 3600,
-    iat: now
-  }));
-  const signature = crypto
-    .createSign('RSA-SHA256')
-    .update(`${header}.${claim}`)
-    .sign(serviceAccount.private_key, 'base64')
-    .replace(/=/g, '')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_');
-
-  const response = await fetch('https://oauth2.googleapis.com/token', {
-    method: 'POST',
-    headers: { 'content-type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-      assertion: `${header}.${claim}.${signature}`
-    })
-  });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error_description || data.error || 'Google auth failed');
-
-  googleToken = {
-    accessToken: data.access_token,
-    expiresAt: now + Number(data.expires_in || 3600)
-  };
-  return googleToken.accessToken;
-}
-
-async function driveRequest(url, options = {}) {
-  const accessToken = await getGoogleAccessToken();
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      authorization: `Bearer ${accessToken}`,
-      ...(options.headers || {})
-    }
-  });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error?.message || `Drive request failed: ${response.status}`);
-  return data;
-}
-
-function sanitizeDrivePath(rawPath) {
-  const pathText = String(rawPath || '').trim();
-  if (!pathText) throw new Error('Caption must contain a folder path, like Physics/Waves/Sound Waves.');
-  if (pathText.startsWith('/') || /^[a-zA-Z]:[\\/]/.test(pathText)) {
-    throw new Error('Folder path must be relative, not absolute.');
-  }
-  const parts = pathText
-    .split('/')
-    .map(part => part.trim())
-    .filter(Boolean);
-  if (!parts.length) throw new Error('Folder path is empty.');
-  if (parts.length > MAX_FOLDER_DEPTH) throw new Error(`Folder path can have at most ${MAX_FOLDER_DEPTH} levels.`);
-  for (const part of parts) {
-    if (part === '.' || part === '..' || part.includes('..')) {
-      throw new Error('Folder path cannot contain path traversal.');
-    }
-    if (/[\\:*?"<>|]/.test(part)) {
-      throw new Error('Folder names cannot contain \\ : * ? " < > | characters.');
-    }
-    if (part.length > MAX_FOLDER_PART_LENGTH) {
-      throw new Error(`Each folder name must be ${MAX_FOLDER_PART_LENGTH} characters or less.`);
-    }
-  }
-  return parts.join('/');
-}
 
 function parseDestination(message) {
   const text = (message.caption || message.text || '').trim();
@@ -161,64 +65,6 @@ async function downloadTelegramFile(fileId) {
   const response = await fetch(`https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${file.file_path}`);
   if (!response.ok) throw new Error(`Telegram file download failed: ${response.status}`);
   return Buffer.from(await response.arrayBuffer());
-}
-
-async function findOrCreateFolder(name, parentId) {
-  const key = `${parentId}/${name}`;
-  if (folderCache.has(key)) return folderCache.get(key);
-
-  const query = [
-    `name='${name.replace(/'/g, "\\'")}'`,
-    `'${parentId}' in parents`,
-    "mimeType='application/vnd.google-apps.folder'",
-    'trashed=false'
-  ].join(' and ');
-
-  const search = await driveRequest(
-    `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name)`
-  );
-  if (search.files?.[0]) {
-    folderCache.set(key, search.files[0].id);
-    return search.files[0].id;
-  }
-
-  const folder = await driveRequest('https://www.googleapis.com/drive/v3/files?fields=id,name', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({
-      name,
-      mimeType: 'application/vnd.google-apps.folder',
-      parents: [parentId]
-    })
-  });
-  folderCache.set(key, folder.id);
-  return folder.id;
-}
-
-async function ensureDrivePath(pathText) {
-  const parts = sanitizeDrivePath(pathText).split('/');
-  let parentId = DRIVE_ROOT_FOLDER_ID;
-  for (const part of parts) {
-    parentId = await findOrCreateFolder(part, parentId);
-  }
-  return parentId;
-}
-
-async function uploadToDrive({ name, buffer, mimeType, parentId }) {
-  const boundary = `upsifs-${Date.now()}-${crypto.randomBytes(6).toString('hex')}`;
-  const metadata = JSON.stringify({ name, parents: [parentId] });
-  const body = Buffer.concat([
-    Buffer.from(`--${boundary}\r\ncontent-type: application/json; charset=UTF-8\r\n\r\n${metadata}\r\n`),
-    Buffer.from(`--${boundary}\r\ncontent-type: ${mimeType || 'application/octet-stream'}\r\n\r\n`),
-    buffer,
-    Buffer.from(`\r\n--${boundary}--`)
-  ]);
-
-  return driveRequest('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,mimeType,size,webViewLink', {
-    method: 'POST',
-    headers: { 'content-type': `multipart/related; boundary=${boundary}` },
-    body
-  });
 }
 
 function buildApprovalKeyboard(requestId) {
@@ -284,13 +130,14 @@ async function handleMessage(message) {
 function friendlyDriveError(error) {
   const messageText = String(error.message || '');
   if (/permission|forbidden|insufficient/i.test(messageText)) {
-    return 'Google Drive permission issue. Share the root folder with the service-account email as Editor.';
+    return 'Google Drive permission issue. Check that the OAuth owner account can edit DRIVE_ROOT_FOLDER_ID.';
   }
   if (/quota|storage/i.test(messageText)) {
-    return 'Google Drive quota issue. Use a Shared Drive or owner OAuth if service-account quota blocks this folder.';
+    return 'Google Drive quota issue on the owner account. Free storage or choose another Drive folder/account.';
   }
+  if (/refresh token|not connected|authorize/i.test(messageText)) return 'Google Drive OAuth issue. Set GOOGLE_REFRESH_TOKEN for the owner account.';
   if (/not found|folder/i.test(messageText)) {
-    return 'Google Drive folder issue. Check DRIVE_ROOT_FOLDER_ID and service-account access.';
+    return 'Google Drive folder issue. Check DRIVE_ROOT_FOLDER_ID and owner account access.';
   }
   return `Upload failed: ${messageText}`;
 }
@@ -300,7 +147,7 @@ async function approveUpload(callbackQuery, request) {
   try {
     const parentId = await ensureDrivePath(request.destination);
     const buffer = await downloadTelegramFile(request.file.fileId);
-    const uploaded = await uploadToDrive({
+    const uploaded = await uploadBufferToDrive({
       name: request.file.name,
       buffer,
       mimeType: request.file.mimeType,

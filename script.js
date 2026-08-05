@@ -578,7 +578,7 @@ async function loadResourceFolder(folderId = resourceState.folderId) {
   } catch (error) {
     console.warn('Live Drive resource sync failed.', error);
     resourceState.items = [];
-    resourceState.error = 'Drive resources could not load. Check service account access and env vars.';
+    resourceState.error = 'Drive resources could not load. Check owner OAuth env vars and folder access.';
   } finally {
     resourceState.loading = false;
     renderResources();
