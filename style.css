@@ -2163,6 +2163,17 @@ body.game-collapsed .game-toggle-btn {
 
 .footer-right {
   min-width: 0;
+  justify-self: end;
+}
+
+.footer-vibe {
+  display: block;
+  font-family: var(--font-pixel);
+  font-size: 0.56rem;
+  color: #ffffff;
+  text-align: right;
+  text-shadow: 1px 1px 0 #000000;
+  white-space: nowrap;
 }
 
 .footer-link {
@@ -2437,6 +2448,10 @@ body.game-collapsed .game-toggle-btn {
 
   .footer-right {
     justify-self: end;
+  }
+
+  .footer-vibe {
+    display: none;
   }
 }
 
@@ -3214,7 +3229,8 @@ body.theme-app .arcade-footer {
 
 body.theme-app .footer-link,
 body.theme-app .social-pixel-btn,
-body.theme-app .footer-love {
+body.theme-app .footer-love,
+body.theme-app .footer-vibe {
   color: #261f1c;
   font-family: var(--font-hand);
   letter-spacing: 0;
@@ -3230,6 +3246,12 @@ body.theme-app .footer-love {
 
 body.theme-app .footer-love span {
   color: #d9362f;
+}
+
+body.theme-app .footer-vibe {
+  color: #6f685c;
+  font-size: 0.86rem;
+  font-weight: 700;
 }
 
 body.theme-app .tab-top-bar {
