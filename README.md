@@ -1,60 +1,61 @@
 # UPSIFS 2026 Hub
 
-Static UPSIFS hub with a Telegram-to-Google-Drive resource upload bot.
+Student-built UPSIFS hub with a Google Drive-backed academic resource explorer and a Telegram approval bot.
 
-## Google Drive OAuth Setup
+## Final Resource Flow
 
-The Telegram Drive bot now uses Google OAuth 2.0 instead of a service account. This is required for uploads into a normal **My Drive** folder because service accounts do not have their own My Drive storage quota.
+Students do not connect Google Drive accounts. One server-side Google service account reads and writes inside the central UPSIFS Drive folder.
 
-### 1. Enable Google Drive API
+### Telegram Uploads
 
-Open Google Cloud Console for the same project you want to use, then enable:
-
-`APIs & Services` → `Library` → `Google Drive API` → `Enable`
-
-### 2. Configure OAuth Consent
-
-Go to `Google Auth Platform` → `Branding` and fill in the app name, support email, and developer email.
-
-For Workspace accounts, use `Internal` if available. Otherwise use `External`, keep the app in testing, and add your Google account under test users.
-
-Important: Google OAuth apps in `External + Testing` mode may issue refresh tokens that expire after a limited testing period. For a college Workspace project, `Internal` avoids that testing limitation when available.
-
-### 3. Create OAuth Client
-
-Because the website uses backend callback routes, create a **Web application** OAuth client.
-
-Authorized redirect URI for local development:
+1. A student sends a file or photo to the Telegram bot.
+2. The caption contains the destination folder path:
 
 ```text
-http://localhost:3000/api/google/callback
+Physics/Waves/Sound Waves
 ```
 
-Production format:
+3. The bot sends an approval request to the configured admin Telegram chat.
+4. Admin taps Approve or Reject.
+5. Approved files are uploaded under `DRIVE_ROOT_FOLDER_ID`, creating any missing subfolders.
+
+### Website Resources
+
+The academic resources page reads the same Drive folder through backend API routes:
+
+- `/api/resources/list`
+- `/api/resources/preview/:fileId`
+- `/api/resources/download/:fileId`
+
+The browser never receives service-account credentials.
+
+## Google Drive Setup
+
+1. Enable the Google Drive API in Google Cloud Console.
+2. Create a service account.
+3. Copy the service account email.
+4. Share the root Drive folder with that email as Editor.
+5. Add the service account JSON to your server environment.
+
+Root folder:
 
 ```text
-https://your-domain.com/api/google/callback
+https://drive.google.com/drive/folders/1DTSwGkV4_jniit6tv9svFZba1oa7DuUT
 ```
 
-Use your actual deployed domain for production.
+## Environment Variables
 
-### 4. Environment Variables
-
-Set these locally and in your host:
+Set these locally and in production:
 
 ```text
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-GOOGLE_REDIRECT_URI=http://localhost:3000/api/google/callback
-GOOGLE_DRIVE_FOLDER_ID=
-GOOGLE_TOKEN_ENCRYPTION_KEY=
+DRIVE_ROOT_FOLDER_ID=1DTSwGkV4_jniit6tv9svFZba1oa7DuUT
+GOOGLE_SERVICE_ACCOUNT_JSON=
+GOOGLE_SERVICE_ACCOUNT_FILE=
 TELEGRAM_BOT_TOKEN=
-TELEGRAM_ALLOWED_CHAT_IDS=
+TELEGRAM_ADMIN_CHAT_ID=
 ```
 
-`GOOGLE_TOKEN_ENCRYPTION_KEY` must be at least 24 characters. It is used to encrypt the server-side OAuth token file fallback.
-
-This repo currently has no database or logged-in admin model, so OAuth tokens are stored as an encrypted server-side file at `.data/google-tokens.json` by default. This is a temporary single-admin fallback. For production serverless hosting, move this token record to a persistent database or KV store because function filesystems may not persist across deployments or cold starts.
+Use either `GOOGLE_SERVICE_ACCOUNT_JSON` or `GOOGLE_SERVICE_ACCOUNT_FILE`.
 
 Never commit these files or secrets:
 
@@ -67,26 +68,10 @@ google-tokens*.json
 .data/
 ```
 
-### 5. Connect Google Drive
-
-Open the website, go to `academic resources`, and use the `google drive` card.
-
-Disconnected state shows a `connect google drive` button. After OAuth succeeds, the card shows the connected Google account email and the configured Drive folder.
-
-Folder selection is structured for a future picker. For now, uploads use `GOOGLE_DRIVE_FOLDER_ID`.
-
-### 6. Run the Telegram Bot
-
-After connecting Drive once from the website:
+## Run
 
 ```bash
 npm run bot
 ```
 
-The bot uploads Telegram files/photos to folders under `GOOGLE_DRIVE_FOLDER_ID`, creating subfolders from captions such as:
-
-```text
-/upload BTech-MTech/2025-26/SEM II/Cyber Law
-```
-
-The old service-account flow is no longer used for uploads.
+The website can be served as usual. On Vercel, the `/api/resources/*` routes handle Drive listing, preview, and download.

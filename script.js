@@ -142,7 +142,7 @@ let activeSeniorYear = '2';
 let activeSeniorQuickFilter = '';
 const SENIOR_ACCESS_KEY = 'upsifs_senior_access_code';
 const SENIOR_FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzd55ExHTpaKooyEFivmZEQ38sAMfAahtCviZgUK4HYV-01-Nn8CS08P1omWKx3CdaPoQ/exec';
-const RESOURCE_FEED_ENDPOINT = '';
+const RESOURCE_FEED_ENDPOINT = '/api/resources/list';
 const ARCADE_THEME_KEY = 'upsifs_arcade_theme';
 const JUNIOR_FEEDBACK_KEY = 'upsifs_junior_feedback_notes';
 
@@ -261,6 +261,19 @@ const homeCopyByTheme = {
   }
 };
 
+const homeHeadlineLines = [
+  'All your UPSIFS. Right Here',
+  'Notes? Photos? Seniors? Found.',
+  'One tiny hub. Big campus energy.',
+  'Less searching. More surviving.',
+  'Ask seniors before panic-googling.',
+  'Resources with less drama.',
+  'Freshers, start here.'
+];
+let homeHeadlineIndex = 0;
+let homeSketchShapeIndex = 0;
+let homeHeadlineTimer = null;
+
 function applyHomeCopy(themeName) {
   const copy = homeCopyByTheme[themeName] || homeCopyByTheme.classic;
   setTextById('home-title', copy.title);
@@ -271,6 +284,43 @@ function applyHomeCopy(themeName) {
   setTextById('home-seniors-btn', copy.seniors);
   setTextById('home-profile-btn', copy.profile);
   setTextById('home-feedback-btn', copy.feedback);
+}
+
+function redrawHomeTitleSketch() {
+  const sketch = document.querySelector('.home-title-sketch');
+  if (!sketch) return;
+  homeSketchShapeIndex = (homeSketchShapeIndex + 1) % 4;
+  sketch.dataset.shape = String(homeSketchShapeIndex);
+  sketch.classList.remove('draw-now');
+  sketch.classList.add('is-redrawing');
+  void sketch.offsetWidth;
+  sketch.classList.add('draw-now');
+  window.setTimeout(() => {
+    sketch.classList.remove('is-redrawing', 'draw-now');
+  }, 2100);
+}
+
+function startHomeHeadlineRotation() {
+  if (homeHeadlineTimer || activeArcadeTheme !== 'app' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    return;
+  }
+
+  homeHeadlineTimer = window.setInterval(() => {
+    const title = document.getElementById('home-title');
+    if (!title || activeArcadeTheme !== 'app') return;
+    homeHeadlineIndex = (homeHeadlineIndex + 1) % homeHeadlineLines.length;
+    title.classList.remove('title-swapping');
+    void title.offsetWidth;
+    title.textContent = homeHeadlineLines[homeHeadlineIndex];
+    title.classList.add('title-swapping');
+    redrawHomeTitleSketch();
+  }, 12000);
+}
+
+function stopHomeHeadlineRotation() {
+  if (!homeHeadlineTimer) return;
+  window.clearInterval(homeHeadlineTimer);
+  homeHeadlineTimer = null;
 }
 
 function applyArcadeTheme(themeName) {
@@ -292,6 +342,15 @@ function applyArcadeTheme(themeName) {
   document.querySelectorAll('.theme-option').forEach(button => {
     button.classList.toggle('active', button.dataset.themeOption === activeArcadeTheme);
   });
+
+  if (activeArcadeTheme === 'app') {
+    homeHeadlineIndex = 0;
+    setTextById('home-title', homeHeadlineLines[homeHeadlineIndex]);
+    redrawHomeTitleSketch();
+    startHomeHeadlineRotation();
+  } else {
+    stopHomeHeadlineRotation();
+  }
 }
 
 function selectArcadeTheme(themeName) {
@@ -329,26 +388,24 @@ window.switchSeniorYear = switchSeniorYear;
 
 // ═══════════════ ACADEMIC RESOURCE BROWSER ═══════════════
 const resourceState = {
-  program: 'All',
-  academicYear: 'All',
-  semester: 'All',
-  teacher: 'All',
-  tag: 'All',
+  folderId: '',
   query: '',
-  items: []
+  items: [],
+  breadcrumbs: [{ id: '', name: 'academic resources' }],
+  loading: false,
+  error: ''
 };
 
-function getResourceItems() {
-  return resourceState.items;
-}
-
-function resourceIcon(type) {
-  const cleanType = String(type || '').toLowerCase();
-  if (cleanType === 'pdf') return '📄';
-  if (['ppt', 'pptx'].includes(cleanType)) return '📊';
-  if (['doc', 'docx'].includes(cleanType)) return '📝';
-  if (['jpg', 'jpeg', 'png', 'webp'].includes(cleanType)) return '🖼️';
-  return '📁';
+function resourceIcon(item) {
+  if (item?.type === 'folder') return 'folder';
+  const mime = String(item?.mimeType || '').toLowerCase();
+  const ext = String(item?.extension || '').toLowerCase();
+  if (mime.includes('pdf') || ext === 'pdf') return 'pdf';
+  if (mime.startsWith('image/') || ['jpg', 'jpeg', 'png', 'webp'].includes(ext)) return 'image';
+  if (mime.includes('presentation') || ['ppt', 'pptx'].includes(ext)) return 'slides';
+  if (mime.includes('document') || ['doc', 'docx'].includes(ext)) return 'doc';
+  if (mime.includes('zip') || ['zip', 'rar', '7z'].includes(ext)) return 'zip';
+  return 'file';
 }
 
 function escapeResourceText(value) {
@@ -361,203 +418,155 @@ function escapeResourceText(value) {
   }[char]));
 }
 
-function makeResourceButton(label, active, onClick) {
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = 'resource-chip' + (active ? ' active' : '');
-  button.textContent = label;
-  button.addEventListener('click', onClick);
-  return button;
+function formatBytes(size) {
+  if (!Number.isFinite(size)) return 'size unknown';
+  if (size < 1024) return `${size} B`;
+  const units = ['KB', 'MB', 'GB'];
+  let value = size / 1024;
+  let unit = 0;
+  while (value >= 1024 && unit < units.length - 1) {
+    value /= 1024;
+    unit += 1;
+  }
+  return `${value.toFixed(value >= 10 ? 0 : 1)} ${units[unit]}`;
 }
 
-function renderResourceFilters(resources) {
-  const programWrap = document.getElementById('resource-program-filters');
-  const yearWrap = document.getElementById('resource-year-filters');
-  const semesterWrap = document.getElementById('resource-semester-filters');
-  const teacherWrap = document.getElementById('resource-teacher-filters');
-  const tagWrap = document.getElementById('resource-tag-filters');
-  if (!programWrap || !yearWrap || !semesterWrap || !teacherWrap || !tagWrap) return;
-
-  const programs = ['All', ...new Set(resources.map(item => item.program || 'B.Tech - M.Tech').filter(Boolean))];
-  const academicYears = ['All', ...new Set(resources.map(item => item.academicYear).filter(Boolean))];
-  const semesters = ['All', ...new Set(resources.map(item => item.semester).filter(Boolean))];
-  const teachers = ['All', ...new Set(resources.map(item => item.teacher).filter(Boolean))];
-  const priorityTags = ['All', '2025-2026', 'Notes', 'Slides', 'PYQ', 'Practical', 'Syllabus', 'Schedule', 'PDF'];
-
-  programWrap.replaceChildren(...programs.map(program =>
-    makeResourceButton(program, resourceState.program === program, () => {
-      resourceState.program = program;
-      renderResources();
-    })
-  ));
-
-  yearWrap.replaceChildren(...academicYears.map(academicYear =>
-    makeResourceButton(academicYear, resourceState.academicYear === academicYear, () => {
-      resourceState.academicYear = academicYear;
-      renderResources();
-    })
-  ));
-
-  semesterWrap.replaceChildren(...semesters.map(semester =>
-    makeResourceButton(semester, resourceState.semester === semester, () => {
-      resourceState.semester = semester;
-      renderResources();
-    })
-  ));
-
-  teacherWrap.replaceChildren(...teachers.map(teacher =>
-    makeResourceButton(teacher, resourceState.teacher === teacher, () => {
-      resourceState.teacher = teacher;
-      renderResources();
-    })
-  ));
-
-  tagWrap.replaceChildren(...priorityTags.map(tag =>
-    makeResourceButton(tag, resourceState.tag === tag, () => {
-      resourceState.tag = tag;
-      renderResources();
-    })
-  ));
+function formatResourceDate(value) {
+  if (!value) return 'date unknown';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'date unknown';
+  return date.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-function filteredResources(resources) {
+function filteredResources() {
   const query = resourceState.query.trim().toLowerCase();
-  return resources.filter(item => {
-    const program = item.program || 'B.Tech - M.Tech';
-    const matchesProgram = resourceState.program === 'All' || program === resourceState.program;
-    const matchesAcademicYear = resourceState.academicYear === 'All' || item.academicYear === resourceState.academicYear;
-    const matchesSemester = resourceState.semester === 'All' || item.semester === resourceState.semester;
-    const matchesTeacher = resourceState.teacher === 'All' || item.teacher === resourceState.teacher;
-    const matchesTag = resourceState.tag === 'All' || (item.tags || []).some(tag => tag.toLowerCase() === resourceState.tag.toLowerCase());
-    const haystack = [program, item.academicYear, item.semester, item.subject, item.teacher, item.title, item.type, ...(item.tags || [])].join(' ').toLowerCase();
-    return matchesProgram && matchesAcademicYear && matchesSemester && matchesTeacher && matchesTag && (!query || haystack.includes(query));
+  const items = [...resourceState.items].sort((a, b) => {
+    if (a.type !== b.type) return a.type === 'folder' ? -1 : 1;
+    return String(a.name || '').localeCompare(String(b.name || ''), undefined, { sensitivity: 'base' });
   });
+  if (!query) return items;
+  return items.filter(item => [item.name, item.mimeType, item.extension, item.type].join(' ').toLowerCase().includes(query));
 }
 
-function groupResources(resources) {
-  return resources.reduce((groups, item) => {
-    const program = item.program || 'B.Tech - M.Tech';
-    const academicYear = item.academicYear || 'Academic archive';
-    const semester = item.semester || 'General';
-    const subject = item.subject || 'General';
-    const teacher = item.teacher ? ` · ${item.teacher}` : '';
-    const subjectKey = `${subject}${teacher}`;
-    groups[program] ||= {};
-    groups[program][academicYear] ||= {};
-    groups[program][academicYear][semester] ||= {};
-    groups[program][academicYear][semester][subjectKey] ||= [];
-    groups[program][academicYear][semester][subjectKey].push(item);
-    return groups;
-  }, {});
+function renderResourceBreadcrumbs() {
+  const wrap = document.getElementById('resource-breadcrumbs');
+  if (!wrap) return;
+  wrap.replaceChildren(...resourceState.breadcrumbs.map((crumb, index) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = crumb.name;
+    button.disabled = index === resourceState.breadcrumbs.length - 1;
+    button.addEventListener('click', () => {
+      resourceState.breadcrumbs = resourceState.breadcrumbs.slice(0, index + 1);
+      loadResourceFolder(crumb.id);
+    });
+    return button;
+  }));
+}
+
+function renderFolderCard(item) {
+  const card = document.createElement('button');
+  card.type = 'button';
+  card.className = 'resource-folder-card';
+  card.innerHTML = `
+    <span class="resource-file-icon" aria-hidden="true">${resourceIcon(item)}</span>
+    <span>${escapeResourceText(item.name)}</span>
+  `;
+  card.addEventListener('click', () => {
+    resourceState.breadcrumbs.push({ id: item.id, name: item.name });
+    loadResourceFolder(item.id);
+  });
+  return card;
 }
 
 function renderResourceCard(item) {
   const card = document.createElement('article');
   card.className = 'resource-file-card';
 
-  const tags = (item.tags || []).slice(0, 5).map(tag => `<span>${escapeResourceText(tag)}</span>`).join('');
   card.innerHTML = `
-    <div class="resource-file-icon" aria-hidden="true">${resourceIcon(item.type)}</div>
+    <div class="resource-file-icon" aria-hidden="true">${resourceIcon(item)}</div>
     <div class="resource-file-main">
-      <h4>${escapeResourceText(item.title)}</h4>
-      <p>${escapeResourceText(item.program || 'B.Tech - M.Tech')} · ${escapeResourceText(item.academicYear || 'Academic archive')} · ${escapeResourceText(item.type || 'FILE')}</p>
-      <div class="resource-tags">${tags}</div>
+      <h4>${escapeResourceText(item.name)}</h4>
+      <p>${escapeResourceText(item.mimeType || 'file')} · ${formatBytes(item.size)} · ${formatResourceDate(item.modifiedTime)}</p>
     </div>
     <div class="resource-actions">
-      <a class="resource-action view" href="${item.viewUrl}" target="_blank" rel="noopener noreferrer">VIEW</a>
-      <a class="resource-action download" href="${item.downloadUrl}" download>DOWNLOAD</a>
+      <button class="resource-action view" type="button" ${item.previewable ? '' : 'disabled'}>preview</button>
+      <a class="resource-action download" href="${item.downloadUrl}">download</a>
     </div>
   `;
+  card.querySelector('.resource-action.view')?.addEventListener('click', () => {
+    openResourcePreview(item.id, item.name, item.mimeType);
+  });
   return card;
 }
 
 function renderResources() {
-  const resources = getResourceItems();
   const groupWrap = document.getElementById('resource-groups');
   const count = document.getElementById('resource-count');
   if (!groupWrap) return;
 
-  renderResourceFilters(resources);
-  const visible = filteredResources(resources);
-  if (count) {
-    const sourceLabel = RESOURCE_FEED_ENDPOINT ? 'Drive sync' : 'resources pending';
-    const yearLabel = resourceState.academicYear === 'All' ? 'all academic years' : resourceState.academicYear;
-    count.textContent = `${visible.length} files · ${yearLabel} · ${sourceLabel}`;
-  }
+  renderResourceBreadcrumbs();
 
-  const groups = groupResources(visible);
-  const fragments = [];
-  Object.entries(groups).forEach(([program, academicYears]) => {
-    const programSection = document.createElement('section');
-    programSection.className = 'resource-program-group';
-    programSection.innerHTML = `<h2 class="res-block-title">[${escapeResourceText(program)}]</h2>`;
-
-    Object.entries(academicYears).forEach(([academicYear, semesters]) => {
-      const yearSection = document.createElement('div');
-      yearSection.className = 'resource-year-group';
-      yearSection.innerHTML = `<h3 class="resource-semester-title">${escapeResourceText(academicYear)}</h3>`;
-
-      Object.entries(semesters).forEach(([semester, subjects]) => {
-      const semesterSection = document.createElement('div');
-      semesterSection.className = 'resource-semester-group';
-      semesterSection.innerHTML = `<h4 class="resource-semester-title">${escapeResourceText(semester)}</h4>`;
-
-      Object.entries(subjects).forEach(([subject, items]) => {
-        const subjectSection = document.createElement('div');
-        subjectSection.className = 'resource-subject-group';
-        subjectSection.innerHTML = `<h3>${escapeResourceText(subject)}</h3>`;
-        const grid = document.createElement('div');
-        grid.className = 'resource-file-grid';
-        items.forEach(item => grid.appendChild(renderResourceCard(item)));
-        subjectSection.appendChild(grid);
-        semesterSection.appendChild(subjectSection);
-      });
-
-        yearSection.appendChild(semesterSection);
-      });
-
-      programSection.appendChild(yearSection);
-    });
-
-    fragments.push(programSection);
-  });
-
-  if (!fragments.length) {
-    groupWrap.innerHTML = '<p class="resource-empty">No matching files found.</p>';
+  if (resourceState.loading) {
+    if (count) count.textContent = 'loading academic resources...';
+    groupWrap.innerHTML = '<p class="resource-empty">Fetching folders from Drive...</p>';
     return;
   }
-  groupWrap.replaceChildren(...fragments);
+
+  if (resourceState.error) {
+    if (count) count.textContent = 'resource sync unavailable';
+    groupWrap.innerHTML = `<p class="resource-empty">${escapeResourceText(resourceState.error)}</p>`;
+    return;
+  }
+
+  const visible = filteredResources();
+  const folders = visible.filter(item => item.type === 'folder');
+  const files = visible.filter(item => item.type !== 'folder');
+  if (count) count.textContent = `${folders.length} folders · ${files.length} files`;
+
+  if (!visible.length) {
+    groupWrap.innerHTML = '<p class="resource-empty">No matching folders or files found.</p>';
+    return;
+  }
+
+  const folderGrid = document.createElement('div');
+  folderGrid.className = 'resource-folder-grid';
+  folders.forEach(folder => folderGrid.appendChild(renderFolderCard(folder)));
+
+  const fileGrid = document.createElement('div');
+  fileGrid.className = 'resource-file-grid';
+  files.forEach(file => fileGrid.appendChild(renderResourceCard(file)));
+
+  groupWrap.replaceChildren(folderGrid, fileGrid);
 }
 
 window.renderResources = renderResources;
 
-async function loadResourceFeed() {
-  const count = document.getElementById('resource-count');
-  if (!RESOURCE_FEED_ENDPOINT) {
-    resourceState.items = [];
-    renderResources();
-    const groupWrap = document.getElementById('resource-groups');
-    if (groupWrap) groupWrap.innerHTML = '';
-    return;
-  }
-
-  resourceState.items = [];
+async function loadResourceFolder(folderId = resourceState.folderId) {
+  resourceState.folderId = folderId || '';
+  resourceState.loading = true;
+  resourceState.error = '';
   renderResources();
-  if (count) count.textContent = 'Fetching latest files from Google Drive...';
 
   try {
-    const response = await fetch(RESOURCE_FEED_ENDPOINT, { cache: 'no-store' });
+    const suffix = resourceState.folderId ? `?folderId=${encodeURIComponent(resourceState.folderId)}` : '';
+    const response = await fetch(`${RESOURCE_FEED_ENDPOINT}${suffix}`, { cache: 'no-store' });
     const data = await response.json();
-    if (!Array.isArray(data)) throw new Error('Resource feed did not return an array.');
-    resourceState.items = data;
-    renderResources();
+    if (!response.ok) throw new Error(data.error || 'Could not load Drive resources.');
+    resourceState.items = Array.isArray(data.items) ? data.items : [];
   } catch (error) {
     console.warn('Live Drive resource sync failed.', error);
     resourceState.items = [];
+    resourceState.error = 'Drive resources could not load. Check service account access and env vars.';
+  } finally {
+    resourceState.loading = false;
     renderResources();
-    const groupWrap = document.getElementById('resource-groups');
-    if (groupWrap) groupWrap.innerHTML = '';
   }
+}
+
+function loadResourceFeed() {
+  resourceState.breadcrumbs = [{ id: '', name: 'academic resources' }];
+  return loadResourceFolder('');
 }
 
 function setSeniorQuickFilter(filter) {
@@ -988,86 +997,30 @@ function showSiteToast(message, type = 'success') {
   }, 4200);
 }
 
-function setGoogleDriveCardState(state, status = {}) {
-  const card = document.getElementById('google-drive-card');
-  const title = document.getElementById('google-drive-title');
-  const copy = document.getElementById('google-drive-copy');
-  const meta = document.getElementById('google-drive-meta');
-  const connect = document.getElementById('google-drive-connect');
-  const changeFolder = document.getElementById('google-drive-change-folder');
-  const disconnect = document.getElementById('google-drive-disconnect');
-  if (!card || !title || !copy || !meta || !connect || !changeFolder || !disconnect) return;
+function openResourcePreview(fileId, name, mimeType) {
+  const modal = document.getElementById('resource-preview-modal');
+  const title = document.getElementById('resource-preview-title');
+  const body = document.getElementById('resource-preview-body');
+  if (!modal || !title || !body) return;
 
-  card.dataset.driveState = state;
-  connect.hidden = state === 'connected' || state === 'loading';
-  disconnect.hidden = state !== 'connected';
-  changeFolder.hidden = state !== 'connected';
-  changeFolder.disabled = state !== 'connected';
-
-  if (state === 'loading') {
-    title.textContent = 'checking google drive...';
-    copy.textContent = 'Checking whether Telegram uploads can reach your Drive folder.';
-    meta.textContent = '';
-    return;
+  title.textContent = name || 'preview';
+  const src = `/api/resources/preview/${encodeURIComponent(fileId)}`;
+  if (String(mimeType || '').startsWith('image/')) {
+    body.innerHTML = `<img src="${src}" alt="${escapeResourceText(name || 'resource preview')}">`;
+  } else {
+    body.innerHTML = `<iframe src="${src}" title="${escapeResourceText(name || 'resource preview')}"></iframe>`;
   }
-
-  if (state === 'connected') {
-    title.textContent = 'google drive connected';
-    copy.textContent = 'Telegram file uploads will use this Google account.';
-    const folder = status.folderName || status.folderId || 'folder from GOOGLE_DRIVE_FOLDER_ID';
-    meta.textContent = `${status.email || 'connected account'} · ${folder}`;
-    return;
-  }
-
-  if (state === 'error') {
-    title.textContent = 'google drive needs attention';
-    copy.textContent = 'Could not check the connection. Try again after confirming the OAuth environment variables.';
-    meta.textContent = '';
-    return;
-  }
-
-  title.textContent = 'google drive';
-  copy.textContent = 'Connect your Google account so Telegram files can upload into your Drive folder.';
-  meta.textContent = 'not connected';
+  modal.classList.add('active');
 }
 
-async function loadGoogleDriveStatus() {
-  if (!document.getElementById('google-drive-card')) return;
-  setGoogleDriveCardState('loading');
-  try {
-    const response = await fetch('/api/google/status', { headers: { accept: 'application/json' } });
-    const status = await response.json();
-    setGoogleDriveCardState(status.connected ? 'connected' : 'disconnected', status);
-  } catch {
-    setGoogleDriveCardState('error');
-  }
+function closeResourcePreview() {
+  const modal = document.getElementById('resource-preview-modal');
+  const body = document.getElementById('resource-preview-body');
+  modal?.classList.remove('active');
+  if (body) body.innerHTML = '';
 }
 
-async function disconnectGoogleDrive() {
-  setGoogleDriveCardState('loading');
-  try {
-    const response = await fetch('/api/google/disconnect', { method: 'POST' });
-    if (!response.ok) throw new Error('disconnect failed');
-    setGoogleDriveCardState('disconnected');
-    showSiteToast('Google Drive disconnected.', 'success');
-  } catch {
-    setGoogleDriveCardState('error');
-    showSiteToast('Could not disconnect Google Drive.', 'error');
-  }
-}
-
-function handleGoogleOAuthResult() {
-  const params = new URLSearchParams(window.location.search);
-  const result = params.get('google');
-  if (!result) return;
-  switchTab('resources', false);
-  if (result === 'connected') showSiteToast('Google Drive connected.', 'success');
-  if (result === 'error') showSiteToast('Google Drive connection failed. Try again.', 'error');
-  params.delete('google');
-  const nextQuery = params.toString();
-  const nextUrl = `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ''}${window.location.hash || '#resources'}`;
-  window.history.replaceState({ tab: 'resources' }, '', nextUrl);
-}
+window.closeResourcePreview = closeResourcePreview;
 
 // ═══════════════ CAMPUS GALLERY BOARD ═══════════════
 const CAMPUS_GALLERY_ITEMS = [
@@ -1891,6 +1844,7 @@ document.addEventListener('keydown', (e) => {
     closeHoloLightbox();
     closeHologramFullscreen();
     closeLightbox();
+    closeResourcePreview();
     closeUploadModal();
     closeSidebar();
   }
@@ -1899,12 +1853,8 @@ document.addEventListener('keydown', (e) => {
 // ═══════════════ INITIALIZATION ═══════════════
 window.addEventListener('DOMContentLoaded', () => {
   setupSidebarToggle();
-  const hasGoogleOAuthResult = new URLSearchParams(window.location.search).has('google');
-  if (!hasGoogleOAuthResult) {
-    window.history.replaceState({ tab: 'home' }, '', window.location.pathname);
-  }
+  window.history.replaceState({ tab: 'home' }, '', window.location.pathname);
   applyArcadeTheme(localStorage.getItem(ARCADE_THEME_KEY) || 'app');
-  handleGoogleOAuthResult();
 
   localStorage.removeItem('upsifs_senior_profile_submissions');
   if (getSeniorAccessCode()) {
@@ -1916,9 +1866,8 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('senior-lock-form')?.addEventListener('submit', unlockSeniorBoard);
   document.getElementById('senior-search')?.addEventListener('input', updateSeniorFilters);
   document.getElementById('junior-feedback-form')?.addEventListener('submit', submitJuniorFeedback);
-  document.getElementById('google-drive-disconnect')?.addEventListener('click', disconnectGoogleDrive);
-  document.getElementById('google-drive-change-folder')?.addEventListener('click', () => {
-    showSiteToast('Folder picker is coming next. Current folder comes from GOOGLE_DRIVE_FOLDER_ID.', 'success');
+  document.getElementById('resource-preview-modal')?.addEventListener('click', (event) => {
+    if (event.target.id === 'resource-preview-modal') closeResourcePreview();
   });
   renderJuniorFeedbackNotes();
   document.getElementById('resource-search')?.addEventListener('input', (event) => {
@@ -1931,7 +1880,6 @@ window.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => setCampusGalleryFilter(btn.dataset.campusFilter || 'all'));
   });
   loadResourceFeed();
-  loadGoogleDriveStatus();
   updateSeniorFilters();
 });
 

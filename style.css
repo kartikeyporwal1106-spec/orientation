@@ -324,6 +324,11 @@ body.sidebar-open .sidebar-handle {
   background: transparent;
 }
 
+.title-oval,
+.title-pencil {
+  display: none;
+}
+
 .stage-subtitle {
   font-family: var(--font-pixel);
   font-size: 0.8rem;
@@ -637,6 +642,34 @@ body.sidebar-open .sidebar-handle {
   text-shadow: 1px 1px 0 #000000;
 }
 
+.resource-breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0 0 0.85rem;
+}
+
+.resource-breadcrumbs button {
+  border: 2px solid #ffffff;
+  background: #18243c;
+  color: #ffffff;
+  padding: 0.36rem 0.58rem;
+  font-family: var(--font-pixel);
+  font-size: 0.52rem;
+  box-shadow: 2px 2px 0 #000000;
+  cursor: pointer;
+}
+
+.resource-breadcrumbs button::after {
+  content: " /";
+  opacity: 0.7;
+}
+
+.resource-breadcrumbs button:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+
 .res-block-title {
   font-family: var(--font-pixel);
   font-size: 0.9rem;
@@ -671,6 +704,34 @@ body.sidebar-open .sidebar-handle {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 0.65rem;
+}
+
+.resource-folder-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.65rem;
+  margin-bottom: 0.8rem;
+}
+
+.resource-folder-card {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 70px;
+  padding: 0.75rem 0.85rem;
+  border: 2px solid #ffffff;
+  background: rgba(255, 184, 0, 0.2);
+  color: #ffffff;
+  box-shadow: 3px 3px 0 #000000;
+  font-family: var(--font-sans);
+  font-weight: 900;
+  text-align: left;
+  cursor: pointer;
+}
+
+.resource-folder-card:hover {
+  transform: translate(-1px, -1px);
+  background: var(--orange-title);
 }
 
 .resource-file-card {
@@ -733,11 +794,17 @@ body.sidebar-open .sidebar-handle {
 .resource-action {
   text-align: center;
   text-decoration: none;
+  cursor: pointer;
   font-family: var(--font-pixel);
   font-size: 0.58rem;
   padding: 0.5rem 0.4rem;
   border: 2px solid #000000;
   box-shadow: 2px 2px 0 #000000;
+}
+
+.resource-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
 }
 
 .resource-action.view {
@@ -758,6 +825,50 @@ body.sidebar-open .sidebar-handle {
   color: #ffffff;
   font-weight: 800;
   text-shadow: 1px 1px 0 #000000;
+}
+
+.resource-preview-modal {
+  width: min(1000px, 92vw);
+  height: min(760px, 86vh);
+  padding: 0;
+  overflow: hidden;
+}
+
+.preview-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border-bottom: 2px solid #000000;
+  background: #ffd34d;
+  color: #17120f;
+  font-family: var(--font-pixel);
+  font-size: 0.62rem;
+}
+
+.preview-modal-head button {
+  border: 2px solid #000000;
+  background: #ffffff;
+  color: #17120f;
+  padding: 0.45rem 0.65rem;
+  font-family: var(--font-pixel);
+  font-size: 0.52rem;
+  box-shadow: 2px 2px 0 #000000;
+}
+
+.resource-preview-body {
+  height: calc(100% - 54px);
+  background: #fffdf4;
+}
+
+.resource-preview-body iframe,
+.resource-preview-body img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  object-fit: contain;
 }
 
 .res-pixel-card {
@@ -2289,6 +2400,185 @@ body.theme-app .stage-title::after {
   color: #e7b12b;
 }
 
+body.theme-app .home-title-sketch {
+  position: relative;
+  width: min(100%, 1040px);
+  margin: 0 auto 1.2rem;
+  padding: clamp(1.8rem, 4vw, 3.2rem) 1rem clamp(1.5rem, 3vw, 2.7rem);
+  display: grid;
+  place-items: center;
+}
+
+body.theme-app .home-title-sketch .stage-title {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 0;
+  font-size: clamp(3rem, 8vw, 6.4rem);
+  line-height: 0.95;
+  animation: home-title-pop 0.58s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
+
+body.theme-app .home-title-sketch .stage-title.title-swapping {
+  animation: home-title-swap 0.48s ease both;
+}
+
+body.theme-app .title-oval {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+body.theme-app .title-oval ellipse {
+  fill: none;
+  stroke: rgba(231, 177, 43, 0.34);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 2900;
+  stroke-dashoffset: 2900;
+  transform-origin: center;
+  transform: rotate(-3deg);
+  animation: sketch-oval 2.8s ease-out 0.25s forwards;
+}
+
+body.theme-app .title-pencil {
+  display: block;
+  position: absolute;
+  z-index: 3;
+  left: 7%;
+  top: 47%;
+  color: #b98212;
+  font-family: var(--font-hand);
+  font-size: clamp(1.8rem, 4vw, 3.1rem);
+  transform: rotate(18deg);
+  opacity: 0;
+  animation: pencil-loop 2.8s ease-out 0.25s forwards;
+  pointer-events: none;
+}
+
+body.theme-app .home-title-sketch[data-shape="1"] .title-pencil {
+  left: 5%;
+  top: 48%;
+}
+
+body.theme-app .home-title-sketch[data-shape="2"] .title-pencil {
+  left: 12%;
+  top: 42%;
+}
+
+body.theme-app .home-title-sketch[data-shape="3"] .title-pencil {
+  left: 4%;
+  top: 64%;
+}
+
+body.theme-app .home-title-sketch.is-redrawing .stage-title::before,
+body.theme-app .home-title-sketch.is-redrawing .title-pencil {
+  animation: none;
+}
+
+body.theme-app .home-title-sketch.is-redrawing.draw-now .stage-title::before {
+  animation: reveal-existing-oval 2.8s ease-out forwards;
+}
+
+body.theme-app .home-title-sketch.is-redrawing.draw-now .title-pencil {
+  animation: pencil-loop 2.8s ease-out forwards;
+}
+
+@keyframes sketch-oval {
+  0% {
+    stroke-dashoffset: 2900;
+    opacity: 0.25;
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes pencil-loop {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+
+@supports (offset-path: path("M 0 0")) {
+  body.theme-app .title-pencil {
+    left: auto;
+    top: auto;
+    offset-path: ellipse(43% 32% at 50% 49%);
+    offset-rotate: auto 18deg;
+  }
+
+  body.theme-app .home-title-sketch[data-shape="1"] .title-pencil {
+    offset-path: ellipse(46% 34% at 50% 50%);
+  }
+
+  body.theme-app .home-title-sketch[data-shape="2"] .title-pencil {
+    offset-path: ellipse(39% 36% at 50% 48%);
+  }
+
+  body.theme-app .home-title-sketch[data-shape="3"] .title-pencil {
+    offset-path: path("M 8 205 C 250 262, 760 262, 992 202");
+  }
+}
+
+@keyframes home-title-pop {
+  from {
+    opacity: 0;
+    transform: translateY(14px) rotate(-1deg) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes home-title-swap {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) rotate(-1deg) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.theme-app .home-title-sketch .stage-title,
+  body.theme-app .home-title-sketch .stage-title.title-swapping,
+  body.theme-app .title-oval ellipse,
+  body.theme-app .title-pencil {
+    animation: none !important;
+  }
+
+  body.theme-app .title-oval ellipse {
+    stroke-dashoffset: 0;
+  }
+
+  body.theme-app .title-pencil {
+    display: none;
+  }
+}
+
 body.theme-app .stage-subtitle,
 body.theme-app .welcome-sub,
 body.theme-app .about-text,
@@ -2426,6 +2716,58 @@ body.theme-app #tab-home .stage-title::before {
   border-radius: 52% 48% 46% 54%;
   transform: rotate(-4deg);
   pointer-events: none;
+  clip-path: inset(0 100% 0 0);
+  animation: reveal-existing-oval 2.8s ease-out 0.25s forwards;
+}
+
+body.theme-app .home-title-sketch[data-shape="1"] .stage-title::before {
+  left: 6%;
+  right: 5%;
+  top: -0.18em;
+  bottom: -0.28em;
+  border-radius: 42% 58% 50% 48%;
+  transform: rotate(2deg) skewX(-2deg);
+}
+
+body.theme-app .home-title-sketch[data-shape="2"] .stage-title::before {
+  left: 14%;
+  right: 11%;
+  top: -0.42em;
+  bottom: -0.08em;
+  border-radius: 58% 42% 62% 38%;
+  border-top-width: 3px;
+  border-bottom-width: 7px;
+  transform: rotate(-7deg);
+}
+
+body.theme-app .home-title-sketch[data-shape="3"] .stage-title::before {
+  left: 4%;
+  right: 4%;
+  top: 0.42em;
+  bottom: -0.22em;
+  border-top-color: transparent;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  border-bottom-width: 7px;
+  border-radius: 0 0 52% 48%;
+  transform: rotate(-2deg);
+}
+
+@keyframes reveal-existing-oval {
+  0% {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0.2;
+  }
+  18% {
+    opacity: 1;
+  }
+  55% {
+    clip-path: inset(0 0 0 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
 }
 
 body.theme-app #home-title {
@@ -3247,6 +3589,39 @@ body.theme-app .campus-gallery-empty {
   text-shadow: none;
 }
 
+body.theme-app .resource-breadcrumbs button {
+  color: #261f1c;
+  background: rgba(255, 252, 241, 0.88);
+  border: 1px solid rgba(82, 69, 51, 0.34);
+  border-radius: 4px;
+  box-shadow: 2px 2px 0 rgba(23, 18, 15, 0.16);
+  font-family: var(--font-hand);
+  font-size: 0.86rem;
+  font-weight: 800;
+  text-transform: lowercase;
+}
+
+body.theme-app .resource-breadcrumbs button:disabled {
+  background: #ffd34d;
+  opacity: 1;
+}
+
+body.theme-app .resource-folder-card {
+  color: #261f1c;
+  background: rgba(255, 252, 241, 0.9);
+  border: 1px solid rgba(82, 69, 51, 0.34);
+  border-radius: 4px;
+  box-shadow: 3px 4px 0 rgba(23, 18, 15, 0.14);
+  font-family: var(--font-hand);
+  font-size: 1.15rem;
+  text-transform: lowercase;
+}
+
+body.theme-app .resource-folder-card:hover {
+  background: #ffd34d;
+  color: #17120f;
+}
+
 body.theme-app .resource-file-card,
 body.theme-app .res-pixel-card {
   border-radius: 4px;
@@ -3269,6 +3644,16 @@ body.theme-app .resource-action {
   box-shadow: 2px 2px 0 rgba(23, 18, 15, 0.18);
   font-family: var(--font-hand);
   text-transform: lowercase;
+}
+
+body.theme-app .resource-action.download {
+  background: #ffd34d;
+}
+
+body.theme-app .resource-action:disabled {
+  color: rgba(38, 31, 28, 0.42);
+  background: rgba(255, 252, 241, 0.6);
+  box-shadow: none;
 }
 
 body.theme-app .resource-action:hover {
@@ -3642,6 +4027,19 @@ body.theme-app .site-toast.error {
 
   body.theme-app #tab-home .stage-title {
     font-size: clamp(2.05rem, 12vw, 3rem);
+  }
+
+  body.theme-app .home-title-sketch {
+    padding: 1.5rem 0.2rem 1.25rem;
+    margin-bottom: 0.8rem;
+  }
+
+  body.theme-app .home-title-sketch .stage-title {
+    font-size: clamp(2.35rem, 13vw, 3.35rem);
+  }
+
+  body.theme-app .title-oval ellipse {
+    stroke-width: 6;
   }
 
   body.theme-app #tab-home .stage-subtitle,

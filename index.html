@@ -144,7 +144,13 @@
     
     <!-- ═══ TAB 1: HOME (FRESHERS WELCOME) ═══ -->
     <div class="tab-content active" id="tab-home">
-      <h1 class="stage-title" id="home-title">WELCOME FRESHERS</h1>
+      <div class="home-title-sketch" data-shape="0" aria-label="Home headline">
+        <h1 class="stage-title" id="home-title">WELCOME FRESHERS</h1>
+        <svg class="title-oval" viewBox="0 0 1000 310" preserveAspectRatio="none" aria-hidden="true">
+          <ellipse cx="500" cy="155" rx="462" ry="118"></ellipse>
+        </svg>
+        <span class="title-pencil" aria-hidden="true">✎</span>
+      </div>
       <p class="stage-subtitle" id="home-subtitle">CLASS OF 2026 · PLAYER 1 READY?</p>
 
       <div class="pixel-starburst">✳ ✳ ✳</div>
@@ -243,33 +249,24 @@
 
       <div class="resource-block resource-browser">
         <div class="resource-toolbar">
-          <label class="resource-search-label" for="resource-search">SEARCH RESOURCES</label>
-          <input type="search" id="resource-search" placeholder="Search subject, file, tag..." autocomplete="off">
+          <label class="resource-search-label" for="resource-search">search resources</label>
+          <input type="search" id="resource-search" placeholder="Search folder or file..." autocomplete="off">
         </div>
-        <div class="resource-filter-row" id="resource-program-filters" aria-label="Program filters"></div>
-        <div class="resource-filter-row" id="resource-year-filters" aria-label="Academic year filters"></div>
-        <div class="resource-filter-row" id="resource-semester-filters" aria-label="Semester filters"></div>
-        <div class="resource-filter-row" id="resource-teacher-filters" aria-label="Teacher filters"></div>
-        <div class="resource-filter-row" id="resource-tag-filters" aria-label="Tag filters"></div>
+        <nav class="resource-breadcrumbs" id="resource-breadcrumbs" aria-label="Resource breadcrumbs"></nav>
         <div class="resource-count" id="resource-count"></div>
         <div class="resource-groups" id="resource-groups"></div>
       </div>
 
-      <div class="resource-block drive-integration-block">
-        <h2 class="res-block-title">google drive</h2>
-        <article class="res-pixel-card google-drive-card" id="google-drive-card" data-drive-state="loading">
+      <div class="resource-block">
+        <h2 class="res-block-title">academic drive</h2>
+        <a class="res-pixel-card drive-open-card" href="https://drive.google.com/drive/folders/1DTSwGkV4_jniit6tv9svFZba1oa7DuUT" target="_blank" rel="noopener noreferrer">
           <span class="card-icon" aria-hidden="true">▱</span>
           <div class="card-text">
-            <span class="c-title" id="google-drive-title">checking google drive...</span>
-            <span class="c-sub" id="google-drive-copy">Checking whether Telegram uploads can reach your Drive folder.</span>
-            <span class="drive-status-line" id="google-drive-meta" aria-live="polite"></span>
+            <span class="c-title">open academic resources</span>
+            <span class="c-sub">Fallback Drive folder link if the live explorer is unavailable.</span>
           </div>
-          <div class="drive-actions">
-            <a class="c-btn" id="google-drive-connect" href="/api/google/auth">connect google drive</a>
-            <button class="c-btn ghost" id="google-drive-change-folder" type="button" disabled>change folder</button>
-            <button class="c-btn ghost danger" id="google-drive-disconnect" type="button">disconnect</button>
-          </div>
-        </article>
+          <span class="c-btn">open drive ↗</span>
+        </a>
       </div>
 
       <div class="pixel-starburst">✳ ✳ ✳</div>
@@ -526,6 +523,16 @@
   </main>
 
   <div class="site-toast" id="site-toast" role="status" aria-live="polite"></div>
+
+  <div class="modal-overlay" id="resource-preview-modal">
+    <div class="modal resource-preview-modal">
+      <div class="preview-modal-head">
+        <span id="resource-preview-title">preview</span>
+        <button type="button" onclick="closeResourcePreview()">close ✕</button>
+      </div>
+      <div class="resource-preview-body" id="resource-preview-body"></div>
+    </div>
+  </div>
 
   <!-- ═══════════════ 8-BIT FOOTER BAR ═══════════════ -->
   <footer class="arcade-footer">
