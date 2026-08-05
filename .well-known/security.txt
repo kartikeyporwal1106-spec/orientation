@@ -1,0 +1,4 @@
+Contact: https://www.reddit.com/r/upsifs/
+Preferred-Languages: en, hi
+Canonical: https://www.10035438.xyz/.well-known/security.txt
+Expires: 2027-08-05T00:00:00Z
