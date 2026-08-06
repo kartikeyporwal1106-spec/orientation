@@ -6442,6 +6442,26 @@ body.theme-app .site-toast.error {
   gap: 0.5rem;
 }
 
+.events-widget[data-events-font="outfit"] {
+  --events-copy-font: 'Outfit', 'Inter', system-ui, sans-serif;
+}
+
+.events-widget[data-events-font="inter"] {
+  --events-copy-font: 'Inter', 'Outfit', system-ui, sans-serif;
+}
+
+.events-widget[data-events-font="kalam"] {
+  --events-copy-font: 'Kalam', 'Comic Sans MS', cursive;
+}
+
+.events-widget[data-events-font="caveat"] {
+  --events-copy-font: 'Caveat', 'Kalam', cursive;
+}
+
+.events-widget[data-events-font="pixel"] {
+  --events-copy-font: var(--font-pixel);
+}
+
 .events-widget-toggle {
   display: flex;
   align-items: center;
@@ -6517,6 +6537,40 @@ body.theme-app .site-toast.error {
   letter-spacing: 1px;
 }
 
+.events-font-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding: 0.58rem 0.8rem 0.5rem;
+  background: rgba(124, 58, 237, 0.1);
+  border-bottom: 1px solid rgba(124, 58, 237, 0.22);
+  color: #c4b5fd;
+  font-family: var(--font-pixel);
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.events-font-control select {
+  min-width: 116px;
+  min-height: 30px;
+  padding: 0.25rem 0.45rem;
+  color: #ffffff;
+  background: #2d2360;
+  border: 1px solid #7c3aed;
+  border-radius: 4px;
+  outline: none;
+  font-family: var(--events-copy-font, var(--font-sans));
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.events-font-control select:focus {
+  border-color: #c4b5fd;
+  box-shadow: 0 0 0 2px rgba(196, 181, 253, 0.24);
+}
+
 .events-close-btn {
   background: none;
   border: none;
@@ -6562,7 +6616,7 @@ body.theme-app .site-toast.error {
 }
 
 .event-name {
-  font-family: var(--font-body, 'Inter', sans-serif);
+  font-family: var(--events-copy-font, var(--font-sans));
   font-size: 0.82rem;
   font-weight: 700;
   color: #e2e8f0;
@@ -6599,6 +6653,119 @@ body.theme-app .site-toast.error {
   border: 1px dashed #78716c;
 }
 
+body.theme-app .events-widget-toggle {
+  color: #2f184d;
+  background: rgba(255, 252, 241, 0.94);
+  border: 2px solid #8b5cf6;
+  border-radius: 10px;
+  box-shadow: 4px 4px 0 rgba(47, 24, 77, 0.18);
+  font-family: 'Kalam', var(--font-sans);
+  font-size: 0.98rem;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+}
+
+body.theme-app .events-widget-toggle:hover {
+  color: #ffffff;
+  background: #8b5cf6;
+  box-shadow: 4px 5px 0 rgba(47, 24, 77, 0.38);
+}
+
+body.theme-app .events-dot-pulse {
+  background: #8b5cf6;
+  box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.5);
+}
+
+body.theme-app .events-widget-panel {
+  background: rgba(255, 252, 241, 0.97);
+  border: 2px solid #8b5cf6;
+  border-radius: 10px;
+  box-shadow: 0 18px 36px rgba(47, 24, 77, 0.16), 5px 5px 0 rgba(47, 24, 77, 0.2);
+}
+
+body.theme-app .events-panel-head {
+  background: #8b5cf6;
+  font-family: var(--font-hand);
+  font-size: 0.98rem;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+}
+
+body.theme-app .events-close-btn {
+  font-family: var(--font-sans);
+  font-weight: 800;
+}
+
+body.theme-app .events-font-control {
+  color: #5b3a82;
+  background: rgba(139, 92, 246, 0.08);
+  border-color: rgba(139, 92, 246, 0.2);
+  font-family: var(--font-hand);
+  font-size: 0.98rem;
+  letter-spacing: 0;
+  text-transform: lowercase;
+}
+
+body.theme-app .events-font-control select {
+  color: #261f1c;
+  background: rgba(255, 255, 255, 0.82);
+  border: 2px solid rgba(139, 92, 246, 0.72);
+  border-radius: 8px;
+}
+
+body.theme-app .events-item {
+  border-bottom-color: rgba(139, 92, 246, 0.16);
+}
+
+body.theme-app .events-item:hover {
+  background: rgba(139, 92, 246, 0.08);
+}
+
+body.theme-app .event-date {
+  color: #6d28d9;
+  font-family: var(--font-hand);
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+body.theme-app .event-name {
+  color: #261f1c;
+  font-size: 0.92rem;
+}
+
+body.theme-app .event-tag {
+  color: #ffffff;
+  background: #8b5cf6;
+  border-radius: 999px;
+  font-family: var(--font-hand);
+  font-size: 0.72rem;
+  letter-spacing: 0;
+}
+
+body.theme-app .events-item.event-hot .event-name {
+  color: #5b21b6;
+}
+
+body.theme-app .events-item.event-hot .event-tag {
+  background: #6d28d9;
+  color: #ffffff;
+}
+
+body.theme-app .events-item.events-coming-soon {
+  opacity: 0.75;
+}
+
+body.theme-app .events-item.events-coming-soon .event-name {
+  color: #6f685c;
+}
+
+body.theme-app .tag-soon {
+  background: rgba(139, 92, 246, 0.14) !important;
+  color: #5b21b6 !important;
+  border: 1px dashed rgba(91, 33, 182, 0.45);
+}
+
 /* Mobile */
 @media (max-width: 480px) {
   .events-widget {
@@ -6609,4 +6776,3 @@ body.theme-app .site-toast.error {
     width: calc(100vw - 1.5rem);
   }
 }
-

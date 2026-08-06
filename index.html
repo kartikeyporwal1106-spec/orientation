@@ -132,6 +132,16 @@
         <span>UPCOMING EVENTS</span>
         <button class="events-close-btn" onclick="toggleEventsWidget()" aria-label="Close events">×</button>
       </div>
+      <label class="events-font-control" for="events-font-select">
+        <span>Font</span>
+        <select id="events-font-select" onchange="setEventsFont(this.value)" aria-label="Change events font">
+          <option value="outfit">Outfit</option>
+          <option value="inter">Inter</option>
+          <option value="kalam">Kalam</option>
+          <option value="caveat">Caveat</option>
+          <option value="pixel">Pixel</option>
+        </select>
+      </label>
       <ul class="events-list">
         <li class="events-item event-hot">
           <span class="event-date">14 Aug 2026</span>
