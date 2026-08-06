@@ -230,6 +230,15 @@ let activeTabName = 'home';
 let arcadeGameInitialized = false;
 const validTabNames = new Set(['home', 'about', 'hostel', 'resources', 'seniors', 'gallery', 'devs']);
 
+// ═══════════════ EVENTS WIDGET ═══════════════
+function toggleEventsWidget() {
+  const panel = document.getElementById('events-widget-panel');
+  const btn = document.getElementById('events-widget-toggle');
+  const isHidden = panel.hidden;
+  panel.hidden = !isHidden;
+  btn.setAttribute('aria-expanded', String(isHidden));
+}
+
 // ═══════════════ TAB SWITCHING ═══════════════
 function switchTab(tabName, updateHistory = true) {
   if (!validTabNames.has(tabName)) return;

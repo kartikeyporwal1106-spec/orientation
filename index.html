@@ -33,9 +33,6 @@
       <button class="nav-btn" data-tab="gallery" onclick="switchTab('gallery')">GALLERY</button>
       <button class="nav-btn" data-tab="devs" onclick="switchTab('devs')">DEVS</button>
     </nav>
-    <a href="https://sih.gov.in" target="_blank" rel="noopener noreferrer" class="btn-sih-badge">
-      ⚡ SIH 2026
-    </a>
     <a href="https://www.reddit.com/r/upsifs/" target="_blank" rel="noopener noreferrer" class="btn-buy-pass">
       r/upsifs
     </a>
@@ -123,6 +120,42 @@
       <span class="blink">●</span> B.TECH-M.TECH CYBER SEC // UPSIFS 2026
     </div>
   </aside>
+
+  <!-- ═══ FIXED EVENTS WIDGET (BOTTOM RIGHT) ═══ -->
+  <div class="events-widget" id="events-widget" aria-label="Upcoming events">
+    <button class="events-widget-toggle" id="events-widget-toggle" onclick="toggleEventsWidget()" aria-expanded="false" aria-controls="events-widget-panel">
+      <span class="events-bell">📅</span> EVENTS
+      <span class="events-dot-pulse"></span>
+    </button>
+    <div class="events-widget-panel" id="events-widget-panel" hidden>
+      <div class="events-panel-head">
+        <span>UPCOMING EVENTS</span>
+        <button class="events-close-btn" onclick="toggleEventsWidget()" aria-label="Close events">×</button>
+      </div>
+      <ul class="events-list">
+        <li class="events-item event-hot">
+          <span class="event-date">14 Aug 2026</span>
+          <span class="event-name">🔭 Capture The Flag</span>
+          <span class="event-tag">CTF</span>
+        </li>
+        <li class="events-item">
+          <span class="event-date">18–19 Aug 2026</span>
+          <span class="event-name">🎓 National Conference</span>
+          <span class="event-tag">CONFERENCE</span>
+        </li>
+        <li class="events-item">
+          <span class="event-date">19 Aug 2026</span>
+          <span class="event-name">🎉 Foundation Day</span>
+          <span class="event-tag">SPECIAL</span>
+        </li>
+        <li class="events-item events-coming-soon">
+          <span class="event-date">Coming Soon</span>
+          <span class="event-name">⚡ SIH 2026 Forms</span>
+          <span class="event-tag tag-soon">SOON</span>
+        </li>
+      </ul>
+    </div>
+  </div>
 
   <!-- ═══════════════ MAIN ARCADE STAGE ═══════════════ -->
   <main class="arcade-stage">
