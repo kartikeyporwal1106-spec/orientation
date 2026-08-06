@@ -919,6 +919,15 @@ body.sidebar-open .sidebar-handle {
   font-size: 0.86em;
 }
 
+.hostel-info-card a {
+  color: #7cff76;
+  text-decoration: underline;
+}
+
+.hostel-info-card a:hover {
+  color: #ffffff;
+}
+
 .wifi-card-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1043,6 +1052,29 @@ body.sidebar-open .sidebar-handle {
   gap: 0.75rem;
 }
 
+.precollege-coming-soon {
+  min-height: 118px;
+  display: grid;
+  place-items: center;
+  gap: 0.35rem;
+  padding: 1.2rem;
+  text-align: center;
+  border: 2px dashed rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.precollege-coming-soon strong {
+  color: #ffb800;
+  font-family: var(--font-pixel);
+  font-size: 1rem;
+  text-shadow: 2px 2px 0 #000000;
+}
+
+.precollege-coming-soon p {
+  color: #eaf1ff;
+  font-weight: 800;
+}
+
 .guide-action-btn {
   min-height: 48px;
   padding: 0.72rem 0.85rem;
@@ -1096,6 +1128,117 @@ body.sidebar-open .sidebar-handle {
   background: rgba(255, 255, 255, 0.96);
 }
 
+.course-view-btn,
+.course-suggest-btn,
+.course-recommendation-card button {
+  min-height: 34px;
+  padding: 0.45rem 0.7rem;
+  border: 2px solid #000000;
+  background: var(--green-btn);
+  color: #ffffff;
+  box-shadow: 2px 2px 0 #000000;
+  font-family: var(--font-pixel);
+  font-size: 0.58rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.course-detail-modal {
+  width: min(1120px, calc(100vw - 1.5rem));
+  max-width: 1120px;
+  max-height: min(820px, 88vh);
+  overflow-y: auto;
+}
+
+.course-detail-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.course-detail-meta {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.course-detail-meta span {
+  padding: 0.28rem 0.55rem;
+  background: #fff4c7;
+  border: 1px solid #000000;
+  font-family: var(--font-pixel);
+  font-size: 0.58rem;
+  color: #111122;
+}
+
+.course-detail-section {
+  display: grid;
+  gap: 0.7rem;
+  align-content: start;
+}
+
+.course-detail-section h3 {
+  color: #111122;
+  font-family: var(--font-pixel);
+  font-size: 0.82rem;
+}
+
+.course-syllabus-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #111122;
+  table-layout: fixed;
+}
+
+.course-syllabus-table th,
+.course-syllabus-table td {
+  padding: 0.65rem;
+  border: 1px solid rgba(17, 17, 34, 0.16);
+  text-align: left;
+  vertical-align: top;
+}
+
+.course-syllabus-table th {
+  width: 110px;
+  background: #fff4c7;
+}
+
+.course-detail-empty {
+  color: #3f465c;
+  font-weight: 800;
+}
+
+.course-recommendation-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.course-recommendation-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem;
+  border: 1px solid rgba(17, 17, 34, 0.14);
+  background: rgba(255, 244, 199, 0.5);
+}
+
+.course-recommendation-card a {
+  color: #111122;
+  font-weight: 900;
+}
+
+.course-recommendation-card p {
+  margin-top: 0.25rem;
+  color: #3f465c;
+}
+
+.course-suggest-btn {
+  width: fit-content;
+}
+
 .mess-table td:not(:first-child) {
   min-width: 190px;
 }
@@ -1103,6 +1246,145 @@ body.sidebar-open .sidebar-handle {
 .mess-items {
   display: grid;
   gap: 0.22rem;
+}
+
+.cyber-track-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.55fr);
+  gap: 0.9rem;
+  align-items: stretch;
+  margin-bottom: 0.9rem;
+}
+
+.cyber-track-copy,
+.cyber-terminal-card,
+.cyber-lane-card,
+.cyber-starter-strip {
+  border: 2px solid rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.32);
+}
+
+.cyber-track-copy {
+  padding: 1rem;
+}
+
+.cyber-pill {
+  display: inline-flex;
+  width: fit-content;
+  margin-bottom: 0.65rem;
+  padding: 0.28rem 0.52rem;
+  border: 2px solid #000000;
+  background: var(--green-btn);
+  color: #ffffff;
+  box-shadow: 2px 2px 0 #000000;
+  font-family: var(--font-pixel);
+  font-size: 0.58rem;
+  text-transform: uppercase;
+}
+
+.cyber-track-copy h3 {
+  max-width: 720px;
+  color: #ffffff;
+  font-family: var(--font-pixel);
+  font-size: clamp(0.95rem, 1.6vw, 1.25rem);
+  line-height: 1.55;
+  text-shadow: 2px 2px 0 #000000;
+}
+
+.cyber-track-copy p {
+  margin-top: 0.65rem;
+  color: #e5edff;
+  font-weight: 800;
+}
+
+.cyber-terminal-card {
+  display: grid;
+  align-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(4, 12, 18, 0.64);
+}
+
+.cyber-terminal-card span,
+.cyber-terminal-card code {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.cyber-terminal-card span {
+  color: #7cff76;
+  font-family: var(--font-pixel);
+  font-size: 0.62rem;
+}
+
+.cyber-terminal-card code {
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.cyber-lane-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.cyber-lane-card {
+  min-height: 168px;
+  padding: 0.9rem;
+}
+
+.cyber-lane-card span {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: var(--yellow);
+  font-family: var(--font-pixel);
+  font-size: 0.62rem;
+}
+
+.cyber-lane-card strong {
+  display: block;
+  color: #ffffff;
+  font-family: var(--font-pixel);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  text-shadow: 1px 1px 0 #000000;
+}
+
+.cyber-lane-card p {
+  margin-top: 0.55rem;
+  color: #e5edff;
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.38;
+}
+
+.cyber-starter-strip {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: start;
+  margin-bottom: 0.9rem;
+  padding: 0.9rem;
+}
+
+.cyber-starter-strip span {
+  color: var(--yellow);
+  font-family: var(--font-pixel);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+}
+
+.cyber-starter-strip ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem 0.9rem;
+  list-style-position: inside;
+  color: #ffffff;
+  font-weight: 800;
 }
 
 .course-controls {
@@ -3135,6 +3417,20 @@ body.game-collapsed .game-toggle-btn {
     bottom: 1rem;
     width: min(230px, 44vw);
     opacity: 0.72;
+  }
+
+  .course-detail-modal {
+    width: min(100vw - 0.8rem, 720px);
+    max-height: 86vh;
+  }
+
+  .course-detail-body {
+    grid-template-columns: 1fr;
+    padding: 0.8rem;
+  }
+
+  .course-recommendation-card {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -5235,6 +5531,18 @@ body.theme-app .hostel-contact-list b {
   color: #261f1c;
 }
 
+body.theme-app .hostel-info-card a {
+  color: #b98212;
+  font-family: var(--font-hand);
+  font-weight: 900;
+  text-decoration: underline;
+  text-transform: none;
+}
+
+body.theme-app .hostel-info-card a:hover {
+  color: #261f1c;
+}
+
 body.theme-app .wifi-card {
   background: rgba(255, 250, 240, 0.82);
   border: 1px solid rgba(82, 69, 51, 0.14);
@@ -5287,12 +5595,16 @@ body.theme-app .wifi-card strong {
 }
 
 body.theme-app .wifi-card code {
-  border: 1px solid rgba(38, 31, 28, 0.16);
-  border-radius: 999px;
-  background: #17120f;
-  color: #fff9ea;
+  padding: 0.35rem 0;
+  border: 0;
+  border-bottom: 2px solid rgba(185, 130, 18, 0.36);
+  border-radius: 0;
+  background: transparent;
+  color: #4f473c;
   box-shadow: none;
-  font-family: var(--font-sans);
+  font-family: var(--font-hand);
+  font-size: 1.08rem;
+  font-weight: 900;
 }
 
 body.theme-app .mess-heading {
@@ -5316,6 +5628,133 @@ body.theme-app .guide-action-btn:hover {
   color: #fff9ea;
   transform: none;
   box-shadow: none;
+}
+
+body.theme-app .precollege-coming-soon {
+  border: 1px dashed rgba(185, 130, 18, 0.34);
+  border-radius: 8px;
+  background: rgba(255, 244, 199, 0.42);
+}
+
+body.theme-app .precollege-coming-soon strong,
+body.theme-app .precollege-coming-soon p {
+  font-family: var(--font-hand);
+  letter-spacing: 0;
+  text-shadow: none;
+}
+
+body.theme-app .precollege-coming-soon strong {
+  color: #b98212;
+  font-size: clamp(1.45rem, 3vw, 2rem);
+}
+
+body.theme-app .precollege-coming-soon p {
+  color: #716a5d;
+  font-size: 1.05rem;
+}
+
+body.theme-app .cyber-track-copy,
+body.theme-app .cyber-lane-card,
+body.theme-app .cyber-starter-strip {
+  background: rgba(255, 250, 240, 0.88);
+  border: 1px solid rgba(82, 69, 51, 0.16);
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+body.theme-app .cyber-pill {
+  border: 1px solid rgba(38, 31, 28, 0.18);
+  background: #ffd34d;
+  color: #261f1c;
+  box-shadow: none;
+  font-family: var(--font-hand);
+  font-size: 0.88rem;
+  font-weight: 900;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+body.theme-app .cyber-track-copy h3 {
+  color: #261f1c;
+  font-family: var(--font-hand);
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
+  font-weight: 900;
+  letter-spacing: 0;
+  text-shadow: none;
+  text-transform: none;
+}
+
+body.theme-app .cyber-track-copy p {
+  color: #595146;
+  font-family: var(--font-hand);
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+body.theme-app .cyber-terminal-card {
+  border: 1px solid rgba(38, 31, 28, 0.2);
+  background: #17120f;
+  box-shadow: 0 4px 12px rgba(38, 31, 28, 0.08);
+  border-radius: 8px;
+}
+
+body.theme-app .cyber-terminal-card span {
+  color: #ffd34d;
+  font-family: var(--font-hand);
+  font-size: 0.9rem;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+body.theme-app .cyber-terminal-card code {
+  color: #fff9ea;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+body.theme-app .cyber-lane-card span {
+  color: #b98212;
+  font-family: var(--font-hand);
+  font-size: 0.95rem;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+body.theme-app .cyber-lane-card strong {
+  color: #261f1c;
+  font-family: var(--font-hand);
+  font-size: 1.12rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-shadow: none;
+  text-transform: none;
+}
+
+body.theme-app .cyber-lane-card p {
+  color: #595146;
+  font-family: var(--font-hand);
+  font-size: 0.96rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+body.theme-app .cyber-starter-strip span {
+  color: #b98212;
+  font-family: var(--font-hand);
+  font-size: 0.95rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+body.theme-app .cyber-starter-strip ul {
+  color: #4f473c;
+  font-family: var(--font-hand);
+  font-size: 0.96rem;
+  font-weight: 700;
 }
 
 body.theme-app .guide-table-wrap {
@@ -5349,6 +5788,81 @@ body.theme-app .guide-table td strong,
 body.theme-app .mess-items span {
   font-family: var(--font-sans);
   text-transform: none;
+}
+
+body.theme-app .course-view-btn,
+body.theme-app .course-suggest-btn,
+body.theme-app .course-recommendation-card button {
+  color: #261f1c;
+  background: #ffd34d;
+  border: 1px solid rgba(38, 31, 28, 0.18);
+  border-radius: 999px;
+  box-shadow: none;
+  font-family: var(--font-hand);
+  font-size: 0.96rem;
+  letter-spacing: 0;
+  text-transform: lowercase;
+}
+
+body.theme-app .course-detail-modal {
+  background: #fffaf0;
+  border-radius: 10px;
+  width: min(1120px, calc(100vw - 1.5rem));
+  max-width: 1120px;
+}
+
+body.theme-app .course-detail-meta span,
+body.theme-app .course-detail-section h3,
+body.theme-app .course-syllabus-table th,
+body.theme-app .course-syllabus-table td,
+body.theme-app .course-detail-empty,
+body.theme-app .course-recommendation-card a,
+body.theme-app .course-recommendation-card p {
+  font-family: var(--font-hand);
+  letter-spacing: 0;
+  text-shadow: none;
+}
+
+body.theme-app .course-detail-meta span {
+  color: #7b5b0c;
+  background: rgba(255, 211, 77, 0.22);
+  border-color: rgba(231, 177, 43, 0.36);
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+body.theme-app .course-detail-section h3 {
+  color: #261f1c;
+  font-size: 1.35rem;
+}
+
+body.theme-app .course-syllabus-table th,
+body.theme-app .course-syllabus-table td {
+  border-color: rgba(82, 69, 51, 0.16);
+  color: #4f473c;
+  font-size: 1rem;
+}
+
+body.theme-app .course-syllabus-table th {
+  color: #b98212;
+  background: rgba(255, 211, 77, 0.18);
+}
+
+body.theme-app .course-recommendation-card {
+  border-color: rgba(82, 69, 51, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 244, 199, 0.42);
+}
+
+body.theme-app .course-recommendation-card a {
+  color: #261f1c;
+  font-size: 1.08rem;
+}
+
+body.theme-app .course-recommendation-card p,
+body.theme-app .course-detail-empty {
+  color: #716a5d;
 }
 
 body.theme-app .course-controls label {
@@ -5569,7 +6083,17 @@ body.theme-app .site-toast.error {
   .course-controls,
   .hostel-info-grid,
   .reach-campus-grid,
-  .wifi-card-grid {
+  .wifi-card-grid,
+  .cyber-track-hero,
+  .cyber-starter-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .cyber-lane-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cyber-starter-strip ul {
     grid-template-columns: 1fr;
   }
 
@@ -5616,6 +6140,10 @@ body.theme-app .site-toast.error {
 }
 
 @media (max-width: 640px) {
+  .cyber-lane-grid {
+    grid-template-columns: 1fr;
+  }
+
   body.theme-app {
     background-size: 26px 26px, 26px 26px, auto, auto, auto;
   }

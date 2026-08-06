@@ -465,7 +465,6 @@ function getStaticSearchEntries() {
     hostel: 'Hostel Life',
     resources: 'Academic Resources',
     seniors: 'Connect Seniors',
-    gallery: 'College Gallery',
     devs: 'Developers'
   };
 
@@ -482,21 +481,6 @@ function getStaticSearchEntries() {
 }
 
 function getMasterSearchEntries() {
-  const galleryEntries = (typeof CAMPUS_GALLERY_ITEMS === 'undefined' ? [] : CAMPUS_GALLERY_ITEMS).map(item => ({
-    title: item.title,
-    type: item.label || 'Gallery',
-    tab: 'gallery',
-    text: `${item.title} ${item.label} ${item.category} ${item.tags}`,
-    action: () => {
-      switchTab('gallery');
-      activeCampusFilter = item.category || 'all';
-      const input = document.getElementById('campus-gallery-search');
-      if (input) input.value = item.title;
-      renderCampusGallery();
-      document.getElementById('campus-gallery-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }));
-
   const resourceEntries = resourceState.items.map(item => ({
     title: item.name || 'Resource',
     type: item.type === 'folder' ? 'Resource Folder' : 'Resource File',
@@ -529,7 +513,7 @@ function getMasterSearchEntries() {
     }
   }));
 
-  return [...getStaticSearchEntries(), ...galleryEntries, ...resourceEntries, ...seniorEntries];
+  return [...getStaticSearchEntries(), ...resourceEntries, ...seniorEntries];
 }
 
 function scoreMasterSearchEntry(entry, query) {
@@ -2296,6 +2280,154 @@ const courseRows = [
   ['Sem-5', 'CTBT-PCC-501', 'Communication Technology', 3], ['Sem-5', 'CTBT-PCC-502', 'Network Security', 3], ['Sem-5', 'CTBT-PCC-503', 'Java Programming', 2], ['Sem-5', 'CTBT-PCC-504', 'Theory of Computation', 4], ['Sem-5', 'CTBT-PEC-50X', 'Program Elective - I', 3], ['Sem-5', 'CTBT-EMC-505', 'Constitution of India', 0], ['Sem-5', 'CTBT-PCC-501L', 'Communication Technology Laboratory', 1], ['Sem-5', 'CTBT-PCC-502L', 'Network Security Laboratory', 1], ['Sem-5', 'CTBT-PCC-503L', 'Java Programming Laboratory', 2], ['Sem-5', 'CTBT-PEC-50XL', 'Program Elective - I Laboratory', 1],
   ['Sem-6', 'CTBT-PCC-601', 'Design & Analysis of Algorithms', 3], ['Sem-6', 'CTBT-PCC-602', 'Application Security', 3], ['Sem-6', 'CTBT-PCC-603', 'Compiler Design', 3], ['Sem-6', 'CTBT-PCC-604', 'Cloud Computing & Architecture', 3], ['Sem-6', 'CTBT-PEC-60X', 'Program Elective - II', 3], ['Sem-6', 'CTBT-EMC-605', 'Indian Knowledge System', 0], ['Sem-6', 'CTBT-PCC-601L', 'Design & Analysis of Algorithms Laboratory', 1], ['Sem-6', 'CTBT-PCC-602L', 'Application Security Laboratory', 1], ['Sem-6', 'CTBT-PCC-603L', 'Compiler Design Laboratory', 1], ['Sem-6', 'CTBT-PCC-604L', 'Cloud Computing & Architecture Laboratory', 1], ['Sem-6', 'CTBT-PEC-60XL', 'Program Elective - II Laboratory', 1]
 ];
+const COURSE_VOTE_KEY = 'upsifs_course_recommendation_votes';
+const COURSE_SUGGEST_FORM_URL = 'https://forms.gle/WurEYQVuinQKqtBP9';
+
+const courseSyllabusByCode = {
+  'CTBT-BSC-101': [
+    'Unit 1: Differential calculus, limits, continuity, partial derivatives, maxima and minima.',
+    'Unit 2: Integral calculus, definite integrals, beta and gamma functions.',
+    'Unit 3: Matrices, rank, linear equations, eigenvalues and eigenvectors.',
+    'Unit 4: Ordinary differential equations and engineering applications.',
+    'Unit 5: Vector calculus basics, gradient, divergence and curl.'
+  ],
+  'CTBT-BSC-201': [
+    'Unit 1: Laplace transforms and inverse Laplace transforms.',
+    'Unit 2: Fourier series and harmonic analysis.',
+    'Unit 3: Complex variables and analytic functions.',
+    'Unit 4: Probability distributions and statistical methods.',
+    'Unit 5: Numerical methods for algebraic and differential equations.'
+  ],
+  'CTBT-ESC-103': [
+    'Unit 1: Drawing instruments, lettering, dimensioning and engineering curves.',
+    'Unit 2: Orthographic projections of points, lines and planes.',
+    'Unit 3: Projection of solids and sectional views.',
+    'Unit 4: Isometric projections and development of surfaces.',
+    'Unit 5: Basic CAD drafting workflow and drawing sheet practice.'
+  ]
+};
+
+const courseRecommendations = {
+  mathematics: [
+    { id: 'gajendra-purohit', name: 'Gajendra Purohit', note: 'Strong for Engineering Mathematics problem practice.', url: 'https://www.youtube.com/@gajendrapurohit' }
+  ],
+  drawing: [
+    { id: 'tikles-academy', name: 'TIKLES ACADEMY', note: 'Useful for Engineering Drawing / Graphics visual explanations.', url: 'https://www.youtube.com/@TIKLESACADEMY' }
+  ],
+  programming: [
+    { id: 'neso-academy-programming', name: 'Neso Academy', note: 'Good structured basics for programming and CS fundamentals.', url: 'https://www.youtube.com/@nesoacademy' }
+  ],
+  default: [
+    { id: 'suggest-needed', name: 'Suggest a channel', note: 'No fixed recommendation yet. Send your best source and seniors can add it.', url: COURSE_SUGGEST_FORM_URL }
+  ]
+};
+
+function getCourseRecommendationGroup(course) {
+  const clean = String(course || '').toLowerCase();
+  if (clean.includes('mathematics')) return 'mathematics';
+  if (clean.includes('graphics') || clean.includes('drawing')) return 'drawing';
+  if (clean.includes('programming') || clean.includes('python') || clean.includes('c++') || clean.includes('java')) return 'programming';
+  return 'default';
+}
+
+function getCourseVotes() {
+  try {
+    return JSON.parse(localStorage.getItem(COURSE_VOTE_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function saveCourseVotes(votes) {
+  localStorage.setItem(COURSE_VOTE_KEY, JSON.stringify(votes));
+}
+
+function getSortedCourseRecommendations(course) {
+  const group = getCourseRecommendationGroup(course);
+  const votes = getCourseVotes();
+  return [...(courseRecommendations[group] || courseRecommendations.default)]
+    .map(item => ({ ...item, votes: Number(votes[item.id] || 0) }))
+    .sort((a, b) => b.votes - a.votes || a.name.localeCompare(b.name));
+}
+
+function voteCourseRecommendation(id) {
+  const votes = getCourseVotes();
+  votes[id] = Number(votes[id] || 0) + 1;
+  saveCourseVotes(votes);
+  const modal = document.getElementById('course-detail-modal');
+  const code = modal?.dataset.courseCode;
+  if (code) {
+    const row = courseRows.find(([, rowCode]) => rowCode === code);
+    if (row) openCourseDetail(...row);
+  }
+}
+
+function suggestCourseRecommendation(course, code) {
+  const url = new URL(COURSE_SUGGEST_FORM_URL);
+  url.searchParams.set('course', course || '');
+  url.searchParams.set('code', code || '');
+  window.open(url.toString(), '_blank', 'noopener,noreferrer');
+}
+
+function openCourseDetail(semester, code, course, credit) {
+  const modal = document.getElementById('course-detail-modal');
+  const title = document.getElementById('course-detail-title');
+  const body = document.getElementById('course-detail-body');
+  if (!modal || !title || !body) return;
+
+  modal.dataset.courseCode = code;
+  title.textContent = `${course} · ${code}`;
+  const syllabus = courseSyllabusByCode[code] || [];
+  const recommendations = getSortedCourseRecommendations(course);
+
+  body.innerHTML = `
+    <div class="course-detail-meta">
+      <span>${escapeHtml(semester)}</span>
+      <span>${escapeHtml(code)}</span>
+      <span>${escapeHtml(String(credit))} credits</span>
+    </div>
+    <section class="course-detail-section course-syllabus-section">
+      <h3>Syllabus table</h3>
+      ${syllabus.length ? `
+        <table class="course-syllabus-table">
+          <tbody>
+            ${syllabus.map((unit, index) => `
+              <tr>
+                <th>Unit ${index + 1}</th>
+                <td>${escapeHtml(unit.replace(/^Unit\s+\d+:\s*/i, ''))}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      ` : '<p class="course-detail-empty">Exact syllabus table will appear here after the official PDF is added/extracted.</p>'}
+    </section>
+    <section class="course-detail-section course-recommendation-section">
+      <h3>YouTubers to follow</h3>
+      <div class="course-recommendation-list">
+        ${recommendations.map(item => `
+          <article class="course-recommendation-card">
+            <div>
+              <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.name)} ↗</a>
+              <p>${escapeHtml(item.note)}</p>
+            </div>
+            <button type="button" onclick="voteCourseRecommendation('${escapeHtml(item.id)}')">▲ ${item.votes}</button>
+          </article>
+        `).join('')}
+      </div>
+      <button class="course-suggest-btn" type="button" onclick="suggestCourseRecommendation('${escapeHtml(course)}', '${escapeHtml(code)}')">suggest more sources</button>
+    </section>
+  `;
+  modal.classList.add('active');
+}
+
+function closeCourseDetail() {
+  document.getElementById('course-detail-modal')?.classList.remove('active');
+}
+
+window.openCourseDetail = openCourseDetail;
+window.closeCourseDetail = closeCourseDetail;
+window.voteCourseRecommendation = voteCourseRecommendation;
+window.suggestCourseRecommendation = suggestCourseRecommendation;
 
 function renderListCell(items) {
   return `<span class="mess-items">${items.map(item => `<span>${escapeHtml(item)}</span>`).join('')}</span>`;
@@ -2341,6 +2473,7 @@ function renderCourseTable() {
       <td>${escapeHtml(code)}</td>
       <td>${escapeHtml(course)}</td>
       <td>${escapeHtml(String(credit))}</td>
+      <td><button class="course-view-btn" type="button" onclick="openCourseDetail('${escapeHtml(semester)}', '${escapeHtml(code)}', '${escapeHtml(course)}', ${Number(credit) || 0})">view</button></td>
     </tr>
   `).join('');
   const empty = document.getElementById('course-empty');
@@ -2376,6 +2509,9 @@ window.addEventListener('DOMContentLoaded', () => {
   }
   document.getElementById('resource-preview-modal')?.addEventListener('click', (event) => {
     if (event.target.id === 'resource-preview-modal') closeResourcePreview();
+  });
+  document.getElementById('course-detail-modal')?.addEventListener('click', (event) => {
+    if (event.target.id === 'course-detail-modal') closeCourseDetail();
   });
   renderJuniorFeedbackNotes();
   document.getElementById('resource-search')?.addEventListener('input', (event) => {

@@ -348,22 +348,64 @@
           <span class="guide-kicker">Before Campus</span>
           <h2 id="pre-college-title">Pre-College Resources</h2>
         </div>
-        <div class="precollege-grid">
-          <button class="guide-action-btn" type="button">C programming basics</button>
-          <button class="guide-action-btn" type="button">Python starter pack</button>
-          <button class="guide-action-btn" type="button">Linux command line</button>
-          <button class="guide-action-btn" type="button">Git & GitHub setup</button>
-          <button class="guide-action-btn" type="button">Cyber security primer</button>
-          <button class="guide-action-btn" type="button">Maths bridge course</button>
+        <div class="precollege-coming-soon">
+          <strong>Coming soon</strong>
+          <p>Resources will be added here shortly.</p>
         </div>
       </section>
 
       <section class="guide-panel" aria-labelledby="courses-title">
         <div class="guide-heading">
           <span class="guide-kicker">Program Map</span>
-          <h2 id="courses-title">Course Info</h2>
+          <h2 id="courses-title">Cyber Security Track</h2>
           <p>B.Tech - M.Tech Computer Science & Engineering (Cyber Security), 5 years integrated course.</p>
         </div>
+
+        <div class="cyber-track-hero" aria-label="Cyber security track overview">
+          <div class="cyber-track-copy">
+            <span class="cyber-pill">Freshers Path</span>
+            <h3>Start with fundamentals, then build toward labs, networks, and real investigations.</h3>
+            <p>Use this section as a semester-wise map for what to learn, what to practice, and which cyber subjects are coming next.</p>
+          </div>
+          <div class="cyber-terminal-card" aria-label="Cyber command prompt">
+            <span>upsifs@cyber:~$</span>
+            <code>learn --daily --ethical --hands-on</code>
+          </div>
+        </div>
+
+        <div class="cyber-lane-grid" aria-label="Cyber security learning lanes">
+          <article class="cyber-lane-card">
+            <span>01</span>
+            <strong>Programming Base</strong>
+            <p>C/C++, Python, DSA, DBMS, and OS give you the language to understand tools instead of only clicking them.</p>
+          </article>
+          <article class="cyber-lane-card">
+            <span>02</span>
+            <strong>Systems & Networks</strong>
+            <p>Computer organization, networking, Linux basics, packet flow, and logs become your daily investigation kit.</p>
+          </article>
+          <article class="cyber-lane-card">
+            <span>03</span>
+            <strong>Security Core</strong>
+            <p>Essentials of Cyber Security, Cryptography, Network Security, and Application Security shape the main track.</p>
+          </article>
+          <article class="cyber-lane-card">
+            <span>04</span>
+            <strong>Forensic Context</strong>
+            <p>Digital evidence, cyber law, and forensic science connect technical skill with admissible, responsible practice.</p>
+          </article>
+        </div>
+
+        <div class="cyber-starter-strip" aria-label="First year cyber starter checklist">
+          <span>First year focus</span>
+          <ul>
+            <li>Practice one programming problem daily.</li>
+            <li>Learn Linux terminal basics and file permissions.</li>
+            <li>Build notes for networking terms as you encounter them.</li>
+            <li>Keep all cyber practice ethical, legal, and permission-based.</li>
+          </ul>
+        </div>
+
         <div class="course-controls" aria-label="Course filters">
           <label>
             Semester
@@ -390,6 +432,7 @@
                 <th>Code</th>
                 <th>Course</th>
                 <th>Credit</th>
+                <th>View</th>
               </tr>
             </thead>
             <tbody id="course-table-body"></tbody>
@@ -452,6 +495,31 @@
             <span>Girls Hostel</span>
             <strong>Contact Details</strong>
             <p>Details will be updated soon.</p>
+          </div>
+          <div class="hostel-info-card">
+            <span>Laundry & Services</span>
+            <strong>Laundry & Dry Cleaning</strong>
+            <div class="hostel-contact-list">
+              <p><b>Raju Laundry:</b> <a href="tel:+919794120725">+91 97941 20725</a> · <a href="https://maps.app.goo.gl/iXi6RvAqmEmg3UcH9" target="_blank" rel="noopener noreferrer">📍 Location</a></p>
+              <p><b>Tumble Dry:</b> Sarojini Nagar · <a href="https://maps.app.goo.gl/bhQRoFtGmnZtd58M8" target="_blank" rel="noopener noreferrer">📍 Location</a></p>
+            </div>
+          </div>
+          <div class="hostel-info-card">
+            <span>Quick Commerce</span>
+            <strong>Campus Deliveries</strong>
+            <div class="hostel-contact-list">
+              <p><b>Blinkit:</b> Delivers up to campus gate / location point</p>
+              <p><a href="https://maps.app.goo.gl/BVpAbiVyVa47JKjT8" target="_blank" rel="noopener noreferrer">📍 Delivery Point</a> <small>(Request them to deliver till UPSIFS)</small></p>
+            </div>
+          </div>
+          <div class="hostel-info-card">
+            <span>Nearby Food</span>
+            <strong>Nearby Eateries & Food Spots</strong>
+            <div class="hostel-contact-list">
+              <p><b>Local Stalls & Eateries:</b> Available near campus perimeter for quick bites.</p>
+              <p><small>(Note: Nearby spots offer basic quick options, though they may not offer food as good as main city eateries)</small></p>
+              <p><small>Detailed list soon to be updated.</small></p>
+            </div>
           </div>
         </div>
         <div class="guide-heading mess-heading">
@@ -830,6 +898,16 @@
         <button type="button" onclick="closeResourcePreview()">close ✕</button>
       </div>
       <div class="resource-preview-body" id="resource-preview-body"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="course-detail-modal">
+    <div class="modal course-detail-modal">
+      <div class="preview-modal-head">
+        <span id="course-detail-title">course details</span>
+        <button type="button" onclick="closeCourseDetail()">close ✕</button>
+      </div>
+      <div class="course-detail-body" id="course-detail-body"></div>
     </div>
   </div>
 
