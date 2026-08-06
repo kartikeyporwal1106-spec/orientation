@@ -44,6 +44,13 @@ button, a, label, input, .nav-btn, .res-pixel-card, .gallery-item, .arcade-card-
   padding: 0;
 }
 
+.icon-sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
 ::selection {
   background: var(--orange-title);
   color: #ffffff;
@@ -679,6 +686,117 @@ body.sidebar-open .sidebar-handle {
   font-family: var(--font-pixel);
   font-size: 0.62rem;
   text-decoration: none;
+}
+
+.dev-links svg,
+.contributor-links svg {
+  width: 1.12rem;
+  height: 1.12rem;
+  fill: currentColor;
+}
+
+.contributors-section {
+  margin: 4rem auto 0;
+}
+
+.contributors-section h2 {
+  color: #ffffff;
+  font-family: var(--font-pixel);
+  font-size: clamp(1rem, 2.8vw, 1.45rem);
+  line-height: 1.35;
+  text-shadow: 2px 2px 0 #000000;
+}
+
+.contributors-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.2rem;
+}
+
+.contributor-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--board-bg);
+  border: 3px solid #ffffff;
+  box-shadow: 5px 5px 0 #000000;
+  text-align: left;
+}
+
+.contributor-role {
+  color: var(--orange-title);
+  font-family: var(--font-pixel);
+  font-size: 0.62rem;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 0 #000000;
+}
+
+.contributor-card h3 {
+  margin-top: 0.35rem;
+  color: #ffffff;
+  font-family: var(--font-pixel);
+  font-size: 1rem;
+  line-height: 1.2;
+  text-shadow: 2px 2px 0 #000000;
+}
+
+.contributor-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.55rem;
+}
+
+.contributor-links a {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  aspect-ratio: 1;
+  color: #000000;
+  background: #ffffff;
+  border: 2px solid #000000;
+  box-shadow: 3px 3px 0 #000000;
+  text-decoration: none;
+  transition: all var(--transition);
+}
+
+.dev-links a:hover,
+.contributor-links a:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 #000000;
+}
+
+.brand-github:hover,
+.dev-links a[aria-label*="GitHub"]:hover {
+  color: #ffffff;
+  background: #24292f;
+}
+
+.brand-linkedin:hover,
+.dev-links a[aria-label*="LinkedIn"]:hover {
+  color: #ffffff;
+  background: #0a66c2;
+}
+
+.brand-instagram:hover,
+.dev-links a[aria-label*="Instagram"]:hover {
+  color: #ffffff;
+  background: #d62976;
+}
+
+.brand-whatsapp:hover,
+.dev-links a[aria-label*="WhatsApp"]:hover {
+  color: #ffffff;
+  background: #25d366;
+}
+
+.brand-seniors:hover,
+.dev-links a[aria-label*="Senior"]:hover {
+  color: #000000;
+  background: #ffd34d;
 }
 
 .dev-photo-frame {
@@ -4525,6 +4643,21 @@ body.theme-app .dev-links a {
   font-weight: 900;
 }
 
+body.theme-app .dev-links svg,
+body.theme-app .contributor-links svg {
+  width: 1.28rem;
+  height: 1.28rem;
+}
+
+body.theme-app .dev-links a:hover,
+body.theme-app .contributor-links a:hover {
+  color: #261f1c;
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(235, 203, 203, 0.95);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 18px rgba(84, 72, 48, 0.12);
+}
+
 body.theme-app .dev-photo-frame {
   width: min(390px, 100%);
   aspect-ratio: 0.74;
@@ -4573,6 +4706,60 @@ body.theme-app .dev-title {
 
 body.theme-app .dev-title span {
   color: #e7b12b;
+}
+
+body.theme-app .contributors-section {
+  margin-top: 4.6rem;
+  padding-bottom: 1.5rem;
+}
+
+body.theme-app .contributors-section h2 {
+  color: #261f1c;
+  font-family: 'Instrument Serif', 'Caveat', Georgia, serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-shadow: none;
+}
+
+body.theme-app .contributors-grid {
+  gap: 1.1rem;
+}
+
+body.theme-app .contributor-card {
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(38, 31, 28, 0.08);
+  border-radius: 8px;
+  box-shadow: 0 18px 36px rgba(84, 72, 48, 0.11);
+}
+
+body.theme-app .contributor-role {
+  color: #8a7560;
+  font-family: var(--font-hand);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-shadow: none;
+}
+
+body.theme-app .contributor-card h3 {
+  color: #261f1c;
+  font-family: 'Instrument Serif', 'Caveat', Georgia, serif;
+  font-size: 2.1rem;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-shadow: none;
+}
+
+body.theme-app .contributor-links a {
+  width: 46px;
+  color: #716a5d;
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(235, 203, 203, 0.75);
+  border-radius: 50%;
+  box-shadow: none;
 }
 
 body.theme-app .logo-text {
@@ -6143,6 +6330,22 @@ body.theme-app .site-toast.error {
     gap: 1.6rem;
   }
 
+  .contributors-grid,
+  body.theme-app .contributors-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .contributor-card,
+  body.theme-app .contributor-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .contributor-links,
+  body.theme-app .contributor-links {
+    justify-content: flex-start;
+  }
+
   body.theme-app .quick-action-row {
     grid-template-columns: 1fr;
   }
@@ -6507,11 +6710,16 @@ body.theme-app .site-toast.error {
   gap: 0.5rem;
 }
 
+.events-widget,
+.events-widget button,
+.events-widget span {
+  font-family: 'Kalam', var(--font-hand), cursive;
+}
+
 .events-widget-toggle {
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  font-family: var(--font-pixel);
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 1px;
@@ -6575,7 +6783,6 @@ body.theme-app .site-toast.error {
   justify-content: space-between;
   background: #7c3aed;
   padding: 0.55rem 0.8rem;
-  font-family: var(--font-pixel);
   font-size: 0.65rem;
   font-weight: 700;
   color: #ffffff;
@@ -6617,7 +6824,6 @@ body.theme-app .site-toast.error {
 .events-item:hover { background: rgba(124, 58, 237, 0.12); }
 
 .event-date {
-  font-family: var(--font-pixel);
   font-size: 0.55rem;
   color: #a78bfa;
   white-space: nowrap;
@@ -6627,7 +6833,6 @@ body.theme-app .site-toast.error {
 }
 
 .event-name {
-  font-family: var(--font-sans);
   font-size: 0.82rem;
   font-weight: 700;
   color: #e2e8f0;
@@ -6638,7 +6843,6 @@ body.theme-app .site-toast.error {
 .event-tag {
   grid-column: 3;
   grid-row: 1 / 3;
-  font-family: var(--font-pixel);
   font-size: 0.48rem;
   padding: 0.2rem 0.4rem;
   border-radius: 3px;
