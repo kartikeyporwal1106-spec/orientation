@@ -6433,7 +6433,7 @@ body.theme-app .site-toast.error {
 /* ═══════════════ EVENTS WIDGET (FIXED BOTTOM RIGHT) ═══════════════ */
 .events-widget {
   position: fixed;
-  bottom: 1.5rem;
+  bottom: 4.25rem;
   right: 1.5rem;
   z-index: 9999;
   display: flex;
@@ -6769,7 +6769,7 @@ body.theme-app .tag-soon {
 /* Mobile */
 @media (max-width: 480px) {
   .events-widget {
-    bottom: 4.5rem;
+    bottom: 6.4rem;
     right: 0.75rem;
   }
   .events-widget-panel {
