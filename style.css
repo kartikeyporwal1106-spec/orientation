@@ -69,6 +69,44 @@ body {
   image-rendering: pixelated;
 }
 
+body[data-site-font="outfit"] {
+  --font-sans: 'Outfit', 'Inter', system-ui, sans-serif;
+  --font-hand: 'Outfit', 'Inter', system-ui, sans-serif;
+  --font-pixel: 'Outfit', 'Inter', system-ui, sans-serif;
+}
+
+body[data-site-font="inter"] {
+  --font-sans: 'Inter', 'Outfit', system-ui, sans-serif;
+  --font-hand: 'Inter', 'Outfit', system-ui, sans-serif;
+  --font-pixel: 'Inter', 'Outfit', system-ui, sans-serif;
+}
+
+body[data-site-font="kalam"] {
+  --font-sans: 'Kalam', 'Comic Sans MS', cursive;
+  --font-hand: 'Kalam', 'Comic Sans MS', cursive;
+  --font-pixel: 'Kalam', 'Comic Sans MS', cursive;
+}
+
+body[data-site-font="caveat"] {
+  --font-sans: 'Caveat', 'Kalam', cursive;
+  --font-hand: 'Caveat', 'Kalam', cursive;
+  --font-pixel: 'Caveat', 'Kalam', cursive;
+}
+
+body[data-site-font="pixel"] {
+  --font-sans: 'Silkscreen', 'Press Start 2P', monospace;
+  --font-hand: 'Silkscreen', 'Press Start 2P', monospace;
+  --font-pixel: 'Silkscreen', 'Press Start 2P', monospace;
+}
+
+body[data-site-font="outfit"] :where(h1, h2, h3, h4, p, a, button, label, input, select, textarea, li, span, td, th, code),
+body[data-site-font="inter"] :where(h1, h2, h3, h4, p, a, button, label, input, select, textarea, li, span, td, th, code),
+body[data-site-font="kalam"] :where(h1, h2, h3, h4, p, a, button, label, input, select, textarea, li, span, td, th, code),
+body[data-site-font="caveat"] :where(h1, h2, h3, h4, p, a, button, label, input, select, textarea, li, span, td, th, code),
+body[data-site-font="pixel"] :where(h1, h2, h3, h4, p, a, button, label, input, select, textarea, li, span, td, th, code) {
+  font-family: var(--font-sans) !important;
+}
+
 /* Legacy mode-copy stays out of the live Arcade and Softer interfaces. */
 .theme-quote-layer {
   display: none !important;
@@ -409,6 +447,33 @@ body.sidebar-open .sidebar-handle {
   background: var(--orange-title);
   border-color: #ffffff;
   box-shadow: 2px 2px 0 #000000;
+}
+
+.site-font-control {
+  display: grid;
+  gap: 0.35rem;
+  color: #f0f4ff;
+  font-family: var(--font-pixel);
+  font-size: 0.72rem;
+}
+
+.site-font-control select {
+  width: 100%;
+  min-height: 36px;
+  padding: 0.35rem 0.55rem;
+  color: #f0f4ff;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid #333;
+  border-radius: 4px;
+  outline: none;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.site-font-control select:focus {
+  border-color: var(--green-btn);
+  box-shadow: 0 0 0 2px rgba(64, 208, 64, 0.18);
 }
 
 .sidebar-footer {
@@ -6442,26 +6507,6 @@ body.theme-app .site-toast.error {
   gap: 0.5rem;
 }
 
-.events-widget[data-events-font="outfit"] {
-  --events-copy-font: 'Outfit', 'Inter', system-ui, sans-serif;
-}
-
-.events-widget[data-events-font="inter"] {
-  --events-copy-font: 'Inter', 'Outfit', system-ui, sans-serif;
-}
-
-.events-widget[data-events-font="kalam"] {
-  --events-copy-font: 'Kalam', 'Comic Sans MS', cursive;
-}
-
-.events-widget[data-events-font="caveat"] {
-  --events-copy-font: 'Caveat', 'Kalam', cursive;
-}
-
-.events-widget[data-events-font="pixel"] {
-  --events-copy-font: var(--font-pixel);
-}
-
 .events-widget-toggle {
   display: flex;
   align-items: center;
@@ -6537,40 +6582,6 @@ body.theme-app .site-toast.error {
   letter-spacing: 1px;
 }
 
-.events-font-control {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.65rem;
-  padding: 0.58rem 0.8rem 0.5rem;
-  background: rgba(124, 58, 237, 0.1);
-  border-bottom: 1px solid rgba(124, 58, 237, 0.22);
-  color: #c4b5fd;
-  font-family: var(--font-pixel);
-  font-size: 0.52rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-
-.events-font-control select {
-  min-width: 116px;
-  min-height: 30px;
-  padding: 0.25rem 0.45rem;
-  color: #ffffff;
-  background: #2d2360;
-  border: 1px solid #7c3aed;
-  border-radius: 4px;
-  outline: none;
-  font-family: var(--events-copy-font, var(--font-sans));
-  font-size: 0.78rem;
-  font-weight: 800;
-}
-
-.events-font-control select:focus {
-  border-color: #c4b5fd;
-  box-shadow: 0 0 0 2px rgba(196, 181, 253, 0.24);
-}
-
 .events-close-btn {
   background: none;
   border: none;
@@ -6616,7 +6627,7 @@ body.theme-app .site-toast.error {
 }
 
 .event-name {
-  font-family: var(--events-copy-font, var(--font-sans));
+  font-family: var(--font-sans);
   font-size: 0.82rem;
   font-weight: 700;
   color: #e2e8f0;
@@ -6694,23 +6705,6 @@ body.theme-app .events-panel-head {
 body.theme-app .events-close-btn {
   font-family: var(--font-sans);
   font-weight: 800;
-}
-
-body.theme-app .events-font-control {
-  color: #5b3a82;
-  background: rgba(139, 92, 246, 0.08);
-  border-color: rgba(139, 92, 246, 0.2);
-  font-family: var(--font-hand);
-  font-size: 0.98rem;
-  letter-spacing: 0;
-  text-transform: lowercase;
-}
-
-body.theme-app .events-font-control select {
-  color: #261f1c;
-  background: rgba(255, 255, 255, 0.82);
-  border: 2px solid rgba(139, 92, 246, 0.72);
-  border-radius: 8px;
 }
 
 body.theme-app .events-item {

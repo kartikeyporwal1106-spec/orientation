@@ -229,8 +229,8 @@ let activeArcadeTheme = 'classic';
 let activeTabName = 'home';
 let arcadeGameInitialized = false;
 const validTabNames = new Set(['home', 'about', 'hostel', 'resources', 'seniors', 'gallery', 'devs']);
-const EVENTS_FONT_KEY = 'upsifs_events_font';
-const eventsFontOptions = new Set(['outfit', 'inter', 'kalam', 'caveat', 'pixel']);
+const SITE_FONT_KEY = 'upsifs_site_font';
+const siteFontOptions = new Set(['default', 'outfit', 'inter', 'kalam', 'caveat', 'pixel']);
 
 // ═══════════════ EVENTS WIDGET ═══════════════
 function toggleEventsWidget() {
@@ -241,17 +241,16 @@ function toggleEventsWidget() {
   btn.setAttribute('aria-expanded', String(isHidden));
 }
 
-function setEventsFont(fontName) {
-  const nextFont = eventsFontOptions.has(fontName) ? fontName : 'outfit';
-  const widget = document.getElementById('events-widget');
-  const select = document.getElementById('events-font-select');
+function setSiteFont(fontName) {
+  const nextFont = siteFontOptions.has(fontName) ? fontName : 'default';
+  const select = document.getElementById('site-font-select');
 
-  if (widget) widget.dataset.eventsFont = nextFont;
+  document.body.dataset.siteFont = nextFont;
   if (select) select.value = nextFont;
-  localStorage.setItem(EVENTS_FONT_KEY, nextFont);
+  localStorage.setItem(SITE_FONT_KEY, nextFont);
 }
 
-window.setEventsFont = setEventsFont;
+window.setSiteFont = setSiteFont;
 
 // ═══════════════ TAB SWITCHING ═══════════════
 function switchTab(tabName, updateHistory = true) {
@@ -2509,7 +2508,7 @@ window.addEventListener('DOMContentLoaded', () => {
   setupMasterSearch();
   window.history.replaceState({ tab: 'home' }, '', window.location.pathname);
   applyArcadeTheme(localStorage.getItem(ARCADE_THEME_KEY) || 'app');
-  setEventsFont(localStorage.getItem(EVENTS_FONT_KEY) || 'outfit');
+  setSiteFont(localStorage.getItem(SITE_FONT_KEY) || 'default');
 
   localStorage.removeItem('upsifs_senior_profile_submissions');
   if (getSeniorAccessCode()) {
