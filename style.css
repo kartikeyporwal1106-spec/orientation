@@ -173,6 +173,28 @@ body {
   box-shadow: 3px 3px 0 #000000;
 }
 
+.btn-sih-badge {
+  font-family: var(--font-pixel);
+  font-size: 0.72rem;
+  color: #ffffff;
+  background: #7c3aed;
+  padding: 0.5rem 0.9rem;
+  text-decoration: none;
+  border: 2px solid #000000;
+  box-shadow: 2px 2px 0 #000000;
+  font-weight: 700;
+  letter-spacing: 1px;
+  transition: all var(--transition);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-sih-badge:hover {
+  background: #6d28d9;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #000000;
+}
+
 .master-search {
   position: relative;
   width: min(720px, calc(100% - 1.2rem));
@@ -779,6 +801,7 @@ body.sidebar-open .sidebar-handle {
 .reach-card a {
   display: inline-flex;
   margin-top: 0.7rem;
+  margin-right: 0.5rem;
   color: #ffffff;
   font-family: var(--font-pixel);
   font-size: 0.62rem;
@@ -826,6 +849,12 @@ body.sidebar-open .sidebar-handle {
 .hostel-info-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.lucknow-spots-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.75rem;
 }
 
@@ -6082,6 +6111,7 @@ body.theme-app .site-toast.error {
   .precollege-grid,
   .course-controls,
   .hostel-info-grid,
+  .lucknow-spots-grid,
   .reach-campus-grid,
   .wifi-card-grid,
   .cyber-track-hero,
