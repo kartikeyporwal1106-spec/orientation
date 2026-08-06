@@ -142,6 +142,7 @@ let activeSeniorYear = '2';
 let activeSeniorQuickFilter = '';
 const SENIOR_ACCESS_KEY = 'upsifs_senior_access_code';
 const JUNIOR_ACCESS_KEY = 'upsifs_junior_access_code';
+const WIFI_ACCESS_KEY = 'upsifs_wifi_access_granted';
 const SENIOR_FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzd55ExHTpaKooyEFivmZEQ38sAMfAahtCviZgUK4HYV-01-Nn8CS08P1omWKx3CdaPoQ/exec';
 const RESOURCE_FEED_ENDPOINT = '/api/resources/list';
 const ARCADE_THEME_KEY = 'upsifs_arcade_theme';
@@ -227,7 +228,7 @@ const arcadeThemes = {
 let activeArcadeTheme = 'classic';
 let activeTabName = 'home';
 let arcadeGameInitialized = false;
-const validTabNames = new Set(['home', 'about', 'resources', 'seniors', 'gallery', 'devs']);
+const validTabNames = new Set(['home', 'about', 'hostel', 'resources', 'seniors', 'gallery', 'devs']);
 
 // ═══════════════ TAB SWITCHING ═══════════════
 function switchTab(tabName, updateHistory = true) {
@@ -444,6 +445,171 @@ function changeArcadePlayerName() {
 }
 
 window.changeArcadePlayerName = changeArcadePlayerName;
+
+// ═══════════════ MASTER SITE SEARCH ═══════════════
+function normalizeMasterSearchText(value) {
+  return String(value || '').toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+function textSnippet(text, query) {
+  const cleanText = String(text || '').replace(/\s+/g, ' ').trim();
+  const cleanQuery = normalizeMasterSearchText(query);
+  const index = cleanText.toLowerCase().indexOf(cleanQuery);
+  if (index === -1) return cleanText.slice(0, 110);
+  return cleanText.slice(Math.max(0, index - 42), index + cleanQuery.length + 72);
+}
+
+function getStaticSearchEntries() {
+  const tabLabels = {
+    about: 'Guide',
+    hostel: 'Hostel Life',
+    resources: 'Academic Resources',
+    seniors: 'Connect Seniors',
+    gallery: 'College Gallery',
+    devs: 'Developers'
+  };
+
+  return Object.entries(tabLabels).map(([tab, title]) => {
+    const section = document.getElementById(`tab-${tab}`);
+    return {
+      title,
+      type: 'Page',
+      tab,
+      text: `${title} ${section?.textContent || ''}`,
+      action: () => switchTab(tab)
+    };
+  });
+}
+
+function getMasterSearchEntries() {
+  const galleryEntries = (typeof CAMPUS_GALLERY_ITEMS === 'undefined' ? [] : CAMPUS_GALLERY_ITEMS).map(item => ({
+    title: item.title,
+    type: item.label || 'Gallery',
+    tab: 'gallery',
+    text: `${item.title} ${item.label} ${item.category} ${item.tags}`,
+    action: () => {
+      switchTab('gallery');
+      activeCampusFilter = item.category || 'all';
+      const input = document.getElementById('campus-gallery-search');
+      if (input) input.value = item.title;
+      renderCampusGallery();
+      document.getElementById('campus-gallery-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }));
+
+  const resourceEntries = resourceState.items.map(item => ({
+    title: item.name || 'Resource',
+    type: item.type === 'folder' ? 'Resource Folder' : 'Resource File',
+    tab: 'resources',
+    text: `${item.name} ${item.type} ${item.mimeType} ${item.extension}`,
+    action: () => {
+      switchTab('resources');
+      const input = document.getElementById('resource-search');
+      if (input) {
+        input.value = item.name || '';
+        resourceState.query = input.value;
+      }
+      renderResources();
+      document.getElementById('resource-groups')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }));
+
+  const seniorEntries = [...document.querySelectorAll('[data-senior-year]')].map(card => ({
+    title: card.querySelector('.senior-info h2')?.textContent?.trim() || 'Senior Profile',
+    type: 'Senior',
+    tab: 'seniors',
+    text: card.innerText || '',
+    action: () => {
+      switchTab('seniors');
+      const input = document.getElementById('senior-search');
+      const name = card.querySelector('.senior-info h2')?.textContent?.trim() || '';
+      if (input) input.value = name;
+      updateSeniorFilters();
+      document.getElementById('senior-private-area')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }));
+
+  return [...getStaticSearchEntries(), ...galleryEntries, ...resourceEntries, ...seniorEntries];
+}
+
+function scoreMasterSearchEntry(entry, query) {
+  const q = normalizeMasterSearchText(query);
+  const title = normalizeMasterSearchText(entry.title);
+  const type = normalizeMasterSearchText(entry.type);
+  const text = normalizeMasterSearchText(entry.text);
+  if (!q || !text.includes(q)) return 0;
+  let score = 1;
+  if (title === q) score += 12;
+  if (title.includes(q)) score += 7;
+  if (type.includes(q)) score += 3;
+  if (entry.tab === q) score += 4;
+  return score;
+}
+
+function renderMasterSearchResults() {
+  const input = document.getElementById('master-search-input');
+  const box = document.getElementById('master-search-results');
+  if (!input || !box) return;
+
+  const query = input.value.trim();
+  if (query.length < 2) {
+    box.hidden = true;
+    box.innerHTML = '';
+    return;
+  }
+
+  const results = getMasterSearchEntries()
+    .map(entry => ({ entry, score: scoreMasterSearchEntry(entry, query) }))
+    .filter(result => result.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 8);
+
+  if (!results.length) {
+    box.hidden = false;
+    box.innerHTML = '<p class="master-search-empty">No match found.</p>';
+    return;
+  }
+
+  box.hidden = false;
+  box.innerHTML = '';
+  results.forEach(({ entry }) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'master-search-result';
+    button.innerHTML = `
+      <span class="master-result-type">${escapeHtml(entry.type)}</span>
+      <strong>${escapeHtml(entry.title)}</strong>
+      <small>${escapeHtml(textSnippet(entry.text, query))}</small>
+    `;
+    button.addEventListener('click', () => {
+      input.value = '';
+      box.hidden = true;
+      entry.action();
+    });
+    box.appendChild(button);
+  });
+}
+
+function setupMasterSearch() {
+  const input = document.getElementById('master-search-input');
+  const box = document.getElementById('master-search-results');
+  if (!input || !box) return;
+  input.addEventListener('input', renderMasterSearchResults);
+  input.addEventListener('focus', renderMasterSearchResults);
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      input.value = '';
+      box.hidden = true;
+    }
+    if (event.key === 'Enter') {
+      const first = box.querySelector('.master-search-result');
+      first?.click();
+    }
+  });
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('.master-search')) box.hidden = true;
+  });
+}
 
 function switchSeniorYear(year) {
   activeSeniorYear = year;
@@ -840,6 +1006,60 @@ function isValidJuniorAccessCode(code) {
   const normalizedCode = normalizeAccessCode(code);
   if (!normalizedCode) return false;
   return JUNIOR_PROFILES.some(profile => normalizeAccessCode(profile.accessCode) === normalizedCode);
+}
+
+function isValidWifiAccessCode(code) {
+  const normalizedCode = normalizeAccessCode(code);
+  if (!normalizedCode) return false;
+  const isEnrollmentNumber = /^\d{6,}$/.test(normalizedCode);
+  return isEnrollmentNumber || normalizedCode === 'upsifs2026' || isValidJuniorAccessCode(code);
+}
+
+function setWifiAccessUnlocked(isUnlocked, message = '') {
+  const grid = document.getElementById('wifi-card-grid');
+  const status = document.getElementById('wifi-access-status');
+  const form = document.getElementById('wifi-access-form');
+  grid?.classList.toggle('locked', !isUnlocked);
+  form?.classList.toggle('unlocked', isUnlocked);
+  document.querySelectorAll('[data-wifi-password]').forEach(item => {
+    item.textContent = isUnlocked ? item.dataset.wifiPassword : '••••••••••';
+  });
+  if (status) status.textContent = message;
+}
+
+function getWifiAccessGranted() {
+  try {
+    return sessionStorage.getItem(WIFI_ACCESS_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function saveWifiAccessGranted(isGranted) {
+  try {
+    if (isGranted) {
+      sessionStorage.setItem(WIFI_ACCESS_KEY, '1');
+    } else {
+      sessionStorage.removeItem(WIFI_ACCESS_KEY);
+    }
+  } catch {
+    // Ignore private-browsing storage failures.
+  }
+}
+
+function unlockWifiPasswords(event) {
+  event.preventDefault();
+  const input = document.getElementById('wifi-access-code');
+  const code = (input?.value || '').trim();
+  if (!code) return;
+  if (isValidWifiAccessCode(code)) {
+    saveWifiAccessGranted(true);
+    setWifiAccessUnlocked(true, 'Access granted. Wi-Fi details unlocked.');
+    input.value = '';
+    return;
+  }
+  saveWifiAccessGranted(false);
+  setWifiAccessUnlocked(false, 'Enrollment number or access code not found.');
 }
 
 function setJuniorAreaLocked(isLocked, message = '') {
@@ -2058,9 +2278,79 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+const messMenuRows = [
+  { day: 'Monday', breakfast: ['Poha with sev', 'Cut onion', 'Mix sprouts', 'Cornflakes', 'Milk (200 ml)'], lunch: ['Arhar dal tadka', 'Aloo matar dry', 'Rice', 'Roti', 'Salad', 'Raita', 'Papad (1 pc)'], snacks: ['Samosa (1 pc)', 'Chutney', 'Tea'], dinner: ['Mix dal', 'Bhindi', 'Rice', 'Roti', 'Salad', 'Rice kheer'] },
+  { day: 'Tuesday', breakfast: ['Idli', 'Sambhar', 'Coconut chutney', 'Tea'], lunch: ['Rajma', 'Mix veg', 'Rice', 'Roti', 'Salad'], snacks: ['Noodles', 'Ketchup', 'Tea'], dinner: ['Chana dal tadka', 'Soya keema matar', 'Rice', 'Roti', 'Salad', 'Suji halwa'] },
+  { day: 'Wednesday', breakfast: ['Mix veg paratha', 'Curd', 'Achar', 'Tea'], lunch: ['Kadhi', 'Jeera aloo', 'Rice', 'Roti', 'Salad'], snacks: ['Mix sprout chaat / Steamed corn chaat', 'Tea'], dinner: ['Butter chicken / Chicken kadhai OR Paneer butter masala / Kadhai paneer', 'Rice', 'Roti', 'Salad', 'Gulab jamun (1 pc)'] },
+  { day: 'Thursday', breakfast: ['Veg sewai', 'Banana (1 pc)', 'Milk (200 ml)', 'Cornflakes'], lunch: ['Black chana', 'Aloo parwal', 'Jeera rice', 'Roti', 'Salad', 'Raita', 'Papad (1 pc)'], snacks: ['Coleslaw / Tawa aloo sandwich', 'Ketchup', 'Tea'], dinner: ['Masoor dal', 'Mix veg kofta', 'Rice', 'Roti', 'Salad'] },
+  { day: 'Friday', breakfast: ['Ajwaini paratha', 'Paneer bhurji / Egg bhurji', 'Achar', 'Tea'], lunch: ['Dal tadka', 'White matar gravy', 'Masala rice', 'Roti', 'Salad'], snacks: ['Masala idli', 'Green chutney', 'Tea'], dinner: ['Egg curry / Soya chaap / Paneer tawa masala', 'Rice', 'Roti', 'Salad', 'Fruit custard'] },
+  { day: 'Saturday', breakfast: ['Pav bhaji', 'Banana (1 pc)', 'Tea'], lunch: ['Chola bhatura', 'Rice', 'Roti', 'Salad', 'Buttermilk'], snacks: ['Macaroni', 'Tea'], dinner: ['Black masoor', 'Palak corn', 'Rice', 'Roti', 'Salad'] },
+  { day: 'Sunday', breakfast: ['Puri', 'Aloo tamatar', 'Tea', 'Achar'], lunch: ['Chicken homestyle / Paneer gravy', 'Rice', 'Roti', 'Salad', 'Papad (1 pc)'], snacks: ['Bhel puri', 'Chutney', 'Tea'], dinner: ['Dal makhani', 'Aloo matar gravy', 'Veg biryani', 'Roti', 'Salad', 'Sweet sewai / Sweet boondi'] }
+];
+
+const courseRows = [
+  ['Sem-1', 'CTBT-BSC-101', 'Engineering Mathematics - 1', 4], ['Sem-1', 'CTBT-ESC-101', 'Basics of Electrical Engineering', 3], ['Sem-1', 'CTBT-ESC-102', 'Programming for Problem Solving', 3], ['Sem-1', 'CTBT-ESC-103', 'Engineering Graphics', 2], ['Sem-1', 'CTBT-BSC-102', 'Engineering Physics', 3], ['Sem-1', 'CTBT-HSM-101', 'Communication Skills', 3], ['Sem-1', 'CTBT-BSC-102L', 'Engineering Physics Laboratory', 1], ['Sem-1', 'CTBT-ESC-102L', 'Programming for Problem Solving Laboratory', 1], ['Sem-1', 'CTBT-ESC-103L', 'Engineering Graphics Laboratory', 1],
+  ['Sem-2', 'CTBT-BSC-201', 'Engineering Mathematics - 2', 4], ['Sem-2', 'CTBT-HSM-201', 'Professional Ethics', 3], ['Sem-2', 'CTBT-PCC-201', 'Object Oriented Programming with C++', 3], ['Sem-2', 'CTBT-ESC-201', 'Digital Logic Design', 3], ['Sem-2', 'CTBT-FMC-201', 'Fundamentals of Forensic Science and Laws', 4], ['Sem-2', 'CTBT-EMC-202', 'Environment Science', 0], ['Sem-2', 'CTBT-PCC-201L', 'Object Oriented Programming with C++ Laboratory', 1], ['Sem-2', 'CTBT-ESC-201L', 'Digital Logic Design Laboratory', 1],
+  ['Sem-3', 'CTBT-BSC-301', 'Engineering Mathematics - 3', 4], ['Sem-3', 'CTBT-PCC-301', 'Data Structure & Algorithms', 3], ['Sem-3', 'CTBT-PCC-302', 'Database Management Systems', 3], ['Sem-3', 'CTBT-PCC-303', 'Computer Programming with Python', 2], ['Sem-3', 'CTBT-PCC-304', 'Computer Organization & Microprocessors', 3], ['Sem-3', 'CTBT-ESC-301', 'Essentials of Cyber Security', 3], ['Sem-3', 'CTBT-PCC-301L', 'Data Structure & Algorithms Laboratory', 1], ['Sem-3', 'CTBT-PCC-302L', 'Database Management Systems Laboratory', 1], ['Sem-3', 'CTBT-PCC-303L', 'Computer Programming with Python Laboratory', 2], ['Sem-3', 'CTBT-PCC-304L', 'Computer Organization & Microprocessors Laboratory', 1],
+  ['Sem-4', 'CTBT-ESC-401', 'Engineering Mathematics - 4', 4], ['Sem-4', 'CTBT-PCC-401', 'Computer Networks', 3], ['Sem-4', 'CTBT-PCC-402', 'Operating System', 3], ['Sem-4', 'CTBT-PCC-403', 'Cryptography', 3], ['Sem-4', 'CTBT-PCC-404', 'Web Application Development', 3], ['Sem-4', 'CTBT-HSC-401', 'Engineering Economics & Management', 3], ['Sem-4', 'CTBT-PCC-401L', 'Computer Networks Laboratory', 1], ['Sem-4', 'CTBT-PCC-402L', 'Operating System Laboratory', 1], ['Sem-4', 'CTBT-PCC-403L', 'Cryptography Laboratory', 1], ['Sem-4', 'CTBT-PCC-404L', 'Web Application Development Laboratory', 1],
+  ['Sem-5', 'CTBT-PCC-501', 'Communication Technology', 3], ['Sem-5', 'CTBT-PCC-502', 'Network Security', 3], ['Sem-5', 'CTBT-PCC-503', 'Java Programming', 2], ['Sem-5', 'CTBT-PCC-504', 'Theory of Computation', 4], ['Sem-5', 'CTBT-PEC-50X', 'Program Elective - I', 3], ['Sem-5', 'CTBT-EMC-505', 'Constitution of India', 0], ['Sem-5', 'CTBT-PCC-501L', 'Communication Technology Laboratory', 1], ['Sem-5', 'CTBT-PCC-502L', 'Network Security Laboratory', 1], ['Sem-5', 'CTBT-PCC-503L', 'Java Programming Laboratory', 2], ['Sem-5', 'CTBT-PEC-50XL', 'Program Elective - I Laboratory', 1],
+  ['Sem-6', 'CTBT-PCC-601', 'Design & Analysis of Algorithms', 3], ['Sem-6', 'CTBT-PCC-602', 'Application Security', 3], ['Sem-6', 'CTBT-PCC-603', 'Compiler Design', 3], ['Sem-6', 'CTBT-PCC-604', 'Cloud Computing & Architecture', 3], ['Sem-6', 'CTBT-PEC-60X', 'Program Elective - II', 3], ['Sem-6', 'CTBT-EMC-605', 'Indian Knowledge System', 0], ['Sem-6', 'CTBT-PCC-601L', 'Design & Analysis of Algorithms Laboratory', 1], ['Sem-6', 'CTBT-PCC-602L', 'Application Security Laboratory', 1], ['Sem-6', 'CTBT-PCC-603L', 'Compiler Design Laboratory', 1], ['Sem-6', 'CTBT-PCC-604L', 'Cloud Computing & Architecture Laboratory', 1], ['Sem-6', 'CTBT-PEC-60XL', 'Program Elective - II Laboratory', 1]
+];
+
+function renderListCell(items) {
+  return `<span class="mess-items">${items.map(item => `<span>${escapeHtml(item)}</span>`).join('')}</span>`;
+}
+
+function renderMessMenu() {
+  const body = document.getElementById('mess-menu-body');
+  if (!body) return;
+  body.innerHTML = messMenuRows.map(row => `
+    <tr>
+      <td><strong>${escapeHtml(row.day)}</strong></td>
+      <td>${renderListCell(row.breakfast)}</td>
+      <td>${renderListCell(row.lunch)}</td>
+      <td>${renderListCell(row.snacks)}</td>
+      <td>${renderListCell(row.dinner)}</td>
+    </tr>
+  `).join('');
+}
+
+function toggleMessMenu() {
+  const wrap = document.getElementById('mess-menu-wrap');
+  const toggle = document.getElementById('mess-menu-toggle');
+  if (!wrap || !toggle) return;
+  const shouldOpen = wrap.hidden;
+  wrap.hidden = !shouldOpen;
+  toggle.setAttribute('aria-expanded', String(shouldOpen));
+  toggle.textContent = shouldOpen ? 'Hide Mess Menu' : 'Show Mess Menu';
+}
+
+function renderCourseTable() {
+  const body = document.getElementById('course-table-body');
+  if (!body) return;
+  const selectedSemester = document.getElementById('course-semester-filter')?.value || 'Sem-1';
+  const query = (document.getElementById('course-search')?.value || '').trim().toLowerCase();
+  const filteredRows = courseRows.filter(([semester, code, course]) => {
+    const semesterMatch = selectedSemester === 'all' || semester === selectedSemester;
+    const queryMatch = !query || `${semester} ${code} ${course}`.toLowerCase().includes(query);
+    return semesterMatch && queryMatch;
+  });
+  body.innerHTML = filteredRows.map(([semester, code, course, credit]) => `
+    <tr>
+      <td>${escapeHtml(semester)}</td>
+      <td>${escapeHtml(code)}</td>
+      <td>${escapeHtml(course)}</td>
+      <td>${escapeHtml(String(credit))}</td>
+    </tr>
+  `).join('');
+  const empty = document.getElementById('course-empty');
+  if (empty) empty.hidden = filteredRows.length > 0;
+}
+
 // ═══════════════ INITIALIZATION ═══════════════
 window.addEventListener('DOMContentLoaded', () => {
   setupSidebarToggle();
+  setupMasterSearch();
   window.history.replaceState({ tab: 'home' }, '', window.location.pathname);
   applyArcadeTheme(localStorage.getItem(ARCADE_THEME_KEY) || 'app');
 
@@ -2073,6 +2363,8 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('senior-profile-form')?.addEventListener('submit', submitSeniorProfile);
   document.getElementById('senior-lock-form')?.addEventListener('submit', unlockSeniorBoard);
   document.getElementById('senior-search')?.addEventListener('input', updateSeniorFilters);
+  document.getElementById('wifi-access-form')?.addEventListener('submit', unlockWifiPasswords);
+  setWifiAccessUnlocked(getWifiAccessGranted(), getWifiAccessGranted() ? 'Access granted. Wi-Fi details unlocked.' : '');
   document.getElementById('junior-lock-form')?.addEventListener('submit', unlockJuniorBoard);
   document.getElementById('junior-feedback-form')?.addEventListener('submit', submitJuniorFeedback);
   if (isValidJuniorAccessCode(getJuniorAccessCode())) {
@@ -2095,6 +2387,11 @@ window.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.campus-filter-btn').forEach((btn) => {
     btn.addEventListener('click', () => setCampusGalleryFilter(btn.dataset.campusFilter || 'all'));
   });
+  renderMessMenu();
+  document.getElementById('mess-menu-toggle')?.addEventListener('click', toggleMessMenu);
+  renderCourseTable();
+  document.getElementById('course-semester-filter')?.addEventListener('change', renderCourseTable);
+  document.getElementById('course-search')?.addEventListener('input', renderCourseTable);
   loadResourceFeed();
   updateSeniorFilters();
 });

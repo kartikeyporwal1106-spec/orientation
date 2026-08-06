@@ -26,7 +26,8 @@
     </div>
     <nav class="header-nav">
       <button class="nav-btn active" data-tab="home" onclick="switchTab('home')">HOME</button>
-      <button class="nav-btn" data-tab="about" onclick="switchTab('about')">ABOUT</button>
+      <button class="nav-btn" data-tab="about" onclick="switchTab('about')">GUIDE</button>
+      <button class="nav-btn" data-tab="hostel" onclick="switchTab('hostel')">HOSTEL</button>
       <button class="nav-btn" data-tab="resources" onclick="switchTab('resources')">RESOURCES</button>
       <button class="nav-btn" data-tab="seniors" onclick="switchTab('seniors')">SENIORS</button>
       <button class="nav-btn" data-tab="gallery" onclick="switchTab('gallery')">GALLERY</button>
@@ -52,7 +53,8 @@
         <span class="sidebar-section-title">// NAVIGATION</span>
         <ul>
           <li><a href="#" class="active" onclick="switchTab('home'); closeSidebar();">▶ HOME</a></li>
-          <li><a href="#about" onclick="switchTab('about'); closeSidebar();">▶ ABOUT UPSIFS</a></li>
+          <li><a href="#about" onclick="switchTab('about'); closeSidebar();">▶ BASIC INFO GUIDE</a></li>
+          <li><a href="#hostel" onclick="switchTab('hostel'); closeSidebar();">▶ HOSTEL LIFE</a></li>
           <li><a href="#resources" onclick="switchTab('resources'); closeSidebar();">▶ academic resources</a></li>
           <li><a href="#gallery" onclick="switchTab('gallery'); switchGalleryView('college'); closeSidebar();">▶ 🏛️ CAMPUS GALLERY</a></li>
           <li><a href="#seniors" onclick="switchTab('seniors'); closeSidebar();">▶ 🧑‍💻 connect with seniors</a></li>
@@ -152,6 +154,11 @@
         </svg>
         <span class="title-pencil" aria-hidden="true">✎</span>
       </div>
+      <div class="master-search" role="search">
+        <label class="master-search-label" for="master-search-input">search everything</label>
+        <input id="master-search-input" type="search" placeholder="hostel, fees, seniors, notes..." autocomplete="off">
+        <div class="master-search-results" id="master-search-results" role="listbox" hidden></div>
+      </div>
       <p class="stage-subtitle" id="home-subtitle">CLASS OF 2026 · PLAYER 1 READY?</p>
 
       <div class="pixel-starburst">✳ ✳ ✳</div>
@@ -209,7 +216,7 @@
       </div>
     </div>
 
-    <!-- ═══ TAB 2: ABOUT ═══ -->
+    <!-- ═══ TAB 2: BASIC INFO GUIDE ═══ -->
     <div class="tab-content" id="tab-about">
       <div class="tab-top-bar">
         <button class="btn-back-home" onclick="switchTab('home')">
@@ -217,25 +224,261 @@
         </button>
       </div>
 
-      <h1 class="stage-title" id="about-title">about upsifs</h1>
-      <p class="stage-subtitle">UTTAR PRADESH STATE INSTITUTE OF FORENSIC SCIENCES</p>
+      <h1 class="stage-title" id="about-title">Basic Info Guide</h1>
+      <p class="stage-subtitle">UTTAR PRADESH STATE INSTITUTE OF FORENSIC SCIENCES · FRESHERS START HERE</p>
 
       <div class="pixel-starburst">✳ ✳ ✳</div>
 
       <div class="about-card-box">
-        <p class="about-text">
-          UPSIFS (Uttar Pradesh State Institute of Forensic Sciences) is a premier state institute dedicated to advanced Cyber Security, Digital Evidence Investigation, and Forensic Science Engineering.
-        </p>
-        <div class="about-stats-list">
-          <div class="stat-row"><span class="s-key">LOCATION:</span> <span class="s-val">Lucknow, Uttar Pradesh</span></div>
-          <div class="stat-row"><span class="s-key">PROGRAMS:</span> <span class="s-val green-text">Integrated B.Tech - M.Tech Cyber Security · B.Tech Cyber Security · B.Sc. LL.B. (Hons.)</span></div>
-          <div class="stat-row"><span class="s-key">COMMUNITY:</span> <span class="s-val"><a href="https://www.reddit.com/r/upsifs/" target="_blank" class="pixel-link">r/upsifs Subreddit ↗</a></span></div>
-          <div class="stat-row"><span class="s-key">STATUS:</span> <span class="s-val green-text">Semesters 1–10 Active & Ready</span></div>
+        <div class="about-card-main">
+          <p class="about-text">
+            UPSIFS is a state forensic sciences institute focused on cyber security, digital evidence investigation, and forensic science engineering.
+          </p>
+          <div class="about-stats-list">
+            <div class="stat-row"><span class="s-key">Location</span> <span class="s-val">Lucknow, Uttar Pradesh</span></div>
+            <div class="stat-row"><span class="s-key">Programs</span> <span class="s-val green-text">Integrated B.Tech - M.Tech Cyber Security · B.Tech Cyber Security · B.Sc. LL.B. (Hons.)</span></div>
+            <div class="stat-row"><span class="s-key">Status</span> <span class="s-val green-text">Semesters 1-10 active & ready</span></div>
+          </div>
+        </div>
+        <div class="about-link-box" aria-label="Quick page links">
+          <a class="mini-page-link primary" href="https://maps.app.goo.gl/KJpaieTsZNynLBDn9" target="_blank" rel="noopener noreferrer">Maps</a>
+          <a class="mini-page-link" href="https://www.reddit.com/r/upsifs/" target="_blank" rel="noopener noreferrer">Reddit</a>
+          <a class="mini-page-link" href="#resources" onclick="switchTab('resources')">Resources</a>
+          <a class="mini-page-link" href="#seniors" onclick="switchTab('seniors')">Seniors</a>
+          <a class="mini-page-link" href="#gallery" onclick="switchTab('gallery'); switchGalleryView('college');">Gallery</a>
+          <a class="mini-page-link" href="https://forms.gle/WurEYQVuinQKqtBP9" target="_blank" rel="noopener noreferrer">Details</a>
         </div>
       </div>
+
+      <section class="guide-panel reach-campus-panel" aria-labelledby="reach-campus-title">
+        <div class="guide-heading">
+          <span class="guide-kicker">Campus Route</span>
+          <h2 id="reach-campus-title">How to Reach Campus</h2>
+          <p>Use the maps link for live directions, then pick the route that fits your luggage and budget.</p>
+        </div>
+        <div class="reach-campus-grid">
+          <article class="reach-card featured">
+            <span>Maps</span>
+            <strong>UPSIFS Campus Location</strong>
+            <p>Open the pinned campus location directly in Google Maps.</p>
+            <a href="https://maps.app.goo.gl/KJpaieTsZNynLBDn9" target="_blank" rel="noopener noreferrer">Open Maps ↗</a>
+          </article>
+          <article class="reach-card">
+            <span>From Charbagh Railway Station</span>
+            <strong>Direct Auto</strong>
+            <p>Usually around ₹200-300 for campus.</p>
+          </article>
+          <article class="reach-card">
+            <span>From Charbagh Railway Station</span>
+            <strong>Direct Cab</strong>
+            <p>Usually around ₹400-500 for campus.</p>
+          </article>
+          <article class="reach-card">
+            <span>Cab Facilities</span>
+            <strong>Available till College</strong>
+            <p>Uber and Rapido as of now.</p>
+          </article>
+          <article class="reach-card">
+            <span>Via Metro</span>
+            <strong>Metro Route</strong>
+            <p>Use the nearest convenient station, then take an auto/cab toward Daroga Kheda / UPSIFS.</p>
+          </article>
+          <article class="reach-card wide">
+            <span>Via City Bus</span>
+            <strong>Till Sarojini Nagar</strong>
+            <p>Get down near Scooter India Chauraha, then take an auto to Daroga Kheda. You may need to cross to the other side and walk about 50m to see the college direction board.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="guide-panel campus-facilities-panel" aria-labelledby="campus-facilities-title">
+        <div class="guide-heading">
+          <span class="guide-kicker">Campus Basics</span>
+          <h2 id="campus-facilities-title">Campus Facilities</h2>
+        </div>
+        <div class="reach-campus-grid">
+          <article class="reach-card">
+            <span>Bank</span>
+            <strong>PNB Bank</strong>
+            <p>Bank facility available on campus.</p>
+          </article>
+          <article class="reach-card">
+            <span>Nearby ATM</span>
+            <strong>Canara Bank ATM</strong>
+            <p>Available near the Lucknow-Kanpur Highway.</p>
+          </article>
+          <article class="reach-card">
+            <span>Cafeteria</span>
+            <strong>Kovalam</strong>
+            <p>Cafeteria facility available on campus.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="guide-panel wifi-panel" aria-labelledby="wifi-title">
+        <div class="guide-heading">
+          <span class="guide-kicker">Campus Access</span>
+          <h2 id="wifi-title">Wi-Fi Details</h2>
+          <p>Enter enrollment number or access code to view campus Wi-Fi passwords.</p>
+        </div>
+        <form class="wifi-access-form" id="wifi-access-form">
+          <label for="wifi-access-code">Enrollment / access code</label>
+          <div class="wifi-access-row">
+            <input type="text" id="wifi-access-code" autocomplete="off" placeholder="ENTER CODE" required>
+            <button class="guide-action-btn wifi-unlock-btn" type="submit">Unlock</button>
+          </div>
+          <p class="wifi-access-status" id="wifi-access-status" aria-live="polite"></p>
+        </form>
+        <div class="wifi-card-grid locked" id="wifi-card-grid">
+          <div class="wifi-card">
+            <span>Academic Block</span>
+            <strong>UPSIFS_Wi-Fi</strong>
+            <code data-wifi-password="forensic@24">••••••••••</code>
+          </div>
+          <div class="wifi-card">
+            <span>Hostel</span>
+            <strong>UPSIFS_HOSTEL</strong>
+            <code data-wifi-password="Hostel@2022">••••••••••</code>
+          </div>
+        </div>
+      </section>
+
+      <section class="guide-panel" aria-labelledby="pre-college-title">
+        <div class="guide-heading">
+          <span class="guide-kicker">Before Campus</span>
+          <h2 id="pre-college-title">Pre-College Resources</h2>
+        </div>
+        <div class="precollege-grid">
+          <button class="guide-action-btn" type="button">C programming basics</button>
+          <button class="guide-action-btn" type="button">Python starter pack</button>
+          <button class="guide-action-btn" type="button">Linux command line</button>
+          <button class="guide-action-btn" type="button">Git & GitHub setup</button>
+          <button class="guide-action-btn" type="button">Cyber security primer</button>
+          <button class="guide-action-btn" type="button">Maths bridge course</button>
+        </div>
+      </section>
+
+      <section class="guide-panel" aria-labelledby="courses-title">
+        <div class="guide-heading">
+          <span class="guide-kicker">Program Map</span>
+          <h2 id="courses-title">Course Info</h2>
+          <p>B.Tech - M.Tech Computer Science & Engineering (Cyber Security), 5 years integrated course.</p>
+        </div>
+        <div class="course-controls" aria-label="Course filters">
+          <label>
+            Semester
+            <select id="course-semester-filter">
+              <option value="all">All semesters</option>
+              <option value="Sem-1" selected>Sem-1</option>
+              <option value="Sem-2">Sem-2</option>
+              <option value="Sem-3">Sem-3</option>
+              <option value="Sem-4">Sem-4</option>
+              <option value="Sem-5">Sem-5</option>
+              <option value="Sem-6">Sem-6</option>
+            </select>
+          </label>
+          <label>
+            Search
+            <input id="course-search" type="search" placeholder="course, code, lab...">
+          </label>
+        </div>
+        <div class="guide-table-wrap">
+          <table class="guide-table course-table">
+            <thead>
+              <tr>
+                <th>Semester</th>
+                <th>Code</th>
+                <th>Course</th>
+                <th>Credit</th>
+              </tr>
+            </thead>
+            <tbody id="course-table-body"></tbody>
+          </table>
+        </div>
+        <p class="guide-empty" id="course-empty" hidden>No course found for this filter.</p>
+      </section>
     </div>
 
-    <!-- ═══ TAB 3: ACADEMIC RESOURCES (MULTI-SEMESTER SEM 1 TO SEM 10) ═══ -->
+    <!-- ═══ TAB 3: HOSTEL LIFE ═══ -->
+    <div class="tab-content" id="tab-hostel">
+      <div class="tab-top-bar">
+        <button class="btn-back-home" onclick="switchTab('home')">
+          ← back home
+        </button>
+      </div>
+
+      <h1 class="stage-title">Hostel Life</h1>
+      <p class="stage-subtitle">MESS MENU · STAY BASICS · DAILY CAMPUS LIVING</p>
+
+      <section class="guide-panel hostel-panel" aria-labelledby="hostel-title">
+        <div class="guide-heading">
+          <span class="guide-kicker">Campus Living</span>
+          <h2 id="hostel-title">Hostel Life</h2>
+          <p>Food, stay, daily essentials, and hostel-side updates for freshers.</p>
+        </div>
+        <div class="hostel-info-grid">
+          <div class="hostel-info-card mess-price-card">
+            <span>Mess</span>
+            <strong>Sunshine Hospitality</strong>
+            <div class="mess-price-list" aria-label="Mess rates">
+              <div class="mess-price-row">
+                <span class="price-badge">Rs.45</span>
+                <p>Breakfast/Snacks</p>
+              </div>
+              <div class="mess-price-row">
+                <span class="price-badge">Rs.80</span>
+                <p>Lunch/Dinner</p>
+              </div>
+            </div>
+          </div>
+          <div class="hostel-info-card">
+            <span>Location</span>
+            <strong>Main Boys and Girls Hostel</strong>
+            <div class="hostel-distance-list">
+              <p><b>Main Boys Hostel</b> around 200-300m from Academic Block.</p>
+              <p><b>Main Girls Hostel</b> around 100m from Academic Block.</p>
+            </div>
+          </div>
+          <div class="hostel-info-card">
+            <span>Boys Hostel Issues</span>
+            <strong>Contact Points</strong>
+            <div class="hostel-contact-list">
+              <p><b>Representative:</b> Aditya Pandey</p>
+              <p><b>Caretakers:</b> Ranjit, Prakash <small>(a bit more on the friendly side)</small></p>
+              <p><b>Warden:</b> Abhishek Sir</p>
+            </div>
+          </div>
+          <div class="hostel-info-card">
+            <span>Girls Hostel</span>
+            <strong>Contact Details</strong>
+            <p>Details will be updated soon.</p>
+          </div>
+        </div>
+        <div class="guide-heading mess-heading">
+          <span class="guide-kicker">Hostel Food</span>
+          <h3 id="mess-menu-title">August Mess Menu</h3>
+          <button class="guide-action-btn mess-toggle-btn" type="button" id="mess-menu-toggle" aria-expanded="false" aria-controls="mess-menu-wrap">
+            Show Mess Menu
+          </button>
+        </div>
+        <div class="guide-table-wrap mess-menu-wrap" id="mess-menu-wrap" hidden>
+          <table class="guide-table mess-table">
+            <thead>
+              <tr>
+                <th>Day</th>
+                <th>Breakfast</th>
+                <th>Lunch</th>
+                <th>Snacks</th>
+                <th>Dinner</th>
+              </tr>
+            </thead>
+            <tbody id="mess-menu-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- ═══ TAB 4: ACADEMIC RESOURCES (MULTI-SEMESTER SEM 1 TO SEM 10) ═══ -->
     <div class="tab-content" id="tab-resources">
       <div class="tab-top-bar">
         <button class="btn-back-home" onclick="switchTab('home')">
@@ -599,7 +842,7 @@
       <a href="https://www.linkedin.com/in/kartikeynfsu/" target="_blank" rel="noopener noreferrer" class="footer-link">LINKEDIN</a>
       <a href="https://forms.gle/WurEYQVuinQKqtBP9" target="_blank" rel="noopener noreferrer" class="footer-link">DETAILS</a>
     </div>
-    <p class="footer-love">* created with love & zest by kartikey and anu <span>❤️</span> *</p>
+    <p class="footer-love">* created with love & zest by kartikey and anubhav <span>❤️</span> *</p>
     <div class="footer-right">
       <span class="footer-vibe">with lots of caffeine & vibe coding</span>
     </div>
