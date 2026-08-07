@@ -1137,13 +1137,13 @@ function normalizeRemoteSeniorProfile(row) {
   const normalizedName = normalizeSearchText(name);
   const board = forcedLawNames.some(forcedName => normalizedName.includes(forcedName))
     ? 'law2'
-    : /law|llb/i.test(course) ? 'law2' : /^(3|b\.?tech\s*y?3|year\s*3)$/i.test(course) ? '3' : '2';
+    : /law|llb/i.test(course) ? 'law2' : /msc/i.test(course) ? 'msc2' : /^(3|b\.?tech\s*y?3|year\s*3)$/i.test(course) ? '3' : '2';
   const photo = coalesceProfileValue(row, 'displayPhoto', 'photo', 'Profile Photo', 'Profile Photo (if you want)');
 
   return {
     source: 'remote',
     name,
-    year: board === 'law2' ? 'law2' : board === '3' ? '3' : '2',
+    year: board === 'law2' ? 'law2' : board === '3' ? '3' : board === 'msc2' ? 'msc2' : '2',
     enrollment: coalesceProfileValue(row, 'displayEnrollment', 'enrollment', 'Enrollment Number'),
     place: coalesceProfileValue(row, 'displayPlace', 'place', 'Place (Kha se Hai Aap)'),
     tagline: coalesceProfileValue(row, 'displayTagline', 'tagline', 'TagLine (Experience or Something good about u)', 'TagLine (Experience or Something good about u) like IIC Member/ Interned at etc kuch bhi cool aapne kiya ho'),
