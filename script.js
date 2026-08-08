@@ -139,6 +139,7 @@ const studentNames = [
 ];
 
 let activeSeniorYear = 'btech-mtech-y1';
+let activeSeniorDisplayBoard = 'B.Tech-M.Tech Sem I';
 let activeSeniorQuickFilter = '';
 const SENIOR_ACCESS_KEY = 'upsifs_senior_access_code';
 const JUNIOR_ACCESS_KEY = 'upsifs_junior_access_code';
@@ -835,7 +836,9 @@ function setupMasterSearch() {
 function switchSeniorYear(year) {
   activeSeniorYear = year;
   document.querySelectorAll('.senior-year-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.year === year);
+    const isActive = btn.dataset.year === year;
+    btn.classList.toggle('active', isActive);
+    if (isActive) activeSeniorDisplayBoard = seniorButtonDisplayBoards(btn).join('|');
   });
 
   updateSeniorFilters();
@@ -1099,6 +1102,21 @@ function seniorIdentityKey(profile) {
   return enrollment || phone || normalizeSearchText(profile.name || '');
 }
 
+function normalizeDisplayBoard(value) {
+  return normalizeSearchText(value || '')
+    .replace(/&/g, 'and')
+    .replace(/[._-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function seniorButtonDisplayBoards(button) {
+  return (button?.dataset.displayBoards || button?.dataset.displayBoard || '')
+    .split('|')
+    .map(normalizeDisplayBoard)
+    .filter(Boolean);
+}
+
 function initialsFromName(name) {
   return (name || 'UP')
     .split(/\s+/)
@@ -1111,7 +1129,9 @@ function initialsFromName(name) {
 function createSubmittedSeniorCard(profile) {
   const article = document.createElement('article');
   article.className = 'senior-card submitted-card';
-  article.dataset.seniorYear = getSeniorBoardCode(profile.year || profile.board || profile.course || '', profile.name);
+  const displayBoard = profile.displayBoard || profile.boardLabel || profile.course || profile.rawBoard || '';
+  article.dataset.seniorYear = getSeniorBoardCode(displayBoard || profile.year || profile.board || '', profile.name);
+  if (displayBoard) article.dataset.displayBoard = normalizeDisplayBoard(displayBoard);
   if (profile.source) article.dataset.source = profile.source;
   if (profile.enrollment) article.dataset.enrollment = profile.enrollment;
 
@@ -1119,6 +1139,7 @@ function createSubmittedSeniorCard(profile) {
   const safeName = escapeHtml(profile.name || 'New Profile');
   const safeTagline = escapeHtml(profile.tagline || 'student profile');
   const safeSkills = escapeHtml(profile.skills || 'Profile update submitted');
+  const safeBoard = escapeHtml(profile.displayBoard || profile.boardLabel || profile.course || '');
   const photo = (profile.photo || '').trim();
   const whatsapp = normalizeWhatsapp(profile.whatsapp);
   const instagram = normalizeInstagram(profile.instagram);
@@ -1145,6 +1166,7 @@ function createSubmittedSeniorCard(profile) {
       <h2>${safeName}</h2>
       <p>${safeTagline}</p>
       <span>${safeSkills}</span>
+      ${safeBoard ? `<small class="senior-board-line">${safeBoard}</small>` : ''}
     </div>
     <div class="senior-actions">
       ${actions || '<span class="senior-connect senior-disabled">PENDING ↗</span>'}
@@ -1427,6 +1449,8 @@ function normalizeRemoteSeniorProfile(row) {
     name,
     year: board,
     board: board,
+    displayBoard: course,
+    rawBoard: course,
     enrollment: coalesceProfileValue(row, 'displayEnrollment', 'enrollment', 'Enrollment Number'),
     place: coalesceProfileValue(row, 'displayPlace', 'place', 'Place (Kha se Hai Aap)'),
     tagline: coalesceProfileValue(row, 'displayTagline', 'tagline', 'TagLine (Experience or Something good about u)', 'TagLine (Experience or Something good about u) like IIC Member/ Interned at etc kuch bhi cool aapne kiya ho'),
@@ -1531,6 +1555,8 @@ async function submitSeniorProfile(event) {
   const form = event.currentTarget;
   const status = document.getElementById('senior-form-status');
   const profile = Object.fromEntries(new FormData(form).entries());
+  const selectedBoardOption = form.querySelector('select[name="year"] option:checked');
+  if (selectedBoardOption) profile.displayBoard = selectedBoardOption.textContent.trim();
   profile.year = getSeniorBoardCode(profile.year || profile.board || profile.course || '', profile.name);
   profile.board = profile.year;
   profile.updatedAt = new Date().toISOString();
@@ -1571,7 +1597,11 @@ function updateSeniorFilters() {
   let visibleCount = 0;
 
   cards.forEach((card, index) => {
-    const yearMatches = card.dataset.seniorYear === activeSeniorYear;
+    const activeBoards = activeSeniorDisplayBoard.split('|').filter(Boolean);
+    const boardMatches = activeBoards.length
+      && card.dataset.displayBoard
+      && activeBoards.includes(card.dataset.displayBoard);
+    const yearMatches = boardMatches || (!card.dataset.displayBoard && card.dataset.seniorYear === activeSeniorYear);
     const cardText = normalizeSearchText(card.textContent);
     const textMatches = !search || cardText.includes(search);
     const quickMatches = !activeSeniorQuickFilter || cardText.includes(activeSeniorQuickFilter);
@@ -2795,6 +2825,11 @@ window.addEventListener('DOMContentLoaded', () => {
   window.history.replaceState({ tab: 'home' }, '', window.location.pathname);
   applyArcadeTheme(localStorage.getItem(ARCADE_THEME_KEY) || 'app');
   setSiteFont(localStorage.getItem(SITE_FONT_KEY) || 'default');
+  const activeSeniorButton = document.querySelector('.senior-year-btn.active');
+  if (activeSeniorButton) {
+    activeSeniorYear = activeSeniorButton.dataset.year || activeSeniorYear;
+    activeSeniorDisplayBoard = seniorButtonDisplayBoards(activeSeniorButton).join('|');
+  }
 
   localStorage.removeItem('upsifs_senior_profile_submissions');
   if (getSeniorAccessCode()) {
@@ -3003,29 +3038,39 @@ function renderAcademicCalendarModalContent() {
   }
 }
 
-function toggleInlineAcademicCalendar() {
+function toggleInlineAcademicCalendar(semesterType = currentInlineCalendarSem) {
   const wrap = document.getElementById('calendar-inline-wrap');
-  const toggle = document.getElementById('calendar-inline-toggle');
-  if (!wrap || !toggle) return;
-  const shouldOpen = wrap.hidden;
-  wrap.hidden = !shouldOpen;
-  toggle.setAttribute('aria-expanded', String(shouldOpen));
-  toggle.textContent = shouldOpen ? 'Hide Academic Calendar' : 'Show Academic Calendar';
-  if (shouldOpen) {
+  if (!wrap) return;
+  const shouldClose = !wrap.hidden && currentInlineCalendarSem === semesterType;
+  currentInlineCalendarSem = semesterType;
+
+  document.querySelectorAll('.cal-sem-btn').forEach(btn => {
+    const isActive = btn.id === `cal-btn-${semesterType}`;
+    btn.classList.toggle('active', !shouldClose && isActive);
+    btn.setAttribute('aria-expanded', String(!shouldClose && isActive));
+  });
+
+  wrap.hidden = shouldClose;
+  if (!shouldClose) {
     renderInlineAcademicCalendar();
+    window.setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 60);
   }
 }
 
 function switchInlineCalendarTab(semesterType) {
   currentInlineCalendarSem = semesterType;
-  document.querySelectorAll('.calendar-inline-tab').forEach(tab => {
-    tab.classList.toggle('active', tab.dataset.sem === semesterType);
+  document.querySelectorAll('.cal-sem-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.id === `cal-btn-${semesterType}`);
   });
   renderInlineAcademicCalendar();
 }
 
 function renderInlineAcademicCalendar() {
   const data = academicCalendarData[currentInlineCalendarSem] || academicCalendarData['odd-1'];
+  const subhead = document.getElementById('calendar-inline-subhead');
+  if (subhead) {
+    subhead.innerHTML = `<strong>${escapeHtml(data.title)}</strong><br><small>${escapeHtml(data.subtitle)}</small>`;
+  }
   const tbody = document.getElementById('calendar-inline-tbody');
   if (tbody) {
     tbody.innerHTML = data.rows.map(row => `

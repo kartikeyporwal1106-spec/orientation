@@ -712,16 +712,35 @@
           </div>
           <div class="calendar-card-actions">
             <button type="button" class="guide-action-btn cal-sem-btn" id="cal-btn-odd-1"
-              onclick="toggleInlineCalendar('odd-1')">
+              onclick="toggleInlineAcademicCalendar('odd-1')">
               📅 Odd Sem I
             </button>
-            <button type="button" class="guide-action-btn" onclick="openAcademicCalendarModal('odd-multi')">
+            <button type="button" class="guide-action-btn cal-sem-btn" id="cal-btn-odd-multi"
+              onclick="toggleInlineAcademicCalendar('odd-multi')">
               📅 Odd Sem III / V / VII / IX
             </button>
-            <button type="button" class="guide-action-btn" onclick="openAcademicCalendarModal('even')">
+            <button type="button" class="guide-action-btn cal-sem-btn" id="cal-btn-even"
+              onclick="toggleInlineAcademicCalendar('even')">
               📅 Even Semesters
             </button>
           </div>
+        </div>
+
+        <div class="calendar-inline-wrap" id="calendar-inline-wrap" hidden>
+          <div class="calendar-modal-subhead" id="calendar-inline-subhead"></div>
+          <div class="calendar-table-scroll">
+            <table class="guide-table calendar-table">
+              <thead>
+                <tr>
+                  <th style="width: 8%;">S.No</th>
+                  <th style="width: 54%;">Particulars</th>
+                  <th style="width: 38%;">Timeline</th>
+                </tr>
+              </thead>
+              <tbody id="calendar-inline-tbody"></tbody>
+            </table>
+          </div>
+          <div class="calendar-footnote" id="calendar-inline-footnote"></div>
         </div>
       </div>
 
@@ -850,51 +869,22 @@
         </form>
       </section>
 
-      <section class="junior-profile-board" id="junior-profile-board" aria-label="Junior profile board">
-        <div class="junior-profile-head">
-          <div>
-            <span class="board-kicker">JUNIOR PROFILES</span>
-            <h2>Freshers in the batch.</h2>
-            <p>Course, interests, topics, and batch feedback in one clean board.</p>
-          </div>
-          <button type="button" class="feedback-card-btn junior-update-btn" onclick="openJuniorProfiles()">connect with batchmates ↗</button>
-        </div>
-        <section class="junior-access-lock" id="junior-access-lock" aria-label="Junior access verification">
-          <div class="lock-copy">
-            <span class="board-kicker">BATCHMATE ACCESS</span>
-            <h2>Enter your access code.</h2>
-            <p>Junior profiles are visible only to the listed batchmates.</p>
-          </div>
-          <form class="senior-lock-form" id="junior-lock-form">
-            <label>
-              ACCESS CODE
-              <input type="text" id="junior-access-code" autocomplete="off" placeholder="ENTER ACCESS CODE" required>
-            </label>
-            <button type="submit" class="submit-btn">[UNLOCK BATCHMATES]</button>
-            <p class="senior-form-status" id="junior-lock-status" aria-live="polite"></p>
-          </form>
-        </section>
-        <div class="junior-private-area locked" id="junior-private-area">
-          <div class="junior-profile-grid" id="junior-profile-grid" aria-live="polite"></div>
-        </div>
-      </section>
-
       <div class="senior-filter-bar" aria-label="Senior year filter">
         <span class="senior-program-chip">SENIOR BOARDS</span>
         <div class="senior-year-switch">
-          <button class="senior-year-btn active" type="button" data-year="btech-mtech-y1" onclick="switchSeniorYear('btech-mtech-y1')">B.Tech-M.Tech Y1</button>
-          <button class="senior-year-btn" type="button" data-year="btech-mtech-y2" onclick="switchSeniorYear('btech-mtech-y2')">B.Tech-M.Tech Y2</button>
-          <button class="senior-year-btn" type="button" data-year="btech-mtech-y3" onclick="switchSeniorYear('btech-mtech-y3')">B.Tech-M.Tech Y3</button>
-          <button class="senior-year-btn" type="button" data-year="bsc-msc-forensic-y1" onclick="switchSeniorYear('bsc-msc-forensic-y1')">B.Sc-M.Sc Forensic Y1</button>
-          <button class="senior-year-btn" type="button" data-year="bsc-msc-forensic-y2" onclick="switchSeniorYear('bsc-msc-forensic-y2')">B.Sc-M.Sc Forensic Y2</button>
-          <button class="senior-year-btn" type="button" data-year="bsc-msc-forensic-y3" onclick="switchSeniorYear('bsc-msc-forensic-y3')">B.Sc-M.Sc Forensic Y3</button>
-          <button class="senior-year-btn" type="button" data-year="bsc-msc-forensic-y4" onclick="switchSeniorYear('bsc-msc-forensic-y4')">B.Sc-M.Sc Forensic Y4</button>
-          <button class="senior-year-btn" type="button" data-year="msc-forensic-y1" onclick="switchSeniorYear('msc-forensic-y1')">M.Sc Forensic Y1</button>
-          <button class="senior-year-btn" type="button" data-year="msc-forensic-y2" onclick="switchSeniorYear('msc-forensic-y2')">M.Sc Forensic Y2</button>
-          <button class="senior-year-btn" type="button" data-year="bsc-llb-y1" onclick="switchSeniorYear('bsc-llb-y1')">B.Sc LL.B Forensic Y1</button>
-          <button class="senior-year-btn" type="button" data-year="bsc-llb-y2" onclick="switchSeniorYear('bsc-llb-y2')">B.Sc LL.B Forensic Y2</button>
-          <button class="senior-year-btn" type="button" data-year="bsc-llb-y3" onclick="switchSeniorYear('bsc-llb-y3')">B.Sc LL.B Forensic Y3</button>
-          <button class="senior-year-btn" type="button" data-year="llm" onclick="switchSeniorYear('llm')">LLM</button>
+          <button class="senior-year-btn active" type="button" data-year="btech-mtech-y1" data-display-boards="B.Tech-M.Tech Sem I|Btech-Mtech Sem I" onclick="switchSeniorYear('btech-mtech-y1')">B.Tech-M.Tech Y1</button>
+          <button class="senior-year-btn" type="button" data-year="btech-mtech-y2" data-display-boards="B.Tech Year 2|Btech-Mtech Sem III|B.Tech-M.Tech Sem III" onclick="switchSeniorYear('btech-mtech-y2')">B.Tech-M.Tech Y2</button>
+          <button class="senior-year-btn" type="button" data-year="btech-mtech-y3" data-display-boards="B.Tech-M.Tech Sem V|Btech Mtech Sem V" onclick="switchSeniorYear('btech-mtech-y3')">B.Tech-M.Tech Y3</button>
+          <button class="senior-year-btn" type="button" data-year="bsc-msc-forensic-y1" data-display-board="B.Sc - M.Sc Forensic Sem - I" onclick="switchSeniorYear('bsc-msc-forensic-y1')">B.Sc-M.Sc Forensic Y1</button>
+          <button class="senior-year-btn" type="button" data-year="bsc-msc-forensic-y2" data-display-board="B.Sc - M.Sc Forensic Sem - III" onclick="switchSeniorYear('bsc-msc-forensic-y2')">B.Sc-M.Sc Forensic Y2</button>
+          <button class="senior-year-btn" type="button" data-year="bsc-msc-forensic-y3" data-display-board="B.Sc - M.Sc Forensic Sem - V" onclick="switchSeniorYear('bsc-msc-forensic-y3')">B.Sc-M.Sc Forensic Y3</button>
+          <button class="senior-year-btn" type="button" data-year="bsc-msc-forensic-y4" data-display-board="B.Sc. - M.Sc. Forensic Science Integrated 7th Sem" onclick="switchSeniorYear('bsc-msc-forensic-y4')">B.Sc-M.Sc Forensic Y4</button>
+          <button class="senior-year-btn" type="button" data-year="msc-forensic-y1" data-display-board="M.Sc Forensic Sem - I" onclick="switchSeniorYear('msc-forensic-y1')">M.Sc Forensic Y1</button>
+          <button class="senior-year-btn" type="button" data-year="msc-forensic-y2" data-display-board="M.Sc Forensic Sem - III" onclick="switchSeniorYear('msc-forensic-y2')">M.Sc Forensic Y2</button>
+          <button class="senior-year-btn" type="button" data-year="bsc-llb-y1" data-display-board="B.Sc - LLB Forensic Sem - I" onclick="switchSeniorYear('bsc-llb-y1')">B.Sc LL.B Forensic Y1</button>
+          <button class="senior-year-btn" type="button" data-year="bsc-llb-y2" data-display-boards="B.Sc. LL.B Year 2|B.Sc - LLB Forensic Sem - III" onclick="switchSeniorYear('bsc-llb-y2')">B.Sc LL.B Forensic Y2</button>
+          <button class="senior-year-btn" type="button" data-year="bsc-llb-y3" data-display-board="B.Sc - LLB Forensic Sem - V" onclick="switchSeniorYear('bsc-llb-y3')">B.Sc LL.B Forensic Y3</button>
+          <button class="senior-year-btn" type="button" data-year="llm" data-display-board="LLM" onclick="switchSeniorYear('llm')">LLM</button>
         </div>
       </div>
 
@@ -931,6 +921,35 @@
 
         <div class="seniors-grid" aria-live="polite"></div>
       </div>
+
+      <section class="junior-profile-board" id="junior-profile-board" aria-label="Junior profile board">
+        <div class="junior-profile-head">
+          <div>
+            <span class="board-kicker">JUNIOR PROFILES</span>
+            <h2>Freshers in the batch.</h2>
+            <p>Course, interests, topics, and batch feedback in one clean board.</p>
+          </div>
+          <button type="button" class="feedback-card-btn junior-update-btn" onclick="openJuniorProfiles()">connect with batchmates ↗</button>
+        </div>
+        <section class="junior-access-lock" id="junior-access-lock" aria-label="Junior access verification">
+          <div class="lock-copy">
+            <span class="board-kicker">BATCHMATE ACCESS</span>
+            <h2>Enter your access code.</h2>
+            <p>Junior profiles are visible only to the listed batchmates.</p>
+          </div>
+          <form class="senior-lock-form" id="junior-lock-form">
+            <label>
+              ACCESS CODE
+              <input type="text" id="junior-access-code" autocomplete="off" placeholder="ENTER ACCESS CODE" required>
+            </label>
+            <button type="submit" class="submit-btn">[UNLOCK BATCHMATES]</button>
+            <p class="senior-form-status" id="junior-lock-status" aria-live="polite"></p>
+          </form>
+        </section>
+        <div class="junior-private-area locked" id="junior-private-area">
+          <div class="junior-profile-grid" id="junior-profile-grid" aria-live="polite"></div>
+        </div>
+      </section>
     </div>
 
     <!-- ═══ TAB 5: GALLERY — CAMPUS BOARD ═══ -->
@@ -1000,14 +1019,14 @@
 
       <section class="dev-team-section" aria-labelledby="dev-team-title">
         <p class="dev-kicker">the team</p>
-        <h1 class="stage-title dev-title" id="dev-team-title">built by seniors of btech second year, <span>for students</span></h1>
+        <h1 class="stage-title dev-title" id="dev-team-title">built by students, <span>for students</span></h1>
         <p class="stage-subtitle">upsifs 2026 is maintained by students who wanted one clean place for resources, seniors, gallery, and community.</p>
 
         <div class="dev-team-layout">
           <article class="dev-profile-card">
             <p class="dev-role">lead developer</p>
             <h2>kartikey</h2>
-            <p>built the upsifs 2026 portal experience, gallery, senior board, resource hub, and visual system for the batch.</p>
+            <p>put this portal together so freshers can find seniors, resources, photos, and useful campus links without asking the same questions everywhere.</p>
             <div class="dev-links">
               <a href="https://github.com/kartikeyporwal1106-spec" target="_blank" rel="noopener noreferrer" aria-label="Kartikey GitHub"><svg><use href="#icon-github"></use></svg></a>
               <a href="https://www.linkedin.com/in/kartikeynfsu/" target="_blank" rel="noopener noreferrer" aria-label="Kartikey LinkedIn"><svg><use href="#icon-linkedin"></use></svg></a>
@@ -1028,7 +1047,7 @@
           <article class="dev-profile-card">
             <p class="dev-role">lead developer</p>
             <h2>anubhav</h2>
-            <p>helped shape the student-first direction, community flow, and the idea of keeping everything simple for freshers.</p>
+            <p>kept the experience focused on what students actually need: clear info, easy community access, and a smoother start for every fresher.</p>
             <div class="dev-links">
               <a href="https://github.com/anubhavkr8000-source" target="_blank" rel="noopener noreferrer" aria-label="Anubhav GitHub"><svg><use href="#icon-github"></use></svg></a>
               <a href="https://www.instagram.com/anubhavkr.exp/" target="_blank" rel="noopener noreferrer" aria-label="Anubhav Instagram"><svg><use href="#icon-instagram"></use></svg></a>
