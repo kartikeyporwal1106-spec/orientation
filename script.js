@@ -138,7 +138,7 @@ const studentNames = [
   "STUDENT 130: SHIVANI TANDON (CYBER CRIMINOLOGY)"
 ];
 
-let activeSeniorYear = '2';
+let activeSeniorYear = 'btech-mtech-y1';
 let activeSeniorQuickFilter = '';
 const SENIOR_ACCESS_KEY = 'upsifs_senior_access_code';
 const JUNIOR_ACCESS_KEY = 'upsifs_junior_access_code';
@@ -233,9 +233,191 @@ const SITE_FONT_KEY = 'upsifs_site_font';
 const siteFontOptions = new Set(['default', 'outfit', 'inter', 'kalam', 'caveat', 'pixel']);
 
 // ═══════════════ EVENTS WIDGET ═══════════════
+// ─── MANUAL EVENTS (add yours here) ────────────────────────────────────────
+// Format: { date: 'DD MMM YYYY', dateEnd?: 'DD MMM YYYY', name: '…', tag: '…', hot?: true, soon?: true }
+// Use soon: true (no date needed) for events with no confirmed date yet.
+const manualEvents = [
+  { date: '14 Aug 2026', name: '🔭 Capture The Flag', tag: 'CTF', hot: true },
+  { date: '18 Aug 2026', dateEnd: '19 Aug 2026', name: '🎓 National Conference', tag: 'CONF' },
+  { date: '19 Aug 2026', name: '🎉 Foundation Day', tag: 'SPECIAL' },
+  { soon: true, name: '⚡ SIH 2026 Forms', tag: 'SOON' }
+];
+
+// ─── CALENDAR AUTO-EVENTS: only fixed/end-sem events derive from academicCalendarData ──
+// Each entry: { dateStr: '06.08.2026', dateEndStr?: '08.08.2026', name: '…', tag: '…' }
+// Patterns we pull automatically (no internal exam dates like TA, MSE, Block Exam, Attendance Review)
+const CALENDAR_AUTO_EVENT_PATTERNS = [
+  { match: /orientation/i,               emoji: '🏫', tag: 'ORIENTATION' },
+  { match: /semester commencement/i,     emoji: '🎒', tag: 'SEMESTER'    },
+  { match: /diwali/i,                    emoji: '🪔', tag: 'BREAK'       },
+  { match: /semester end theory/i,       emoji: '📝', tag: 'THEORY EXAM' },
+  { match: /semester end practical/i,    emoji: '🔬', tag: 'PRAC EXAM'   },
+  { match: /semester end examination/i,  emoji: '📝', tag: 'END SEM'     },
+  { match: /semester break/i,            emoji: '😴', tag: 'BREAK'       },
+  { match: /summer.?internship break/i,  emoji: '☀️', tag: 'BREAK'       },
+  { match: /commencement of next/i,      emoji: '🎒', tag: 'NEXT SEM'    },
+  { match: /sports week/i,               emoji: '🏅', tag: 'SPORTS'      },
+  { match: /annual day/i,               emoji: '🎉', tag: 'ANNUAL DAY'   }
+];
+
+function parseDDMMYYYY(str) {
+  // '06.08.2026' → Date object (midnight IST treated as local)
+  if (!str || typeof str !== 'string') return null;
+  const parts = str.trim().match(/^(\d{1,2})\.(\d{2})\.(\d{4})$/);
+  if (!parts) return null;
+  return new Date(Number(parts[3]), Number(parts[2]) - 1, Number(parts[1]));
+}
+
+function formatEventDate(d, dEnd) {
+  if (!d) return '';
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const day = d.getDate();
+  const mon = months[d.getMonth()];
+  const yr  = d.getFullYear();
+  if (dEnd && (dEnd.getTime() !== d.getTime())) {
+    const day2 = dEnd.getDate();
+    const mon2 = months[dEnd.getMonth()];
+    const yr2  = dEnd.getFullYear();
+    if (mon === mon2 && yr === yr2) return `${day}–${day2} ${mon} ${yr}`;
+    if (yr === yr2) return `${day} ${mon} – ${day2} ${mon2} ${yr}`;
+    return `${day} ${mon} ${yr} – ${day2} ${mon2} ${yr2}`;
+  }
+  return `${day} ${mon} ${yr}`;
+}
+
+function parseManualEventDate(str) {
+  // '14 Aug 2026' → Date (same as new Date('14 Aug 2026'))
+  if (!str) return null;
+  const d = new Date(str);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function eventFallsInMonth(event, monthAnchor) {
+  if (!event?._date) return false;
+  const monthStart = new Date(monthAnchor.getFullYear(), monthAnchor.getMonth(), 1);
+  const monthEnd = new Date(monthAnchor.getFullYear(), monthAnchor.getMonth() + 1, 0);
+  monthStart.setHours(0, 0, 0, 0);
+  monthEnd.setHours(23, 59, 59, 999);
+
+  const eventStart = new Date(event._date);
+  const eventEnd = event._dateEnd ? new Date(event._dateEnd) : eventStart;
+  eventStart.setHours(0, 0, 0, 0);
+  eventEnd.setHours(23, 59, 59, 999);
+
+  return eventStart <= monthEnd && eventEnd >= monthStart;
+}
+
+function buildCalendarAutoEvents() {
+  const events = [];
+  // Pull from all 3 semesters
+  ['odd-1', 'odd-multi', 'even'].forEach(semKey => {
+    const cal = academicCalendarData[semKey];
+    if (!cal) return;
+    cal.rows.forEach(row => {
+      const matched = CALENDAR_AUTO_EVENT_PATTERNS.find(p => p.match.test(row.particulars));
+      if (!matched) return;
+
+      // Parse the timeline — look for DD.MM.YYYY patterns
+      const timeline = row.timeline || '';
+      const dateMatches = [...timeline.matchAll(/(\d{1,2}\.\d{2}\.\d{4})/g)];
+      if (dateMatches.length === 0) return; // skip 'Coming soon', '30 days after…'
+
+      const startDate = parseDDMMYYYY(dateMatches[0][1]);
+      const endDate   = dateMatches.length > 1 ? parseDDMMYYYY(dateMatches[dateMatches.length - 1][1]) : null;
+      if (!startDate) return;
+
+      // Deduplicate: skip if same name+date combo already added (e.g. duplicate commencement date)
+      const key = `${matched.tag}-${startDate.getTime()}`;
+      if (events.find(e => e._key === key)) return;
+
+      events.push({
+        _key:   key,
+        _date:  startDate,
+        _dateEnd: endDate,
+        dateLabel: formatEventDate(startDate, endDate),
+        name: `${matched.emoji} ${row.particulars.replace(/\*/g, '').trim()}`,
+        tag:  matched.tag,
+        fromCalendar: true
+      });
+    });
+  });
+  return events;
+}
+
+function buildAllEvents() {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+
+  // Process manual events
+  const manual = manualEvents.map(ev => {
+    if (ev.soon) {
+      return { _date: null, dateLabel: 'Coming Soon', name: ev.name, tag: ev.tag, hot: false, soon: true };
+    }
+    const d    = parseManualEventDate(ev.date);
+    const dEnd = ev.dateEnd ? parseManualEventDate(ev.dateEnd) : null;
+    return {
+      _date:     d,
+      _dateEnd:  dEnd,
+      dateLabel: ev.dateLabel || formatEventDate(d, dEnd),
+      name:      ev.name,
+      tag:       ev.tag,
+      hot:       !!ev.hot,
+      soon:      false,
+      manual:    true
+    };
+  });
+
+  const currentMonthManual = manual.filter(e => !e.soon && e._date && e._date >= now && eventFallsInMonth(e, now));
+  const calendarEvents = buildCalendarAutoEvents()
+    .filter(e => e._date && e._date >= now && eventFallsInMonth(e, now));
+
+  // Remove calendar events that clash with a manual event on the same date
+  const manualDates = new Set(currentMonthManual.map(e => e._date.getTime()));
+  const calendarFiltered = calendarEvents.filter(e => !manualDates.has(e._date.getTime()));
+
+  // Merge manual + calendar events for the current month only.
+  const datedManual = currentMonthManual.sort((a, b) => a._date - b._date);
+  const datedCal    = calendarFiltered.sort((a, b) => a._date - b._date);
+
+  // Interleave: merge manual + calendar by date
+  const merged = [];
+  let mi = 0, ci = 0;
+  while (mi < datedManual.length || ci < datedCal.length) {
+    const m = datedManual[mi];
+    const c = datedCal[ci];
+    if (!c || (m && m._date <= c._date)) { merged.push(m); mi++; }
+    else                                  { merged.push(c); ci++; }
+  }
+
+  return merged.slice(0, 10); // cap at 10
+}
+
+function renderEventsWidget() {
+  const list = document.getElementById('events-list-dynamic');
+  if (!list) return;
+
+  const events = buildAllEvents();
+  if (!events.length) {
+    list.innerHTML = `<li class="events-item events-coming-soon"><span class="event-name" style="grid-column:1/-1">No events this month.</span></li>`;
+    return;
+  }
+
+  list.innerHTML = events.map(ev => {
+    const hotClass  = ev.hot  ? ' event-hot'          : '';
+    const soonClass = ev.soon ? ' events-coming-soon'  : '';
+    const tagClass  = ev.soon ? ' tag-soon'            : '';
+    const calTag    = ev.fromCalendar ? ' tag-cal'     : '';
+    return `<li class="events-item${hotClass}${soonClass}">
+      <span class="event-date">${escapeHtml(ev.dateLabel)}</span>
+      <span class="event-name">${escapeHtml(ev.name)}</span>
+      <span class="event-tag${tagClass}${calTag}">${escapeHtml(ev.tag)}</span>
+    </li>`;
+  }).join('');
+}
+
 function toggleEventsWidget() {
   const panel = document.getElementById('events-widget-panel');
-  const btn = document.getElementById('events-widget-toggle');
+  const btn   = document.getElementById('events-widget-toggle');
   const isHidden = panel.hidden;
   panel.hidden = !isHidden;
   btn.setAttribute('aria-expanded', String(isHidden));
@@ -535,7 +717,40 @@ function getMasterSearchEntries() {
     }
   }));
 
-  return [...getStaticSearchEntries(), ...resourceEntries, ...seniorEntries];
+  const calendarEntries = [
+    {
+      title: 'Academic Calendar 2026–2027 (Odd Sem I)',
+      type: 'Calendar',
+      tab: 'resources',
+      text: 'academic calendar odd semester 1 sem 1 orientation teaching phase mid semester end theory exam datesheet schedule 2026 2027',
+      action: () => {
+        switchTab('resources');
+        openAcademicCalendarModal('odd-1');
+      }
+    },
+    {
+      title: 'Academic Calendar 2026–2027 (Odd Sem III/V/VII/IX)',
+      type: 'Calendar',
+      tab: 'resources',
+      text: 'academic calendar odd semester 3 5 7 9 remedial examination mid semester end theory practical exam 2026 2027',
+      action: () => {
+        switchTab('resources');
+        openAcademicCalendarModal('odd-multi');
+      }
+    },
+    {
+      title: 'Academic Calendar 2026–2027 (Even Semesters)',
+      type: 'Calendar',
+      tab: 'resources',
+      text: 'academic calendar even semester 2 4 6 8 10 summer break internship break dissertation registration datesheet 2026 2027',
+      action: () => {
+        switchTab('resources');
+        openAcademicCalendarModal('even');
+      }
+    }
+  ];
+
+  return [...getStaticSearchEntries(), ...calendarEntries, ...resourceEntries, ...seniorEntries];
 }
 
 function scoreMasterSearchEntry(entry, query) {
@@ -896,7 +1111,7 @@ function initialsFromName(name) {
 function createSubmittedSeniorCard(profile) {
   const article = document.createElement('article');
   article.className = 'senior-card submitted-card';
-  article.dataset.seniorYear = profile.year || profile.board || '2';
+  article.dataset.seniorYear = getSeniorBoardCode(profile.year || profile.board || profile.course || '', profile.name);
   if (profile.source) article.dataset.source = profile.source;
   if (profile.enrollment) article.dataset.enrollment = profile.enrollment;
 
@@ -1130,20 +1345,88 @@ function coalesceProfileValue(profile, ...keys) {
   return '';
 }
 
+function getSeniorBoardCode(courseStr, nameStr) {
+  const course = (courseStr || '').trim();
+  const normalizedCourse = normalizeSearchText(course)
+    .replace(/&/g, ' and ')
+    .replace(/[._-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const normalizedName = normalizeSearchText(nameStr || '');
+  const forcedLawNames = ['shashwat pande', 'shashwat pandey', 'pranav sagar', 'pranavsagar'];
+  const legacyBoardMap = {
+    junior: 'btech-mtech-y1',
+    '1': 'btech-mtech-y1',
+    '2': 'btech-mtech-y2',
+    '3': 'btech-mtech-y3',
+    y1: 'btech-mtech-y1',
+    y2: 'btech-mtech-y2',
+    y3: 'btech-mtech-y3',
+    law: 'bsc-llb-y1',
+    law2: 'bsc-llb-y2',
+    msc: 'bsc-msc-forensic-y1',
+    msc2: 'bsc-msc-forensic-y2',
+    llm: 'llm'
+  };
+
+  if (/^(btech-mtech|bsc-msc-forensic|msc-forensic|bsc-llb)-y[1-4]$/.test(normalizedCourse) || normalizedCourse === 'llm') {
+    return normalizedCourse;
+  }
+
+  if (legacyBoardMap[normalizedCourse]) {
+    return legacyBoardMap[normalizedCourse];
+  }
+
+  if (forcedLawNames.some(forcedName => normalizedName.includes(forcedName))) {
+    return 'bsc-llb-y2';
+  }
+
+  if (/\bllm\b/.test(normalizedCourse)) {
+    return 'llm';
+  }
+
+  const semMatch = normalizedCourse.match(/\bsem(?:ester)?\s*(?:i{1,3}|iv|v|vi{0,3}|ix|x|\d+)\b/);
+  const semText = semMatch ? semMatch[0] : normalizedCourse;
+  const semRomanMap = { i: 1, ii: 2, iii: 3, iv: 4, v: 5, vi: 6, vii: 7, viii: 8, ix: 9, x: 10 };
+  const semNumberMatch = semText.match(/\b(\d+)\b/);
+  const semRomanMatch = semText.match(/\b(i{1,3}|iv|v|vi{0,3}|ix|x)\b/);
+  const semester = semNumberMatch
+    ? Number(semNumberMatch[1])
+    : semRomanMatch ? semRomanMap[semRomanMatch[1]] : null;
+  const yearFromSemester = semester ? Math.ceil(semester / 2) : null;
+  const explicitYearMatch = normalizedCourse.match(/\by(?:ear)?\s*(\d+)\b/);
+  const year = explicitYearMatch ? Number(explicitYearMatch[1]) : yearFromSemester;
+
+  if (/law|llb|ll b/.test(normalizedCourse)) {
+    return `bsc-llb-y${Math.min(Math.max(year || 1, 1), 3)}`;
+  }
+
+  if (/b\s*sc.*m\s*sc|bsc.*msc|integrated.*forensic|forensic science integrated/.test(normalizedCourse)) {
+    return `bsc-msc-forensic-y${Math.min(Math.max(year || 1, 1), 4)}`;
+  }
+
+  if (/\bm\s*sc\b|msc|forensic/.test(normalizedCourse)) {
+    return `msc-forensic-y${Math.min(Math.max(year || 1, 1), 2)}`;
+  }
+
+  if (/b\s*tech|btech|m\s*tech|mtech/.test(normalizedCourse)) {
+    return `btech-mtech-y${Math.min(Math.max(year || 1, 1), 3)}`;
+  }
+
+  return 'btech-mtech-y1';
+}
+
 function normalizeRemoteSeniorProfile(row) {
   const name = coalesceProfileValue(row, 'displayName', 'name', 'Your Name');
   const course = coalesceProfileValue(row, 'displayBoard', 'board', 'year', 'Your Course And Semester', 'Your Course');
-  const forcedLawNames = ['shashwat pande', 'shashwat pandey', 'pranav sagar', 'pranavsagar'];
-  const normalizedName = normalizeSearchText(name);
-  const board = forcedLawNames.some(forcedName => normalizedName.includes(forcedName))
-    ? 'law2'
-    : /law|llb/i.test(course) ? 'law2' : /msc/i.test(course) ? 'msc2' : /^(3|b\.?tech\s*y?3|year\s*3)$/i.test(course) ? '3' : '2';
+  const board = getSeniorBoardCode(course, name);
   const photo = coalesceProfileValue(row, 'displayPhoto', 'photo', 'Profile Photo', 'Profile Photo (if you want)');
 
   return {
     source: 'remote',
     name,
-    year: board === 'law2' ? 'law2' : board === '3' ? '3' : board === 'msc2' ? 'msc2' : '2',
+    year: board,
+    board: board,
     enrollment: coalesceProfileValue(row, 'displayEnrollment', 'enrollment', 'Enrollment Number'),
     place: coalesceProfileValue(row, 'displayPlace', 'place', 'Place (Kha se Hai Aap)'),
     tagline: coalesceProfileValue(row, 'displayTagline', 'tagline', 'TagLine (Experience or Something good about u)', 'TagLine (Experience or Something good about u) like IIC Member/ Interned at etc kuch bhi cool aapne kiya ho'),
@@ -1248,6 +1531,8 @@ async function submitSeniorProfile(event) {
   const form = event.currentTarget;
   const status = document.getElementById('senior-form-status');
   const profile = Object.fromEntries(new FormData(form).entries());
+  profile.year = getSeniorBoardCode(profile.year || profile.board || profile.course || '', profile.name);
+  profile.board = profile.year;
   profile.updatedAt = new Date().toISOString();
 
   if (SENIOR_FORM_ENDPOINT) {
@@ -2281,6 +2566,7 @@ document.addEventListener('keydown', (e) => {
     closeResourcePreview();
     closeUploadModal();
     closeSidebar();
+    closeAcademicCalendarModal();
   }
 });
 
@@ -2548,12 +2834,223 @@ window.addEventListener('DOMContentLoaded', () => {
   });
   renderMessMenu();
   document.getElementById('mess-menu-toggle')?.addEventListener('click', toggleMessMenu);
+  document.getElementById('academic-calendar-modal')?.addEventListener('click', (event) => {
+    if (event.target.id === 'academic-calendar-modal') closeAcademicCalendarModal();
+  });
+  document.getElementById('calendar-modal-search')?.addEventListener('input', renderAcademicCalendarModalContent);
   renderCourseTable();
   document.getElementById('course-semester-filter')?.addEventListener('change', renderCourseTable);
   document.getElementById('course-search')?.addEventListener('input', renderCourseTable);
   loadResourceFeed();
   updateSeniorFilters();
 });
+
+// ═══════════════ ACADEMIC CALENDAR DATA & LOGIC ═══════════════
+const academicCalendarData = {
+  'odd-1': {
+    title: 'A. Odd Semester – Semester – I (Academic Year 2026 – 2027)',
+    subtitle: 'All Courses & All Campuses of NFSU',
+    rows: [
+      { id: 1, particulars: 'Orientation and Induction Program', timeline: '06.08.2026 to 08.08.2026' },
+      { id: 2, particulars: 'Semester Commencement', timeline: '10.08.2026' },
+      { id: 3, particulars: 'Teaching Phase – I', timeline: '10.08.2026 to 17.09.2026' },
+      { id: 4, particulars: 'Teaching Assessment (TA) – I / Review Report (RR) / Continuous Assessment (CA) – I', timeline: '14.09.2026 to 17.09.2026' },
+      { id: 5, particulars: 'Academic & Attendance Review* – I', timeline: '18.09.2026' },
+      { id: 6, particulars: 'Teaching Phase – II', timeline: '18.09.2026 to 09.10.2026' },
+      { id: 7, particulars: 'Result of Teaching Assessment (TA) – I / Review Report (RR) / Continuous Assessment (CA) – I', timeline: '30.09.2026' },
+      { id: 8, particulars: 'Academic & Attendance Review* – II', timeline: '09.10.2026' },
+      { id: 9, particulars: 'Mid Semester Exam (MSE) / Laboratory Practice Work (LPW) Exam/Review Report (RR)', timeline: '12.10.2026 to 19.10.2026' },
+      { id: 10, particulars: 'Teaching Phase – III', timeline: '21.10.2026 to 18.12.2026' },
+      { id: 11, particulars: 'Result of Mid Semester Exam (MSE) / Review Report (RR)', timeline: '02.11.2026' },
+      { id: 12, particulars: 'Block Exam for Mid Semester Exam', timeline: '16.11.2026 to 20.11.2026' },
+      { id: 13, particulars: 'Result of Block Semester Exam', timeline: '24.11.2026' },
+      { id: 14, particulars: 'Teaching Assessment (TA) – II/ Review Report (RR) / Continuous Assessment (CA) – II *', timeline: '19.11.2026 to 25.11.2026' },
+      { id: 15, particulars: 'Result of Teaching Assessment (TA) – II/ Review Report (RR) / Continuous Assessment (CA) –II', timeline: '27.11.2026' },
+      { id: 16, particulars: 'Final Academic & Attendance Review*', timeline: '17.12.2026' },
+      { id: 17, particulars: 'Submission of Final Internal Marks & Attendance', timeline: '17.12.2026 to 21.12.2026' },
+      { id: 18, particulars: 'Semester End Examination Form Filling', timeline: '22.12.2026 to 24.12.2026' },
+      { id: 19, particulars: 'Semester End Practical Examination', timeline: '23.12.2026 to 30.12.2026' },
+      { id: 20, particulars: 'Semester End Theory Examination', timeline: '04.01.2027 to 12.01.2027' },
+      { id: 21, particulars: 'Diwali Break', timeline: '09.11.2026 to 13.11.2026' },
+      { id: 22, particulars: 'Semester Break', timeline: '13.01.2027 to 17.01.2027' },
+      { id: 23, particulars: 'Commencement of Next Semester', timeline: '18.01.2027' }
+    ],
+    footnote: '*Academic Review shall be inclusive of the syllabus coverage of all subject across the campuses as per the lesson plan; review of performance in Continuous Assessment; overall performance of students; identification of weak students and the areas where students require counselling. Furthermore, it shall also include review of the co-curricular activities and status of the expert talks/ workshops from industry personnel for each course.'
+  },
+  'odd-multi': {
+    title: 'B. Odd Semester – Semester – III/V/VII/IX & Forensic Dentistry Semester – II/IV',
+    subtitle: 'All Courses & All Campuses of NFSU',
+    rows: [
+      { id: 1, particulars: 'Semester Commencement', timeline: '23.07.2026' },
+      { id: 2, particulars: 'Teaching Phase – I', timeline: '23.07.2026 to 17.09.2026' },
+      { id: 3, particulars: 'Remedial Examination (Form Filling/Examination)', timeline: '30 days after the announcement of the results of SEE for all campuses & affiliated Institutes' },
+      { id: 4, particulars: 'Teaching Assessment (TA) – I / Review Report (RR) / Continuous Assessment (CA) – I', timeline: '14.09.2026 to 17.09.2026' },
+      { id: 5, particulars: 'Academic & Attendance Review* – I', timeline: '18.09.2026' },
+      { id: 6, particulars: 'Teaching Phase – II', timeline: '18.09.2026 to 09.10.2026' },
+      { id: 7, particulars: 'Result of Teaching Assessment (TA) – I / Review Report (RR) / Continuous Assessment (CA) – I', timeline: '30.09.2026' },
+      { id: 8, particulars: 'Academic & Attendance Review* – II', timeline: '09.10.2026' },
+      { id: 9, particulars: 'Mid Semester Exam (MSE) / Laboratory Practice Work (LPW) Exam/Review Report (RR)', timeline: '12.10.2026 to 19.10.2026' },
+      { id: 10, particulars: 'Teaching Phase – III', timeline: '21.10.2026 to 18.12.2026' },
+      { id: 11, particulars: 'Result of Mid Semester Exam (MSE) / Review Report (RR)', timeline: '02.11.2026' },
+      { id: 12, particulars: 'Block Exam for Mid Semester Exam', timeline: '16.11.2026 to 20.11.2026' },
+      { id: 13, particulars: 'Result of Block Semester Exam', timeline: '24.11.2026' },
+      { id: 14, particulars: 'Teaching Assessment (TA) – II/ Review Report (RR) / Continuous Assessment (CA) – II *', timeline: '19.11.2026 to 25.11.2026' },
+      { id: 15, particulars: 'Result of Teaching Assessment (TA) – II/ Review Report (RR) / Continuous Assessment (CA) –II', timeline: '27.11.2026' },
+      { id: 16, particulars: 'Final Academic & Attendance Review*', timeline: '08.12.2026' },
+      { id: 17, particulars: 'Submission of Final Internal Marks & Attendance', timeline: '08.12.2026 to 10.12.2026' },
+      { id: 18, particulars: 'Semester End Examination Form Filling', timeline: '11.12.2026 to 15.12.2026' },
+      { id: 19, particulars: 'Semester End Theory Examination', timeline: '23.12.2026 to 01.01.2027' },
+      { id: 20, particulars: 'Semester End Practical Examination', timeline: '04.01.2027 to 08.01.2027' },
+      { id: 21, particulars: 'Diwali Break', timeline: '09.11.2026 to 13.11.2026' },
+      { id: 22, particulars: 'Semester Break', timeline: '11.01.2027 to 17.01.2027' },
+      { id: 23, particulars: 'Commencement of Next Semester', timeline: '18.01.2027' }
+    ],
+    footnote: '*Academic Review shall be inclusive of the syllabus coverage of all subject across the campuses as per the lesson plan; review of performance in Continuous Assessment; overall performance of students; identification of weak students and the areas where students require counselling. Furthermore, it shall also include review of the co-curricular activities and status of the expert talks/ workshops from industry personnel for each course.'
+  },
+  'even': {
+    title: 'C. Even Semester – Semester – II/IV/VI/VIII/X & Forensic Dentistry Semester – I/III',
+    subtitle: 'All Courses & All Campuses of NFSU',
+    rows: [
+      { id: 1, particulars: 'Semester Commencement', timeline: '18.01.2027' },
+      { id: 2, particulars: 'Registration of Dissertation/Electives', timeline: '18.01.2027' },
+      { id: 3, particulars: 'Teaching Phase – I', timeline: '18.01.2027 to 11.02.2027' },
+      { id: 4, particulars: 'Remedial Examination (Form Filling/Examination)', timeline: '30 days after the announcement of the results of SEE for all campuses & affiliated Institutes' },
+      { id: 5, particulars: 'Teaching Assessment (TA) – I / Review Report (RR) / Continuous Assessment (CA) – I', timeline: '08.02.2027 to 11.02.2027' },
+      { id: 6, particulars: 'Academic & Attendance Review* – I', timeline: '12.02.2027' },
+      { id: 7, particulars: 'Teaching Phase – II', timeline: '12.02.2027 to 19.03.2027' },
+      { id: 8, particulars: 'Result of Teaching Assessment (TA) – I / Review Report (RR) / Continuous Assessment (CA) – I', timeline: '15.02.2027' },
+      { id: 9, particulars: 'Academic & Attendance Review* – II', timeline: '11.03.2027' },
+      { id: 10, particulars: 'Mid Semester Exam (MSE) / Laboratory Practice Work (LPW) Exam/Review Report (RR)', timeline: '11.03.2027 to 19.03.2027' },
+      { id: 11, particulars: 'Teaching Phase – III', timeline: '23.03.2027 to 28.04.2027' },
+      { id: 12, particulars: 'Result of Mid Semester Exam (MSE) / Review Report (RR)', timeline: '30.03.2027' },
+      { id: 13, particulars: 'Block Exam for Mid Semester Exam', timeline: '05.04.2027 to 09.04.2027' },
+      { id: 14, particulars: 'Result of Block Semester Exam', timeline: '14.04.2027' },
+      { id: 15, particulars: 'Teaching Assessment (TA) – II/ Review Report (RR) / Continuous Assessment (CA) – II *', timeline: '20.04.2027 to 23.04.2027' },
+      { id: 16, particulars: 'Result of Teaching Assessment (TA) – II/ Review Report (RR) / Continuous Assessment (CA) –II', timeline: '26.04.2027' },
+      { id: 17, particulars: 'Final Academic & Attendance Review*', timeline: '03.05.2027' },
+      { id: 18, particulars: 'Submission of Final Internal Marks & Attendance', timeline: '03.05.2027 to 05.05.2027' },
+      { id: 19, particulars: 'Semester End Examination Form Filling', timeline: '07.05.2027 to 10.05.2027' },
+      { id: 20, particulars: 'Semester End Theory Examination', timeline: '18.05.2027 to 28.07.2027' },
+      { id: 21, particulars: 'Semester End Practical Examination', timeline: '10.05.2027 to 14.05.2027' },
+      { id: 22, particulars: 'Summer/Internship Break', timeline: '31.05.2027 to 31.07.2027' },
+      { id: 23, particulars: 'Commencement of Next Semester', timeline: '02.08.2027' }
+    ],
+    footnote: '*Academic Review shall be inclusive of the syllabus coverage of all subject across the campuses as per the lesson plan; review of performance in Continuous Assessment; overall performance of students; identification of weak students and the areas where students require counselling. Furthermore, it shall also include review of the co-curricular activities and status of the expert talks/ workshops from industry personnel for each course.\n**Sports Week & Annual Day to be observed from 21.01.2027 (Thursday) to 26.01.2027 (Tuesday)'
+  }
+};
+
+let currentModalCalendarSem = 'odd-1';
+let currentInlineCalendarSem = 'odd-1';
+
+function openAcademicCalendarModal(semesterType = 'odd-1') {
+  currentModalCalendarSem = semesterType;
+  const modal = document.getElementById('academic-calendar-modal');
+  if (!modal) return;
+  modal.classList.add('active');
+  const searchInput = document.getElementById('calendar-modal-search');
+  if (searchInput) searchInput.value = '';
+  renderAcademicCalendarModalContent();
+}
+
+function closeAcademicCalendarModal() {
+  const modal = document.getElementById('academic-calendar-modal');
+  if (modal) modal.classList.remove('active');
+}
+
+function setAcademicCalendarTab(semesterType) {
+  currentModalCalendarSem = semesterType;
+  renderAcademicCalendarModalContent();
+}
+
+function renderAcademicCalendarModalContent() {
+  const data = academicCalendarData[currentModalCalendarSem] || academicCalendarData['odd-1'];
+
+  ['odd-1', 'odd-multi', 'even'].forEach(type => {
+    const pill = document.getElementById(`cal-pill-${type}`);
+    if (pill) pill.classList.toggle('active', type === currentModalCalendarSem);
+  });
+
+  const subhead = document.getElementById('calendar-modal-subhead');
+  if (subhead) {
+    subhead.innerHTML = `<strong>${escapeHtml(data.title)}</strong><br><small>${escapeHtml(data.subtitle)}</small>`;
+  }
+
+  const searchVal = (document.getElementById('calendar-modal-search')?.value || '').trim().toLowerCase();
+  const tbody = document.getElementById('calendar-modal-tbody');
+
+  if (tbody) {
+    const filteredRows = data.rows.filter(row => {
+      if (!searchVal) return true;
+      return row.particulars.toLowerCase().includes(searchVal) || row.timeline.toLowerCase().includes(searchVal);
+    });
+
+    if (filteredRows.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:1.5rem; opacity:0.8;">No matching events found.</td></tr>`;
+    } else {
+      tbody.innerHTML = filteredRows.map(row => `
+        <tr>
+          <td><strong>${row.id}</strong></td>
+          <td>${escapeHtml(row.particulars)}</td>
+          <td><span class="calendar-timeline-tag">${escapeHtml(row.timeline)}</span></td>
+        </tr>
+      `).join('');
+    }
+  }
+
+  const footnote = document.getElementById('calendar-modal-footnote');
+  if (footnote) {
+    footnote.innerText = data.footnote;
+  }
+}
+
+function toggleInlineAcademicCalendar() {
+  const wrap = document.getElementById('calendar-inline-wrap');
+  const toggle = document.getElementById('calendar-inline-toggle');
+  if (!wrap || !toggle) return;
+  const shouldOpen = wrap.hidden;
+  wrap.hidden = !shouldOpen;
+  toggle.setAttribute('aria-expanded', String(shouldOpen));
+  toggle.textContent = shouldOpen ? 'Hide Academic Calendar' : 'Show Academic Calendar';
+  if (shouldOpen) {
+    renderInlineAcademicCalendar();
+  }
+}
+
+function switchInlineCalendarTab(semesterType) {
+  currentInlineCalendarSem = semesterType;
+  document.querySelectorAll('.calendar-inline-tab').forEach(tab => {
+    tab.classList.toggle('active', tab.dataset.sem === semesterType);
+  });
+  renderInlineAcademicCalendar();
+}
+
+function renderInlineAcademicCalendar() {
+  const data = academicCalendarData[currentInlineCalendarSem] || academicCalendarData['odd-1'];
+  const tbody = document.getElementById('calendar-inline-tbody');
+  if (tbody) {
+    tbody.innerHTML = data.rows.map(row => `
+      <tr>
+        <td><strong>${row.id}</strong></td>
+        <td>${escapeHtml(row.particulars)}</td>
+        <td><span class="calendar-timeline-tag">${escapeHtml(row.timeline)}</span></td>
+      </tr>
+    `).join('');
+  }
+  const footnote = document.getElementById('calendar-inline-footnote');
+  if (footnote) {
+    footnote.innerText = data.footnote;
+  }
+}
+
+window.openAcademicCalendarModal = openAcademicCalendarModal;
+window.closeAcademicCalendarModal = closeAcademicCalendarModal;
+window.setAcademicCalendarTab = setAcademicCalendarTab;
+window.toggleInlineAcademicCalendar = toggleInlineAcademicCalendar;
+window.switchInlineCalendarTab = switchInlineCalendarTab;
+window.toggleEventsWidget = toggleEventsWidget;
+
+// Render events widget after all data (academicCalendarData) is ready
+document.addEventListener('DOMContentLoaded', renderEventsWidget);
 
 console.log(`
  🍄 FULL-VIEWPORT SCALED 90s NES SUPER MARIO GAME ENGINE WITH DRIFTING CLOUDS ACTIVE!

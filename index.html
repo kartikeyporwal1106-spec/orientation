@@ -75,7 +75,7 @@
           <li><a href="#resources" onclick="switchTab('resources'); closeSidebar();">▶ academic resources</a></li>
           <li><a href="#gallery" onclick="switchTab('gallery'); switchGalleryView('college'); closeSidebar();">▶ 🏛️ CAMPUS GALLERY</a></li>
           <li><a href="#seniors" onclick="switchTab('seniors'); closeSidebar();">▶ 🧑‍💻 connect with seniors</a></li>
-          <li><a href="#devs" onclick="switchTab('devs'); closeSidebar();">▶ BUILT BY STUDENTS</a></li>
+          <li><a href="#devs" onclick="switchTab('devs'); closeSidebar();">▶ BUILT BY SENIORS OF BTECH SECOND YEAR</a></li>
         </ul>
       </div>
 
@@ -167,28 +167,7 @@
         <span>UPCOMING EVENTS</span>
         <button class="events-close-btn" onclick="toggleEventsWidget()" aria-label="Close events">×</button>
       </div>
-      <ul class="events-list">
-        <li class="events-item event-hot">
-          <span class="event-date">14 Aug 2026</span>
-          <span class="event-name">🔭 Capture The Flag</span>
-          <span class="event-tag">CTF</span>
-        </li>
-        <li class="events-item">
-          <span class="event-date">18–19 Aug 2026</span>
-          <span class="event-name">🎓 National Conference</span>
-          <span class="event-tag">CONFERENCE</span>
-        </li>
-        <li class="events-item">
-          <span class="event-date">19 Aug 2026</span>
-          <span class="event-name">🎉 Foundation Day</span>
-          <span class="event-tag">SPECIAL</span>
-        </li>
-        <li class="events-item events-coming-soon">
-          <span class="event-date">Coming Soon</span>
-          <span class="event-name">⚡ SIH 2026 Forms</span>
-          <span class="event-tag tag-soon">SOON</span>
-        </li>
-      </ul>
+      <ul class="events-list" id="events-list-dynamic"></ul>
     </div>
   </div>
 
@@ -237,7 +216,7 @@
       <div class="lineup-grid">
         <div class="lineup-tier tier-2">
           <p class="welcome-sub">
-            Built by seniors with love <span aria-label="love">❤️</span>
+            built by seniors of btech second year with love <span aria-label="love">❤️</span>
           </p>
         </div>
 
@@ -723,6 +702,31 @@
 
       <div class="pixel-starburst">✳ ✳ ✳</div>
 
+      <!-- ══ Academic Calendar Block (Odd & Even Semesters) ══ -->
+      <div class="resource-block academic-calendar-card">
+        <div class="calendar-card-header">
+          <div class="calendar-card-title-group">
+            <span class="board-kicker">SCHEDULE & TIMELINES</span>
+            <h2 class="res-block-title">Academic Calendar 2026–2027</h2>
+            <p class="res-block-sub">NFSU Official Academic Timelines — click a semester below to view its schedule.</p>
+          </div>
+          <div class="calendar-card-actions">
+            <button type="button" class="guide-action-btn cal-sem-btn" id="cal-btn-odd-1"
+              onclick="toggleInlineCalendar('odd-1')">
+              📅 Odd Sem I
+            </button>
+            <button type="button" class="guide-action-btn" onclick="openAcademicCalendarModal('odd-multi')">
+              📅 Odd Sem III / V / VII / IX
+            </button>
+            <button type="button" class="guide-action-btn" onclick="openAcademicCalendarModal('even')">
+              📅 Even Semesters
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pixel-starburst">✳ ✳ ✳</div>
+
       <div class="resource-block resource-browser">
         <div class="resource-toolbar">
           <label class="resource-search-label" for="resource-search">search resources</label>
@@ -791,10 +795,19 @@
             <label>
               COURSE / BOARD *
               <select name="year" required>
-                <option value="junior">B.Tech-M.Tech Sem I</option>
-                <option value="2">B.Tech Year 2</option>
-                <option value="law2">B.Sc. LL.B Year 2</option>
-                <option value="3">B.Tech Year 3</option>
+                <option value="btech-mtech-y1">B.Tech-M.Tech Y1</option>
+                <option value="btech-mtech-y2">B.Tech-M.Tech Y2</option>
+                <option value="btech-mtech-y3">B.Tech-M.Tech Y3</option>
+                <option value="bsc-msc-forensic-y1">B.Sc-M.Sc Forensic Y1</option>
+                <option value="bsc-msc-forensic-y2">B.Sc-M.Sc Forensic Y2</option>
+                <option value="bsc-msc-forensic-y3">B.Sc-M.Sc Forensic Y3</option>
+                <option value="bsc-msc-forensic-y4">B.Sc-M.Sc Forensic Y4</option>
+                <option value="msc-forensic-y1">M.Sc Forensic Y1</option>
+                <option value="msc-forensic-y2">M.Sc Forensic Y2</option>
+                <option value="bsc-llb-y1">B.Sc LL.B Forensic Y1</option>
+                <option value="bsc-llb-y2">B.Sc LL.B Forensic Y2</option>
+                <option value="bsc-llb-y3">B.Sc LL.B Forensic Y3</option>
+                <option value="llm">LLM</option>
               </select>
             </label>
             <label>
@@ -869,10 +882,19 @@
       <div class="senior-filter-bar" aria-label="Senior year filter">
         <span class="senior-program-chip">SENIOR BOARDS</span>
         <div class="senior-year-switch">
-          <button class="senior-year-btn active" type="button" data-year="2" onclick="switchSeniorYear('2')">B.TECH Y2</button>
-          <button class="senior-year-btn" type="button" data-year="law2" onclick="switchSeniorYear('law2')">B.SC LL.B Y2</button>
-          <button class="senior-year-btn" type="button" data-year="3" onclick="switchSeniorYear('3')">B.TECH Y3</button>
-          <button class="senior-year-btn" type="button" data-year="msc2" onclick="switchSeniorYear('msc2')">B.SC M.SC Y2</button>
+          <button class="senior-year-btn active" type="button" data-year="btech-mtech-y1" onclick="switchSeniorYear('btech-mtech-y1')">B.Tech-M.Tech Y1</button>
+          <button class="senior-year-btn" type="button" data-year="btech-mtech-y2" onclick="switchSeniorYear('btech-mtech-y2')">B.Tech-M.Tech Y2</button>
+          <button class="senior-year-btn" type="button" data-year="btech-mtech-y3" onclick="switchSeniorYear('btech-mtech-y3')">B.Tech-M.Tech Y3</button>
+          <button class="senior-year-btn" type="button" data-year="bsc-msc-forensic-y1" onclick="switchSeniorYear('bsc-msc-forensic-y1')">B.Sc-M.Sc Forensic Y1</button>
+          <button class="senior-year-btn" type="button" data-year="bsc-msc-forensic-y2" onclick="switchSeniorYear('bsc-msc-forensic-y2')">B.Sc-M.Sc Forensic Y2</button>
+          <button class="senior-year-btn" type="button" data-year="bsc-msc-forensic-y3" onclick="switchSeniorYear('bsc-msc-forensic-y3')">B.Sc-M.Sc Forensic Y3</button>
+          <button class="senior-year-btn" type="button" data-year="bsc-msc-forensic-y4" onclick="switchSeniorYear('bsc-msc-forensic-y4')">B.Sc-M.Sc Forensic Y4</button>
+          <button class="senior-year-btn" type="button" data-year="msc-forensic-y1" onclick="switchSeniorYear('msc-forensic-y1')">M.Sc Forensic Y1</button>
+          <button class="senior-year-btn" type="button" data-year="msc-forensic-y2" onclick="switchSeniorYear('msc-forensic-y2')">M.Sc Forensic Y2</button>
+          <button class="senior-year-btn" type="button" data-year="bsc-llb-y1" onclick="switchSeniorYear('bsc-llb-y1')">B.Sc LL.B Forensic Y1</button>
+          <button class="senior-year-btn" type="button" data-year="bsc-llb-y2" onclick="switchSeniorYear('bsc-llb-y2')">B.Sc LL.B Forensic Y2</button>
+          <button class="senior-year-btn" type="button" data-year="bsc-llb-y3" onclick="switchSeniorYear('bsc-llb-y3')">B.Sc LL.B Forensic Y3</button>
+          <button class="senior-year-btn" type="button" data-year="llm" onclick="switchSeniorYear('llm')">LLM</button>
         </div>
       </div>
 
@@ -978,7 +1000,7 @@
 
       <section class="dev-team-section" aria-labelledby="dev-team-title">
         <p class="dev-kicker">the team</p>
-        <h1 class="stage-title dev-title" id="dev-team-title">built by students, <span>for students</span></h1>
+        <h1 class="stage-title dev-title" id="dev-team-title">built by seniors of btech second year, <span>for students</span></h1>
         <p class="stage-subtitle">upsifs 2026 is maintained by students who wanted one clean place for resources, seniors, gallery, and community.</p>
 
         <div class="dev-team-layout">
@@ -1107,6 +1129,51 @@
         <button type="button" onclick="closeCourseDetail()">close ✕</button>
       </div>
       <div class="course-detail-body" id="course-detail-body"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ ACADEMIC CALENDAR MODAL ═══════════════ -->
+  <div class="modal-overlay" id="academic-calendar-modal">
+    <div class="modal academic-calendar-modal">
+      <div class="preview-modal-head">
+        <span id="calendar-modal-title">📅 ACADEMIC CALENDAR 2026 – 2027 (NFSU)</span>
+        <button type="button" onclick="closeAcademicCalendarModal()">close ✕</button>
+      </div>
+      <div class="academic-calendar-body">
+        <div class="calendar-modal-controls">
+          <div class="calendar-tab-pills">
+            <button type="button" class="calendar-tab-pill active" id="cal-pill-odd-1" onclick="setAcademicCalendarTab('odd-1')">
+              Odd Sem – Sem I
+            </button>
+            <button type="button" class="calendar-tab-pill" id="cal-pill-odd-multi" onclick="setAcademicCalendarTab('odd-multi')">
+              Odd Sem – Sem III / V / VII / IX
+            </button>
+            <button type="button" class="calendar-tab-pill" id="cal-pill-even" onclick="setAcademicCalendarTab('even')">
+              Even Sem – Sem II / IV / VI / VIII / X
+            </button>
+          </div>
+          <div class="calendar-search-wrap">
+            <input type="search" id="calendar-modal-search" placeholder="Search event (e.g. Exam, Diwali, Review)..." autocomplete="off">
+          </div>
+        </div>
+
+        <div class="calendar-modal-subhead" id="calendar-modal-subhead"></div>
+
+        <div class="calendar-table-scroll">
+          <table class="guide-table calendar-table">
+            <thead>
+              <tr>
+                <th style="width: 8%;">S.No</th>
+                <th style="width: 54%;">Particulars</th>
+                <th style="width: 38%;">Timeline</th>
+              </tr>
+            </thead>
+            <tbody id="calendar-modal-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="calendar-footnote" id="calendar-modal-footnote"></div>
+      </div>
     </div>
   </div>
 
