@@ -3094,6 +3094,96 @@ window.toggleInlineAcademicCalendar = toggleInlineAcademicCalendar;
 window.switchInlineCalendarTab = switchInlineCalendarTab;
 window.toggleEventsWidget = toggleEventsWidget;
 
+function toggleCampusHelperGuide() {
+  const bubble = document.getElementById('campus-helper-bubble');
+  bubble?.classList.toggle('expanded');
+}
+
+const siteMusicTracks = {
+  lofi: {
+    tempo: 820,
+    wave: 'sine',
+    notes: [261.63, 329.63, 392.0, 493.88, 392.0, 329.63]
+  },
+  rain: {
+    tempo: 1100,
+    wave: 'triangle',
+    notes: [220.0, 277.18, 329.63, 277.18, 246.94]
+  },
+  arcade: {
+    tempo: 560,
+    wave: 'square',
+    notes: [329.63, 392.0, 523.25, 659.25, 523.25, 392.0]
+  }
+};
+let siteMusicContext = null;
+let siteMusicGain = null;
+let siteMusicTimer = null;
+let siteMusicStep = 0;
+let activeSiteMusicTrack = 'lofi';
+
+function playSiteMusicNote() {
+  if (!siteMusicContext || !siteMusicGain) return;
+  const track = siteMusicTracks[activeSiteMusicTrack] || siteMusicTracks.lofi;
+  const note = track.notes[siteMusicStep % track.notes.length];
+  const osc = siteMusicContext.createOscillator();
+  const noteGain = siteMusicContext.createGain();
+  osc.type = track.wave;
+  osc.frequency.value = note;
+  noteGain.gain.setValueAtTime(0.0001, siteMusicContext.currentTime);
+  noteGain.gain.exponentialRampToValueAtTime(0.08, siteMusicContext.currentTime + 0.02);
+  noteGain.gain.exponentialRampToValueAtTime(0.0001, siteMusicContext.currentTime + 0.34);
+  osc.connect(noteGain);
+  noteGain.connect(siteMusicGain);
+  osc.start();
+  osc.stop(siteMusicContext.currentTime + 0.36);
+  siteMusicStep++;
+}
+
+function startSiteMusic() {
+  if (!siteMusicContext) {
+    siteMusicContext = new (window.AudioContext || window.webkitAudioContext)();
+    siteMusicGain = siteMusicContext.createGain();
+    siteMusicGain.gain.value = 0.22;
+    siteMusicGain.connect(siteMusicContext.destination);
+  }
+  siteMusicContext.resume?.();
+  window.clearInterval(siteMusicTimer);
+  playSiteMusicNote();
+  const track = siteMusicTracks[activeSiteMusicTrack] || siteMusicTracks.lofi;
+  siteMusicTimer = window.setInterval(playSiteMusicNote, track.tempo);
+  const btn = document.getElementById('music-toggle');
+  if (btn) {
+    btn.textContent = '♪ pause';
+    btn.setAttribute('aria-pressed', 'true');
+  }
+}
+
+function stopSiteMusic() {
+  window.clearInterval(siteMusicTimer);
+  siteMusicTimer = null;
+  const btn = document.getElementById('music-toggle');
+  if (btn) {
+    btn.textContent = '♪ play';
+    btn.setAttribute('aria-pressed', 'false');
+  }
+}
+
+function toggleSiteMusic() {
+  if (siteMusicTimer) stopSiteMusic();
+  else startSiteMusic();
+}
+
+function changeSiteMusicTrack(trackName) {
+  activeSiteMusicTrack = siteMusicTracks[trackName] ? trackName : 'lofi';
+  siteMusicStep = 0;
+  if (siteMusicTimer) startSiteMusic();
+}
+
+window.toggleCampusHelperGuide = toggleCampusHelperGuide;
+window.toggleSiteMusic = toggleSiteMusic;
+window.changeSiteMusicTrack = changeSiteMusicTrack;
+
 // Render events widget after all data (academicCalendarData) is ready
 document.addEventListener('DOMContentLoaded', renderEventsWidget);
 

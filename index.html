@@ -136,7 +136,7 @@
             </a>
           </li>
           <li>
-            <a href="https://forms.gle/WurEYQVuinQKqtBP9" target="_blank" rel="noopener noreferrer">
+            <a href="https://forms.gle/1evMkgELcSNHQzcr5" target="_blank" rel="noopener noreferrer">
               <span class="social-icon">📝</span>
               JUNIOR DETAILS FORM
             </a>
@@ -155,6 +155,41 @@
       <span class="blink">●</span> B.TECH-M.TECH CYBER SEC // UPSIFS 2026
     </div>
   </aside>
+
+  <!-- ═══ FLOATING HELPER + EVENTS + MUSIC ═══ -->
+  <div class="campus-helper-widget" aria-label="Campus helper">
+    <button class="campus-helper-bot" type="button" onclick="toggleCampusHelperGuide()" aria-label="Campus helper bot">
+      <span class="helper-plush" aria-hidden="true">
+        <span class="plush-head">
+          <span class="plush-face">
+            <span class="plush-eye plush-eye-left"></span>
+            <span class="plush-eye plush-eye-right"></span>
+            <span class="plush-beak"></span>
+          </span>
+        </span>
+        <span class="plush-body"></span>
+        <span class="plush-wing plush-wing-left"></span>
+        <span class="plush-wing plush-wing-right"></span>
+        <span class="plush-foot plush-foot-left"></span>
+        <span class="plush-foot plush-foot-right"></span>
+      </span>
+    </button>
+    <div class="campus-helper-bubble collapsed" id="campus-helper-bubble">
+      <span class="helper-mini-text">need help? tap me.</span>
+      <div class="helper-full-guide">
+        <strong>hey fresher, quick guide.</strong>
+        <p><b>guide</b> has routes, Wi-Fi, campus basics and the where-is-what map.</p>
+        <p><b>hostel</b> has mess timings, menu, laundry, printouts, eateries and daily needs.</p>
+        <p><b>resources</b> has notes, Drive folders, academic calendar and course map.</p>
+        <p><b>seniors</b> opens verified senior contacts first. Batchmates are below it.</p>
+        <div class="helper-form-links" aria-label="Useful forms">
+          <a href="https://forms.gle/WurEYQVuinQKqtBP9" target="_blank" rel="noopener noreferrer">contribute info</a>
+          <a href="https://forms.gle/1evMkgELcSNHQzcr5" target="_blank" rel="noopener noreferrer">junior profile</a>
+          <a href="https://forms.gle/dDi8wxwUQkHSnrKE8" target="_blank" rel="noopener noreferrer">senior profile</a>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ═══ FIXED EVENTS WIDGET (BOTTOM RIGHT) ═══ -->
   <div class="events-widget" id="events-widget" aria-label="Upcoming events">
@@ -230,7 +265,7 @@
             <button class="arcade-card-btn" id="home-gallery-btn" onclick="switchTab('gallery'); switchGalleryView('college');">
               college gallery
             </button>
-            <a href="https://forms.gle/WurEYQVuinQKqtBP9" target="_blank" rel="noopener noreferrer" class="arcade-card-btn highlight" id="home-community-btn">
+            <a href="https://forms.gle/1evMkgELcSNHQzcr5" target="_blank" rel="noopener noreferrer" class="arcade-card-btn highlight" id="home-community-btn">
               JUNIOR DETAIL SUBMISSION
             </a>
             <button class="arcade-card-btn" id="home-seniors-btn" onclick="switchTab('seniors')">
@@ -296,7 +331,7 @@
           <a class="mini-page-link" href="#resources" onclick="switchTab('resources')">Resources</a>
           <a class="mini-page-link" href="#seniors" onclick="switchTab('seniors')">Seniors</a>
           <a class="mini-page-link" href="#gallery" onclick="switchTab('gallery'); switchGalleryView('college');">Gallery</a>
-          <a class="mini-page-link" href="https://forms.gle/WurEYQVuinQKqtBP9" target="_blank" rel="noopener noreferrer">Details</a>
+          <a class="mini-page-link" href="https://forms.gle/WurEYQVuinQKqtBP9" target="_blank" rel="noopener noreferrer">Contribute</a>
         </div>
       </div>
 
@@ -524,6 +559,14 @@
           <p>Food, stay, daily essentials, and hostel-side updates for freshers.</p>
         </div>
         <div class="hostel-info-grid">
+          <div class="hostel-info-card">
+            <span>Mess Location</span>
+            <strong>Main Boys and Girls Hostel</strong>
+            <div class="hostel-distance-list">
+              <p><b>Main Boys Hostel</b> around 200-300m from Academic Block.</p>
+              <p><b>Main Girls Hostel</b> around 100m from Academic Block.</p>
+            </div>
+          </div>
           <div class="hostel-info-card mess-price-card">
             <span>Mess</span>
             <strong>Sunshine Hospitality</strong>
@@ -538,13 +581,32 @@
               </div>
             </div>
           </div>
-          <div class="hostel-info-card">
-            <span>Location</span>
-            <strong>Main Boys and Girls Hostel</strong>
-            <div class="hostel-distance-list">
-              <p><b>Main Boys Hostel</b> around 200-300m from Academic Block.</p>
-              <p><b>Main Girls Hostel</b> around 100m from Academic Block.</p>
-            </div>
+          <div class="guide-heading mess-heading">
+            <span class="guide-kicker">Hostel Food</span>
+            <h3 id="mess-menu-title">August Mess Menu</h3>
+            <button class="guide-action-btn mess-toggle-btn" type="button" id="mess-menu-toggle" aria-expanded="false" aria-controls="mess-menu-wrap">
+              Show Mess Menu
+            </button>
+          </div>
+          <div class="mess-timing-strip" aria-label="Mess timings">
+            <span><b>Breakfast</b> 8:00-9:30 AM</span>
+            <span><b>Lunch</b> 12:30-2:00 PM</span>
+            <span><b>Evening Snacks</b> 5:00-6:00 PM</span>
+            <span><b>Dinner</b> 8:00-9:30 PM</span>
+          </div>
+          <div class="guide-table-wrap mess-menu-wrap" id="mess-menu-wrap" hidden>
+            <table class="guide-table mess-table">
+              <thead>
+                <tr>
+                  <th>Day</th>
+                  <th>Breakfast</th>
+                  <th>Lunch</th>
+                  <th>Snacks</th>
+                  <th>Dinner</th>
+                </tr>
+              </thead>
+              <tbody id="mess-menu-body"></tbody>
+            </table>
           </div>
           <div class="hostel-info-card">
             <span>Boys Hostel Issues</span>
@@ -589,6 +651,8 @@
             <strong>Nearby Eateries & Food Spots</strong>
             <div class="hostel-contact-list">
               <p><b>Moradabadi Biryani Point:</b> <a href="https://maps.app.goo.gl/Zi1bmDBiPZ7DBZrj6" target="_blank" rel="noopener noreferrer">📍 Daroga Kheda</a><br><small>~1 km from campus · Quick & affordable biryani right nearby.</small></p>
+              <p><b>Singh's Sweets and Bakers:</b> <a href="https://maps.app.goo.gl/n7NSFV163BPzY3Ab8" target="_blank" rel="noopener noreferrer">📍 Gauri Bazar</a><br><small>Aloo tikki chaat is a must-try here, and the sweets are good too.</small></p>
+              <p><b>Foodie Pizza:</b> <a href="https://share.google/CtwZEezmcyhFhty6P" target="_blank" rel="noopener noreferrer">📍 Location</a><br><small>Nearby pizza option for quick cravings.</small></p>
               <p><b>Moniginis Bakery:</b> <a href="https://maps.app.goo.gl/RSVibXKueg7P2jCEA" target="_blank" rel="noopener noreferrer">📍 Sarojini Nagar</a><br><small>~4 km from campus · Famous for patties, cakes & bakery items.</small></p>
               <p><small>(Note: Nearby spots offer basic quick options; city eateries are further away.)</small></p>
             </div>
@@ -611,11 +675,10 @@
         <div class="lucknow-spots-grid">
           <div class="hostel-info-card">
             <span>🍢 Food Iconic</span>
-            <strong>Tunday Kababi</strong>
+            <strong>Tunday Kababi, Aminabad</strong>
             <div class="hostel-contact-list">
-              <p>The legendary galouti kabab joint of Lucknow. Must-try at least once.</p>
+              <p>The legendary Aminabad galouti kabab spot of Lucknow. Must-try at least once.</p>
               <p><a href="https://maps.app.goo.gl/uBgbHY6j6oKoY5bLA" target="_blank" rel="noopener noreferrer">📍 Aminabad (Original)</a> · <small>~14 km · 30–40 min</small></p>
-              <p><a href="https://maps.app.goo.gl/y4c9ywkz6eHRVuBw8" target="_blank" rel="noopener noreferrer">📍 LuLu Mall Outlet</a> · <small>~22 km · 40–50 min</small></p>
             </div>
           </div>
           <div class="hostel-info-card">
@@ -665,27 +728,6 @@
           </div>
         </div>
 
-        <div class="guide-heading mess-heading">
-          <span class="guide-kicker">Hostel Food</span>
-          <h3 id="mess-menu-title">August Mess Menu</h3>
-          <button class="guide-action-btn mess-toggle-btn" type="button" id="mess-menu-toggle" aria-expanded="false" aria-controls="mess-menu-wrap">
-            Show Mess Menu
-          </button>
-        </div>
-        <div class="guide-table-wrap mess-menu-wrap" id="mess-menu-wrap" hidden>
-          <table class="guide-table mess-table">
-            <thead>
-              <tr>
-                <th>Day</th>
-                <th>Breakfast</th>
-                <th>Lunch</th>
-                <th>Snacks</th>
-                <th>Dinner</th>
-              </tr>
-            </thead>
-            <tbody id="mess-menu-body"></tbody>
-          </table>
-        </div>
       </section>
     </div>
 
@@ -899,7 +941,7 @@
             ENROLLMENT NUMBER
             <input type="text" id="senior-access-code" inputmode="numeric" autocomplete="off" placeholder="ENTER ENROLLMENT NUMBER" required>
           </label>
-          <button type="submit" class="submit-btn">[UNLOCK SENIORS]</button>
+          <button type="submit" class="submit-btn">unlock seniors</button>
           <p class="senior-form-status" id="senior-lock-status" aria-live="polite"></p>
         </form>
       </section>
@@ -942,7 +984,7 @@
               ACCESS CODE
               <input type="text" id="junior-access-code" autocomplete="off" placeholder="ENTER ACCESS CODE" required>
             </label>
-            <button type="submit" class="submit-btn">[UNLOCK BATCHMATES]</button>
+            <button type="submit" class="submit-btn">unlock batchmates</button>
             <p class="senior-form-status" id="junior-lock-status" aria-live="polite"></p>
           </form>
         </section>
@@ -1202,7 +1244,7 @@
       <a href="https://www.reddit.com/r/upsifs/" target="_blank" class="footer-link">R/UPSIFS</a>
       <a href="#gallery" onclick="switchTab('gallery')" class="footer-link">GALLERY</a>
       <a href="#devs" onclick="switchTab('devs')" class="footer-link">DEVS</a>
-      <a href="https://forms.gle/WurEYQVuinQKqtBP9" target="_blank" rel="noopener noreferrer" class="footer-link">DETAILS FILLING FORM</a>
+      <a href="https://forms.gle/WurEYQVuinQKqtBP9" target="_blank" rel="noopener noreferrer" class="footer-link">CONTRIBUTE INFO</a>
     </div>
     <p class="footer-love">* created with love & zest by kartikey and anubhav <span>❤️</span> *</p>
     <div class="footer-right">
