@@ -138,7 +138,7 @@
           <li>
             <a href="https://forms.gle/1evMkgELcSNHQzcr5" target="_blank" rel="noopener noreferrer">
               <span class="social-icon">📝</span>
-              JUNIOR DETAILS FORM
+              JUNIOR PROFILE FORM
             </a>
           </li>
           <li>
@@ -266,7 +266,7 @@
               college gallery
             </button>
             <a href="https://forms.gle/1evMkgELcSNHQzcr5" target="_blank" rel="noopener noreferrer" class="arcade-card-btn highlight" id="home-community-btn">
-              JUNIOR DETAIL SUBMISSION
+              JUNIOR PROFILE SUBMISSION
             </a>
             <button class="arcade-card-btn" id="home-seniors-btn" onclick="switchTab('seniors')">
               connect with seniors
@@ -417,7 +417,7 @@
       <section class="guide-panel wifi-panel" aria-labelledby="wifi-title">
         <div class="guide-heading">
           <span class="guide-kicker">Campus Access</span>
-          <h2 id="wifi-title">Wi-Fi Details</h2>
+          <h2 id="wifi-title">Wi-Fi Access</h2>
           <p>Enter enrollment number or access code to view campus Wi-Fi passwords.</p>
         </div>
         <form class="wifi-access-form" id="wifi-access-form">
@@ -432,12 +432,12 @@
           <div class="wifi-card">
             <span>Academic Block</span>
             <strong>UPSIFS_Wi-Fi</strong>
-            <code data-wifi-password="forensic@24">••••••••••</code>
+            <code data-wifi-password-key="academic">••••••••••</code>
           </div>
           <div class="wifi-card">
             <span>Hostel</span>
             <strong>UPSIFS_HOSTEL</strong>
-            <code data-wifi-password="Hostel@2022">••••••••••</code>
+            <code data-wifi-password-key="hostel">••••••••••</code>
           </div>
         </div>
       </section>
@@ -457,18 +457,18 @@
         <div class="guide-heading">
           <span class="guide-kicker">Program Map</span>
           <h2 id="courses-title">Cyber Security Track</h2>
-          <p>B.Tech - M.Tech Computer Science & Engineering (Cyber Security), 5 years integrated course.</p>
+          <p>A practical map for the B.Tech - M.Tech Cyber Security journey: coding, systems, networks, security, and digital forensics.</p>
         </div>
 
         <div class="cyber-track-hero" aria-label="Cyber security track overview">
           <div class="cyber-track-copy">
             <span class="cyber-pill">Freshers Path</span>
             <h3>Start with fundamentals, then build toward labs, networks, and real investigations.</h3>
-            <p>Use this section as a semester-wise map for what to learn, what to practice, and which cyber subjects are coming next.</p>
+            <p>Think of it like a senior's roadmap: first get comfortable with code and Linux, then move into networks, logs, web security, crypto, and evidence handling.</p>
           </div>
           <div class="cyber-terminal-card" aria-label="Cyber command prompt">
             <span>upsifs@cyber:~$</span>
-            <code>learn --daily --ethical --hands-on</code>
+            <code>practice --daily --legal --hands-on</code>
           </div>
         </div>
 
@@ -476,22 +476,22 @@
           <article class="cyber-lane-card">
             <span>01</span>
             <strong>Programming Base</strong>
-            <p>C/C++, Python, DSA, DBMS, and OS give you the language to understand tools instead of only clicking them.</p>
+            <p>C/C++, Python, DSA, DBMS, and OS help you understand tools instead of only clicking buttons.</p>
           </article>
           <article class="cyber-lane-card">
             <span>02</span>
             <strong>Systems & Networks</strong>
-            <p>Computer organization, networking, Linux basics, packet flow, and logs become your daily investigation kit.</p>
+            <p>Linux basics, computer organization, packet flow, ports, services, and logs become your daily investigation kit.</p>
           </article>
           <article class="cyber-lane-card">
             <span>03</span>
             <strong>Security Core</strong>
-            <p>Essentials of Cyber Security, Cryptography, Network Security, and Application Security shape the main track.</p>
+            <p>Cyber security basics, cryptography, network security, application security, and cloud concepts shape the main track.</p>
           </article>
           <article class="cyber-lane-card">
             <span>04</span>
             <strong>Forensic Context</strong>
-            <p>Digital evidence, cyber law, and forensic science connect technical skill with admissible, responsible practice.</p>
+            <p>Digital evidence, cyber law, chain of custody, and forensic science connect technical skill with responsible practice.</p>
           </article>
         </div>
 
@@ -499,8 +499,8 @@
           <span>First year focus</span>
           <ul>
             <li>Practice one programming problem daily.</li>
-            <li>Learn Linux terminal basics and file permissions.</li>
-            <li>Build notes for networking terms as you encounter them.</li>
+            <li>Learn Linux terminal basics, users, paths, and file permissions.</li>
+            <li>Make a tiny networking notebook: IP, DNS, ports, HTTP, TCP/UDP, logs.</li>
             <li>Keep all cyber practice ethical, legal, and permission-based.</li>
           </ul>
         </div>
@@ -619,8 +619,8 @@
           </div>
           <div class="hostel-info-card">
             <span>Girls Hostel</span>
-            <strong>Contact Details</strong>
-            <p>Details will be updated soon.</p>
+            <strong>Hostel Update</strong>
+            <p>Girls hostel contacts will be updated soon.</p>
           </div>
           <div class="hostel-info-card">
             <span>Laundry & Services</span>
@@ -837,7 +837,7 @@
         </div>
         <button type="button" class="feedback-card" onclick="openSeniorForm()">
           <span class="feedback-card-title">ADD / UPDATE PROFILE</span>
-          <span class="feedback-card-copy">Students can submit fresh details or update an existing card.</span>
+          <span class="feedback-card-copy">Students can submit fresh info or update an existing card.</span>
           <span class="feedback-card-btn">OPEN FORM ↗</span>
         </button>
       </section>
@@ -1186,7 +1186,7 @@
   <div class="modal-overlay" id="course-detail-modal">
     <div class="modal course-detail-modal">
       <div class="preview-modal-head">
-        <span id="course-detail-title">course details</span>
+        <span id="course-detail-title">course guide</span>
         <button type="button" onclick="closeCourseDetail()">close ✕</button>
       </div>
       <div class="course-detail-body" id="course-detail-body"></div>
@@ -1289,7 +1289,7 @@
       UPSIFS ARCHIVES · INITIALIZING
       <div class="holo-hud-sub">Drag to rotate & scroll · Click a photo to view</div>
     </div>
-    <div id="holo-hint">SCROLL / DRAG VERTICALLY TO NAVIGATE · CLICK CARD TO VIEW DETAILED PROFILE</div>
+    <div id="holo-hint">SCROLL / DRAG VERTICALLY TO NAVIGATE · CLICK CARD TO VIEW PROFILE</div>
     <div id="holo-controls">
       <button class="holo-ctrl-btn" id="holo-close-btn" onclick="closeHologramFullscreen()">✕ EXIT</button>
       <button class="holo-ctrl-btn" id="holo-upload-btn" onclick="openUploadModal()">+ ADD PHOTO</button>

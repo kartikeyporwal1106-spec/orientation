@@ -142,60 +142,15 @@ let activeSeniorYear = 'btech-mtech-y1';
 let activeSeniorDisplayBoard = 'B.Tech-M.Tech Sem I';
 let activeSeniorQuickFilter = '';
 const SENIOR_ACCESS_KEY = 'upsifs_senior_access_code';
-const JUNIOR_ACCESS_KEY = 'upsifs_junior_access_code';
-const WIFI_ACCESS_KEY = 'upsifs_wifi_access_granted';
+const JUNIOR_ACCESS_KEY = 'upsifs_junior_access_granted';
+const WIFI_ACCESS_KEY = 'upsifs_wifi_access_payload';
+const ACCESS_VERIFY_ENDPOINT = '/api/access/verify';
 const SENIOR_FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzd55ExHTpaKooyEFivmZEQ38sAMfAahtCviZgUK4HYV-01-Nn8CS08P1omWKx3CdaPoQ/exec';
 const RESOURCE_FEED_ENDPOINT = '/api/resources/list';
 const ARCADE_THEME_KEY = 'upsifs_arcade_theme';
 const JUNIOR_FEEDBACK_KEY = 'upsifs_junior_feedback_notes';
-const JUNIOR_PROFILES = [
-  {
-    name: 'Aryan Tiwari',
-    course: 'B.Tech-M.Tech Sem I',
-    accessCode: '492008',
-    place: 'Kanpur',
-    interests: 'Cricket, politics',
-    topics: 'Important skills',
-    tagline: '.',
-    feedback: 'Photos of playground and courts',
-    whatsapp: '8869935689',
-    instagram: 't.aryan4'
-  },
-  {
-    name: 'Dhruv Saxena',
-    course: 'B.Tech-M.Tech Sem I',
-    accessCode: 'Dhruv07',
-    place: 'Prayagraj',
-    interests: 'Quantum computing, research, drone & robotics technology',
-    topics: 'How to join the drone and robotics lab',
-    tagline: 'Playing football and coder',
-    feedback: 'Everything is best',
-    whatsapp: '6386246598',
-    instagram: 'No',
-    photo: 'assets/juniors/dhruv-saxena.png'
-  },
-  {
-    name: 'Sanskar Yadav',
-    course: 'B.Tech-M.Tech Sem I',
-    accessCode: '241280',
-    place: 'Lalitpur, UP',
-    interests: 'Video editing, graphic designing, robotics, travelling, badminton',
-    topics: 'Startup, innovation, creativity',
-    tagline: 'I think I’m quite stubborn with problems',
-    feedback: 'Just Include my profile. Website is damn good btw...',
-    whatsapp: '9935675543',
-    instagram: "I don't use Currently.",
-    photo: 'assets/juniors/sanskar-yadav.png'
-  }
-].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
-
-const DEFAULT_JUNIOR_FEEDBACK_NOTES = JUNIOR_PROFILES
-  .filter(profile => profile.feedback)
-  .map(profile => ({
-    name: profile.name,
-    message: profile.feedback,
-    createdAt: '2026-08-05T00:00:00.000Z'
-  }));
+let juniorProfilesCache = [];
+let defaultJuniorFeedbackNotes = [];
 
 const arcadeThemes = {
   classic: {
@@ -500,7 +455,7 @@ const homeCopyByTheme = {
     subtitle: 'CLASS OF 2026 · PLAYER 1 READY?',
     resources: 'academic resources',
     gallery: 'college gallery',
-    community: 'JUNIOR DETAIL SUBMISSION',
+    community: 'JUNIOR PROFILE SUBMISSION',
     seniors: 'connect with seniors',
     profile: 'connect with batchmates',
     feedback: 'FEEDBACK ↗'
@@ -510,7 +465,7 @@ const homeCopyByTheme = {
     subtitle: 'Resources, gallery, seniors, and community in one student-built hub',
     resources: 'academic resources →',
     gallery: 'college gallery →',
-    community: 'Junior Detail Submission',
+    community: 'Junior Profile Submission',
     seniors: 'connect with seniors →',
     profile: 'connect with batchmates →',
     feedback: 'Feedback →'
@@ -1215,73 +1170,35 @@ function createJuniorProfileCard(profile) {
   return article;
 }
 
-function renderJuniorProfiles() {
+function renderJuniorProfiles(profiles = juniorProfilesCache) {
   const grid = document.getElementById('junior-profile-grid');
   if (!grid) return;
-  grid.replaceChildren(...JUNIOR_PROFILES.map(createJuniorProfileCard));
+  juniorProfilesCache = Array.isArray(profiles) ? profiles : [];
+  grid.replaceChildren(...juniorProfilesCache.map(createJuniorProfileCard));
 }
 
-function normalizeAccessCode(code) {
-  return (code || '').trim().toLowerCase();
-}
-
-function getJuniorAccessCode() {
-  try {
-    return sessionStorage.getItem(JUNIOR_ACCESS_KEY) || '';
-  } catch {
-    return '';
-  }
-}
-
-function saveJuniorAccessCode(code) {
-  try {
-    if (code) {
-      sessionStorage.setItem(JUNIOR_ACCESS_KEY, code);
-    } else {
-      sessionStorage.removeItem(JUNIOR_ACCESS_KEY);
-    }
-  } catch {
-    // Ignore private-browsing storage failures.
-  }
-}
-
-function isValidJuniorAccessCode(code) {
-  const normalizedCode = normalizeAccessCode(code);
-  if (!normalizedCode) return false;
-  return JUNIOR_PROFILES.some(profile => normalizeAccessCode(profile.accessCode) === normalizedCode);
-}
-
-function isValidWifiAccessCode(code) {
-  const normalizedCode = normalizeAccessCode(code);
-  if (!normalizedCode) return false;
-  const isEnrollmentNumber = /^\d{6,}$/.test(normalizedCode);
-  return isEnrollmentNumber || normalizedCode === 'upsifs2026' || isValidJuniorAccessCode(code);
-}
-
-function setWifiAccessUnlocked(isUnlocked, message = '') {
-  const grid = document.getElementById('wifi-card-grid');
-  const status = document.getElementById('wifi-access-status');
-  const form = document.getElementById('wifi-access-form');
-  grid?.classList.toggle('locked', !isUnlocked);
-  form?.classList.toggle('unlocked', isUnlocked);
-  document.querySelectorAll('[data-wifi-password]').forEach(item => {
-    item.textContent = isUnlocked ? item.dataset.wifiPassword : '••••••••••';
+async function verifyAccess(kind, code) {
+  const response = await fetch(ACCESS_VERIFY_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ kind, code })
   });
-  if (status) status.textContent = message;
+  if (!response.ok) throw new Error('Access verification failed');
+  return response.json();
 }
 
-function getWifiAccessGranted() {
+function readWifiPayload() {
   try {
-    return sessionStorage.getItem(WIFI_ACCESS_KEY) === '1';
+    return JSON.parse(sessionStorage.getItem(WIFI_ACCESS_KEY) || 'null');
   } catch {
-    return false;
+    return null;
   }
 }
 
-function saveWifiAccessGranted(isGranted) {
+function saveWifiPayload(payload) {
   try {
-    if (isGranted) {
-      sessionStorage.setItem(WIFI_ACCESS_KEY, '1');
+    if (payload?.passwords) {
+      sessionStorage.setItem(WIFI_ACCESS_KEY, JSON.stringify(payload));
     } else {
       sessionStorage.removeItem(WIFI_ACCESS_KEY);
     }
@@ -1290,19 +1207,40 @@ function saveWifiAccessGranted(isGranted) {
   }
 }
 
-function unlockWifiPasswords(event) {
+function setWifiAccessUnlocked(isUnlocked, message = '', passwords = {}) {
+  const grid = document.getElementById('wifi-card-grid');
+  const status = document.getElementById('wifi-access-status');
+  const form = document.getElementById('wifi-access-form');
+  grid?.classList.toggle('locked', !isUnlocked);
+  form?.classList.toggle('unlocked', isUnlocked);
+  document.querySelectorAll('[data-wifi-password-key]').forEach(item => {
+    const key = item.dataset.wifiPasswordKey;
+    item.textContent = isUnlocked && passwords?.[key] ? passwords[key] : '••••••••••';
+  });
+  if (status) status.textContent = message;
+}
+
+function getWifiAccessGranted() {
+  return Boolean(readWifiPayload()?.passwords);
+}
+
+async function unlockWifiPasswords(event) {
   event.preventDefault();
   const input = document.getElementById('wifi-access-code');
   const code = (input?.value || '').trim();
   if (!code) return;
-  if (isValidWifiAccessCode(code)) {
-    saveWifiAccessGranted(true);
-    setWifiAccessUnlocked(true, 'Access granted. Wi-Fi details unlocked.');
+  setWifiAccessUnlocked(false, 'Checking access...');
+  try {
+    const result = await verifyAccess('wifi', code);
+    if (!result?.ok || !result.passwords) throw new Error('Access denied');
+    saveWifiPayload(result);
+    setWifiAccessUnlocked(true, 'Access granted. Wi-Fi access unlocked.', result.passwords);
     input.value = '';
     return;
+  } catch (error) {
+    saveWifiPayload(null);
+    setWifiAccessUnlocked(false, 'Enrollment number or access code not found.');
   }
-  saveWifiAccessGranted(false);
-  setWifiAccessUnlocked(false, 'Enrollment number or access code not found.');
 }
 
 function setJuniorAreaLocked(isLocked, message = '') {
@@ -1312,8 +1250,10 @@ function setJuniorAreaLocked(isLocked, message = '') {
   if (status) status.textContent = message;
 }
 
-function unlockJuniorProfiles(message = 'Access granted. Batchmate board loaded.') {
-  renderJuniorProfiles();
+function unlockJuniorProfiles(profiles = juniorProfilesCache, message = 'Access granted. Batchmate board loaded.', feedback = []) {
+  if (Array.isArray(feedback)) defaultJuniorFeedbackNotes = feedback;
+  renderJuniorProfiles(profiles);
+  renderJuniorFeedbackWall();
   setJuniorAreaLocked(false, message);
 }
 
@@ -1323,35 +1263,57 @@ async function unlockJuniorBoard(event) {
   const code = (input?.value || '').trim();
   if (!code) return;
 
-  if (isValidJuniorAccessCode(code)) {
-    saveJuniorAccessCode(code);
-    unlockJuniorProfiles('Access granted. Batchmate board loaded.');
-    return;
+  setJuniorAreaLocked(true, 'Checking access...');
+  try {
+    const result = await verifyAccess('junior', code);
+    if (result?.ok) {
+      unlockJuniorProfiles(result.profiles || [], 'Access granted. Batchmate board loaded.', result.feedback || []);
+      input.value = '';
+      return;
+    }
+  } catch {
+    // Fall through to senior enrollment check.
   }
 
-  saveSeniorAccessCode(code);
-  saveJuniorAccessCode('');
-  setJuniorAreaLocked(true, 'Checking senior enrollment...');
-  const seniorUnlocked = await loadApprovedSeniorProfiles();
+  if (/^\d{6,}$/.test(code)) {
+    saveSeniorAccessCode(code);
+    setJuniorAreaLocked(true, 'Checking senior enrollment...');
+    const seniorUnlocked = await loadApprovedSeniorProfiles();
 
-  if (seniorUnlocked) {
-    unlockJuniorProfiles('Senior enrollment verified. Batchmate board loaded.');
+    if (seniorUnlocked) {
+      try {
+        const result = await verifyAccess('junior', code);
+        if (result?.ok) {
+          unlockJuniorProfiles(result.profiles || [], 'Senior enrollment verified. Batchmate board loaded.', result.feedback || []);
+          return;
+        }
+      } catch {
+        // Keep junior profiles locked if backend does not authorize this enrollment.
+      }
+      return;
+    }
   } else {
-    setJuniorAreaLocked(true, 'Access code or senior enrollment not found.');
+    saveSeniorAccessCode('');
   }
+
+  setJuniorAreaLocked(true, 'Access code or senior enrollment not found.');
 }
 
 function openJuniorProfiles() {
   switchTab('seniors');
   window.setTimeout(() => {
-    const savedCode = getJuniorAccessCode();
-    if (isValidJuniorAccessCode(savedCode) || getSeniorAccessCode()) {
-      unlockJuniorProfiles('');
-    } else {
-      setJuniorAreaLocked(true);
-    }
+    setJuniorAreaLocked(true);
     document.getElementById('junior-profile-board')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 80);
+}
+
+async function restoreWifiAccess() {
+  const payload = readWifiPayload();
+  if (payload?.passwords) {
+    setWifiAccessUnlocked(true, 'Access granted. Wi-Fi access unlocked.', payload.passwords);
+    return;
+  }
+  setWifiAccessUnlocked(false, '');
 }
 
 window.unlockJuniorBoard = unlockJuniorBoard;
@@ -1526,7 +1488,6 @@ async function loadApprovedSeniorProfiles() {
 
     sortSeniorCardsAlphabetically();
     updateSeniorFilters();
-    unlockJuniorProfiles('');
     return true;
   } catch (error) {
     saveSeniorAccessCode('');
@@ -1640,7 +1601,7 @@ function getJuniorFeedbackNotes() {
     saved = [];
   }
   const seen = new Set();
-  return [...saved, ...DEFAULT_JUNIOR_FEEDBACK_NOTES].filter(note => {
+  return [...saved, ...defaultJuniorFeedbackNotes].filter(note => {
     const key = `${normalizeSearchText(note.name)}::${normalizeSearchText(note.message)}`;
     if (seen.has(key)) return false;
     seen.add(key);
@@ -2149,7 +2110,7 @@ function initHologramEngine() {
     holoRenderer.setSize(w, h);
   });
 
-  updateHoloHud('UPSIFS ARCHIVES · ONLINE', 'Drag to rotate & scroll · Click a profile to view details');
+  updateHoloHud('UPSIFS ARCHIVES · ONLINE', 'Drag to rotate & scroll · Click a profile to view');
 
   // 6. Helix Loop
   function holoLoop() {
@@ -2841,16 +2802,11 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('senior-lock-form')?.addEventListener('submit', unlockSeniorBoard);
   document.getElementById('senior-search')?.addEventListener('input', updateSeniorFilters);
   document.getElementById('wifi-access-form')?.addEventListener('submit', unlockWifiPasswords);
-  setWifiAccessUnlocked(getWifiAccessGranted(), getWifiAccessGranted() ? 'Access granted. Wi-Fi details unlocked.' : '');
+  restoreWifiAccess();
   document.getElementById('junior-lock-form')?.addEventListener('submit', unlockJuniorBoard);
   document.getElementById('junior-feedback-form')?.addEventListener('submit', submitJuniorFeedback);
-  if (isValidJuniorAccessCode(getJuniorAccessCode())) {
-    renderJuniorProfiles();
-    setJuniorAreaLocked(false);
-  } else {
-    saveJuniorAccessCode('');
-    setJuniorAreaLocked(true);
-  }
+  renderJuniorProfiles([]);
+  setJuniorAreaLocked(true);
   document.getElementById('resource-preview-modal')?.addEventListener('click', (event) => {
     if (event.target.id === 'resource-preview-modal') closeResourcePreview();
   });

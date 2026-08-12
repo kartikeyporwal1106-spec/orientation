@@ -1,4 +1,4 @@
-const { getFileMeta, streamFile } = require('../../../lib/google-drive-service');
+const { assertDriveItemInRoot, getFileMeta, streamFile } = require('../../../lib/google-drive-service');
 
 function isSafeDriveId(value) {
   return /^[\w-]+$/.test(String(value || ''));
@@ -23,6 +23,7 @@ module.exports = async function handler(req, res) {
   if (!isSafeDriveId(fileId)) return res.status(400).json({ error: 'Invalid file id.' });
 
   try {
+    await assertDriveItemInRoot(fileId);
     const meta = await getFileMeta(fileId);
     if (!canPreview(meta.mimeType)) return res.status(415).json({ error: 'Preview is not available for this file type.' });
     const driveResponse = await streamFile(fileId);
