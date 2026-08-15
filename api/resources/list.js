@@ -19,9 +19,27 @@ module.exports = async function handler(req, res) {
     return res.status(200).json(data);
   } catch (error) {
     console.error('Drive resource listing failed:', error);
-    return res.status(500).json({
-      error: 'Could not load Drive resources.',
-      detail: process.env.NODE_ENV === 'production' ? undefined : error.message
+    return res.status(200).json({
+      folderId,
+      folderName: 'Academic Resources',
+      rootFolderId: DRIVE_ROOT_FOLDER_ID,
+      fallback: true,
+      warning: process.env.NODE_ENV === 'production' ? undefined : error.message,
+      items: [{
+        id: 'drive-folder-fallback',
+        parentId: '',
+        name: 'Open academic resources folder',
+        mimeType: 'text/uri-list',
+        type: 'file',
+        extension: 'link',
+        size: null,
+        modifiedTime: '',
+        webViewLink: `https://drive.google.com/drive/folders/${encodeURIComponent(DRIVE_ROOT_FOLDER_ID)}`,
+        externalUrl: `https://drive.google.com/drive/folders/${encodeURIComponent(DRIVE_ROOT_FOLDER_ID)}`,
+        previewable: false,
+        previewUrl: '',
+        downloadUrl: ''
+      }]
     });
   }
 };

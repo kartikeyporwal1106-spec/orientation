@@ -940,6 +940,8 @@ function renderResourceCard(item) {
   const card = document.createElement('article');
   card.className = 'resource-file-card';
   const typeLabel = resourceIcon(item);
+  const actionHref = item.externalUrl || item.downloadUrl || '#';
+  const actionLabel = item.externalUrl ? 'open' : 'download';
 
   card.innerHTML = `
     <div class="resource-file-main">
@@ -948,7 +950,7 @@ function renderResourceCard(item) {
     </div>
     <div class="resource-actions">
       <button class="resource-action view" type="button" ${item.previewable ? '' : 'disabled'}>preview</button>
-      <a class="resource-action download" href="${item.downloadUrl}">download</a>
+      <a class="resource-action download" href="${escapeResourceText(actionHref)}" ${item.externalUrl ? 'target="_blank" rel="noopener noreferrer"' : ''}>${actionLabel}</a>
     </div>
   `;
   card.querySelector('.resource-action.view')?.addEventListener('click', () => {
@@ -1011,6 +1013,7 @@ async function loadResourceFolder(folderId = resourceState.folderId) {
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Could not load Drive resources.');
     resourceState.items = Array.isArray(data.items) ? data.items : [];
+    resourceState.error = '';
   } catch (error) {
     console.warn('Live Drive resource sync failed.', error);
     resourceState.items = [];
