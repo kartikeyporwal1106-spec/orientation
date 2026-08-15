@@ -1,9 +1,5 @@
 const { exchangeCodeForTokens } = require('../../lib/google-drive-service');
 
-function isOAuthSetupAllowed() {
-  return process.env.ALLOW_GOOGLE_OAUTH_SETUP === 'true' || process.env.NODE_ENV !== 'production';
-}
-
 function escapeHtml(value) {
   return String(value || '').replace(/[&<>"']/g, char => ({
     '&': '&amp;',
@@ -18,10 +14,6 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'GET') {
     res.setHeader('allow', 'GET');
     return res.status(405).send('Method not allowed');
-  }
-
-  if (!isOAuthSetupAllowed()) {
-    return res.status(404).send('Not found');
   }
 
   const code = req.query.code;

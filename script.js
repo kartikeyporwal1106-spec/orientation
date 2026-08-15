@@ -149,8 +149,51 @@ const SENIOR_FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzd55ExHTp
 const RESOURCE_FEED_ENDPOINT = '/api/resources/list';
 const ARCADE_THEME_KEY = 'upsifs_arcade_theme';
 const JUNIOR_FEEDBACK_KEY = 'upsifs_junior_feedback_notes';
-let juniorProfilesCache = [];
-let defaultJuniorFeedbackNotes = [];
+const JUNIOR_PROFILES = [
+  {
+    name: 'Aryan Tiwari',
+    course: 'B.Tech-M.Tech Sem I',
+    place: 'Kanpur',
+    interests: 'Cricket, politics',
+    topics: 'Important skills',
+    tagline: '.',
+    feedback: 'Photos of playground and courts',
+    whatsapp: '8869935689',
+    instagram: 't.aryan4'
+  },
+  {
+    name: 'Dhruv Saxena',
+    course: 'B.Tech-M.Tech Sem I',
+    place: 'Prayagraj',
+    interests: 'Quantum computing, research, drone & robotics technology',
+    topics: 'How to join the drone and robotics lab',
+    tagline: 'Playing football and coder',
+    feedback: 'Everything is best',
+    whatsapp: '6386246598',
+    instagram: 'No',
+    photo: 'assets/juniors/dhruv-saxena.png'
+  },
+  {
+    name: 'Sanskar Yadav',
+    course: 'B.Tech-M.Tech Sem I',
+    place: 'Lalitpur, UP',
+    interests: 'Video editing, graphic designing, robotics, travelling, badminton',
+    topics: 'Startup, innovation, creativity',
+    tagline: 'I think I’m quite stubborn with problems',
+    feedback: 'Just Include my profile. Website is damn good btw...',
+    whatsapp: '9935675543',
+    instagram: "I don't use Currently.",
+    photo: 'assets/juniors/sanskar-yadav.png'
+  }
+].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+
+const DEFAULT_JUNIOR_FEEDBACK_NOTES = JUNIOR_PROFILES
+  .filter(profile => profile.feedback)
+  .map(profile => ({
+    name: profile.name,
+    message: profile.feedback,
+    createdAt: '2026-08-05T00:00:00.000Z'
+  }));
 
 const arcadeThemes = {
   classic: {
@@ -1170,11 +1213,30 @@ function createJuniorProfileCard(profile) {
   return article;
 }
 
-function renderJuniorProfiles(profiles = juniorProfilesCache) {
+function renderJuniorProfiles() {
   const grid = document.getElementById('junior-profile-grid');
   if (!grid) return;
-  juniorProfilesCache = Array.isArray(profiles) ? profiles : [];
-  grid.replaceChildren(...juniorProfilesCache.map(createJuniorProfileCard));
+  grid.replaceChildren(...JUNIOR_PROFILES.map(createJuniorProfileCard));
+}
+
+function getJuniorAccessGranted() {
+  try {
+    return sessionStorage.getItem(JUNIOR_ACCESS_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function saveJuniorAccessGranted(isGranted) {
+  try {
+    if (isGranted) {
+      sessionStorage.setItem(JUNIOR_ACCESS_KEY, '1');
+    } else {
+      sessionStorage.removeItem(JUNIOR_ACCESS_KEY);
+    }
+  } catch {
+    // Ignore private-browsing storage failures.
+  }
 }
 
 async function verifyAccess(kind, code) {
@@ -1250,10 +1312,8 @@ function setJuniorAreaLocked(isLocked, message = '') {
   if (status) status.textContent = message;
 }
 
-function unlockJuniorProfiles(profiles = juniorProfilesCache, message = 'Access granted. Batchmate board loaded.', feedback = []) {
-  if (Array.isArray(feedback)) defaultJuniorFeedbackNotes = feedback;
-  renderJuniorProfiles(profiles);
-  renderJuniorFeedbackWall();
+function unlockJuniorProfiles(message = 'Access granted. Batchmate board loaded.') {
+  renderJuniorProfiles();
   setJuniorAreaLocked(false, message);
 }
 
@@ -1267,7 +1327,8 @@ async function unlockJuniorBoard(event) {
   try {
     const result = await verifyAccess('junior', code);
     if (result?.ok) {
-      unlockJuniorProfiles(result.profiles || [], 'Access granted. Batchmate board loaded.', result.feedback || []);
+      saveJuniorAccessGranted(true);
+      unlockJuniorProfiles('Access granted. Batchmate board loaded.');
       input.value = '';
       return;
     }
@@ -1277,23 +1338,17 @@ async function unlockJuniorBoard(event) {
 
   if (/^\d{6,}$/.test(code)) {
     saveSeniorAccessCode(code);
+    saveJuniorAccessGranted(false);
     setJuniorAreaLocked(true, 'Checking senior enrollment...');
     const seniorUnlocked = await loadApprovedSeniorProfiles();
 
     if (seniorUnlocked) {
-      try {
-        const result = await verifyAccess('junior', code);
-        if (result?.ok) {
-          unlockJuniorProfiles(result.profiles || [], 'Senior enrollment verified. Batchmate board loaded.', result.feedback || []);
-          return;
-        }
-      } catch {
-        // Keep junior profiles locked if backend does not authorize this enrollment.
-      }
+      unlockJuniorProfiles('Senior enrollment verified. Batchmate board loaded.');
       return;
     }
   } else {
     saveSeniorAccessCode('');
+    saveJuniorAccessGranted(false);
   }
 
   setJuniorAreaLocked(true, 'Access code or senior enrollment not found.');
@@ -1302,7 +1357,11 @@ async function unlockJuniorBoard(event) {
 function openJuniorProfiles() {
   switchTab('seniors');
   window.setTimeout(() => {
-    setJuniorAreaLocked(true);
+    if (getJuniorAccessGranted() || getSeniorAccessCode()) {
+      unlockJuniorProfiles('');
+    } else {
+      setJuniorAreaLocked(true);
+    }
     document.getElementById('junior-profile-board')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 80);
 }
@@ -1488,6 +1547,7 @@ async function loadApprovedSeniorProfiles() {
 
     sortSeniorCardsAlphabetically();
     updateSeniorFilters();
+    unlockJuniorProfiles('');
     return true;
   } catch (error) {
     saveSeniorAccessCode('');
@@ -1601,7 +1661,7 @@ function getJuniorFeedbackNotes() {
     saved = [];
   }
   const seen = new Set();
-  return [...saved, ...defaultJuniorFeedbackNotes].filter(note => {
+  return [...saved, ...DEFAULT_JUNIOR_FEEDBACK_NOTES].filter(note => {
     const key = `${normalizeSearchText(note.name)}::${normalizeSearchText(note.message)}`;
     if (seen.has(key)) return false;
     seen.add(key);
@@ -2805,8 +2865,13 @@ window.addEventListener('DOMContentLoaded', () => {
   restoreWifiAccess();
   document.getElementById('junior-lock-form')?.addEventListener('submit', unlockJuniorBoard);
   document.getElementById('junior-feedback-form')?.addEventListener('submit', submitJuniorFeedback);
-  renderJuniorProfiles([]);
-  setJuniorAreaLocked(true);
+  if (getJuniorAccessGranted()) {
+    renderJuniorProfiles();
+    setJuniorAreaLocked(false);
+  } else {
+    saveJuniorAccessGranted(false);
+    setJuniorAreaLocked(true);
+  }
   document.getElementById('resource-preview-modal')?.addEventListener('click', (event) => {
     if (event.target.id === 'resource-preview-modal') closeResourcePreview();
   });
